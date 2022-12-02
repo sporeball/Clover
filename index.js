@@ -8,5 +8,17 @@ export default function parse(code) {
     input = '';
   }
   console.log(input);
-  console.log(code);
+
+  let focus = input;
+
+  code = code.split('\n')
+    .map(line => line.replace(/;.*/gm, '').trim());
+
+  for (const line of code) {
+    if (line.length === 0) {
+      continue;
+    }
+    const tokens = line.split(/ +/);
+    console.log(tokens);
+  }
 }
