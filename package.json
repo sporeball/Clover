@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/sporeball/clover/issues"
   },
-  "homepage": "https://github.com/sporeball/clover#readme"
+  "homepage": "https://github.com/sporeball/clover#readme",
+  "dependencies": {
+    "picocolors": "^1.0.0"
+  }
 }
