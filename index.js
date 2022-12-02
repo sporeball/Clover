@@ -1,6 +1,8 @@
+import * as Command from './commands.js';
+
 import fs from 'fs';
 
-export default function parse(code) {
+export default function parse (code) {
   let input;
   try {
     input = fs.readFileSync('input.txt', { encoding: 'utf-8' });
@@ -9,7 +11,7 @@ export default function parse(code) {
   }
   console.log(input);
 
-  let focus = input;
+  global.focus = input;
 
   code = code.split('\n')
     .map(line => line.replace(/;.*/gm, '').trim());
@@ -19,6 +21,8 @@ export default function parse(code) {
       continue;
     }
     const tokens = line.split(/ +/);
-    console.log(tokens);
+    Command.evaluate(tokens);
   }
+
+  console.log(focus);
 }
