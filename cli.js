@@ -6,11 +6,18 @@ import colors from 'picocolors';
 
 function cli () {
   let code;
+  let filename = process.argv[2];
+  // implicit filetype
+  if (!filename.endsWith('.clo')) {
+    filename += '.clo';
+  }
+  // read
   try {
-    code = fs.readFileSync(process.argv[2], { encoding: 'utf-8' });
+    code = fs.readFileSync(filename, { encoding: 'utf-8' });
   } catch (e) {
     throw new Error('file not found');
   }
+  // parse
   parse(code);
 }
 
