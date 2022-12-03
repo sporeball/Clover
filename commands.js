@@ -1,7 +1,5 @@
 import Token, { any, equals, matches } from './token.js';
 
-// TODO: check if there are extraneous tokens on the end of a command
-
 /**
  * each command written in a clover program consists of a list of tokens.
  * if this list begins with a valid token, the interpreter will call a
@@ -22,23 +20,28 @@ export function evaluate (tokens) {
     throw new Error(`no pattern for head token '${Clover.head}'`);
   }
   Token.next(); // remove head
-  commands[Clover.prev](); // run
+  commands[Clover.prev](); // run the command
+
+  // at this point the command should be over
+  Token.drop(); // drop the last token
+  // throw if there is still something left
+  if (Clover.tkstream.length > 0) {
+    throw new Error(`found token '${Clover.head}' after end of pattern`);
+  }
 }
 
 function add () {
   if (Token.type() === 'number') {
     Clover.working += Token.cast();
   }
-  Token.drop();
 }
 
 function divide () {
   Token.assert(equals('by')())
-  .then();
+    .then();
   if (Token.type() === 'number') {
     Clover.working /= Token.cast();
   }
-  Token.drop();
 }
 
 function focus () {
@@ -48,7 +51,6 @@ function focus () {
     Clover.focus = Token.cast();
   }
   Clover.working = Clover.focus;
-  Token.drop();
 }
 
 function multiply () {
@@ -57,14 +59,12 @@ function multiply () {
   if (Token.type() === 'number') {
     Clover.working *= Token.cast();
   }
-  Token.drop();
 }
 
 function subtract () {
   if (Token.type() === 'number') {
     Clover.working -= Token.cast();
   }
-  Token.drop();
 }
 
 // TODO: turn back on
