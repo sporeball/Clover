@@ -26,8 +26,8 @@ export function evaluate (tokens) {
 function split (tk) {
   assert(tk, is('by'));
   option(tk, {
-    nl: () => { focus = focus.split('\n'); },
-    block: () => { focus = focus.split('\n\n'); }
+    nl: () => { Clover.focus = Clover.focus.split('\n'); },
+    block: () => { Clover.focus = Clover.focus.split('\n\n'); }
     // TODO: string literal flavor
   });
 }

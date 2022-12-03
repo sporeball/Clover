@@ -7,6 +7,8 @@ import fs from 'fs';
  * @param {string} code
  */
 export default function parse (code) {
+  global.Clover = {};
+
   // implicit input
   let input;
   try {
@@ -18,7 +20,7 @@ export default function parse (code) {
 
   // commands act on the focus value
   // this is equivalent to the original input at first
-  global.focus = input;
+  Clover.focus = input;
 
   code = code.split('\n')
     .map(line => line.replace(/;.*/gm, '').trim()); // clean
@@ -40,5 +42,5 @@ export default function parse (code) {
     Command.evaluate(tokens);
   }
 
-  console.log(focus);
+  console.log(Clover.focus);
 }
