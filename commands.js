@@ -1,4 +1,4 @@
-import { assert, is, option } from './util.js';
+import Token, { equals } from './token.js';
 
 /**
  * each command written in a clover program consists of a list of tokens.
@@ -14,22 +14,21 @@ import { assert, is, option } from './util.js';
  * @param {string[]} tokens
  */
 export function evaluate (tokens) {
+  Token.setStream(tokens);
   // look for a command pattern that starts with the head
-  const head = tokens[0];
-  if (!(head in commands)) {
-    throw new Error(`no pattern for head token ${head}`);
+  if (!(Clover.head in commands)) {
+    throw new Error(`no pattern for head token ${Clover.head}`);
   }
-  tokens.shift(); // remove head
-  commands[head](tokens); // run
+  Token.next(); // remove head
+  commands[Clover.prev](); // run
 }
 
-function split (tk) {
-  assert(tk, is('by'));
-  option(tk, {
-    nl: () => { Clover.focus = Clover.focus.split('\n'); },
-    block: () => { Clover.focus = Clover.focus.split('\n\n'); }
-    // TODO: string literal flavor
-  });
+function split () {
+  Token.assert(equals('by'));
+  // option(tk, {
+  //   nl: () => { Clover.focus = Clover.focus.split('\n'); },
+  //   block: () => { Clover.focus = Clover.focus.split('\n\n'); }
+  // });
 }
 
 const commands = {
