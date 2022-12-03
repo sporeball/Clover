@@ -20,6 +20,8 @@ export default function parse (code) {
   // this is equivalent to the original input at first
   Clover.focus = Clover.input;
 
+  Clover.working = Clover.focus;
+
   code = code.split('\n')
     .map(line => line.replace(/;.*/gm, '').trim()); // clean
 
@@ -40,5 +42,6 @@ export default function parse (code) {
     Command.evaluate(tokens);
   }
 
-  console.log(Clover.focus);
+  // implicit output
+  console.log(Clover.working);
 }

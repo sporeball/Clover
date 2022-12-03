@@ -1,5 +1,7 @@
 import Token, { any, equals, matches } from './token.js';
 
+// TODO: check if there are extraneous tokens on the end of a command
+
 /**
  * each command written in a clover program consists of a list of tokens.
  * if this list begins with a valid token, the interpreter will call a
@@ -23,11 +25,44 @@ export function evaluate (tokens) {
   commands[Clover.prev](); // run
 }
 
+function add () {
+  if (Token.type() === 'number') {
+    Clover.working += Token.cast();
+  }
+  Token.drop();
+}
+
+function divide () {
+  Token.assert(equals('by')())
+  .then();
+  if (Token.type() === 'number') {
+    Clover.working /= Token.cast();
+  }
+  Token.drop();
+}
+
 function focus () {
   if (Clover.head === 'input') {
     Clover.focus = Clover.input;
   } else {
     Clover.focus = Token.cast();
+  }
+  Clover.working = Clover.focus;
+  Token.drop();
+}
+
+function multiply () {
+  Token.assert(equals('by')())
+    .then();
+  if (Token.type() === 'number') {
+    Clover.working *= Token.cast();
+  }
+  Token.drop();
+}
+
+function subtract () {
+  if (Token.type() === 'number') {
+    Clover.working -= Token.cast();
   }
   Token.drop();
 }
@@ -42,7 +77,10 @@ function focus () {
   // });
 // }
 
-const commands = {
+export const commands = {
+  add,
+  divide,
   focus,
-  // split
+  multiply,
+  subtract
 };

@@ -78,7 +78,7 @@ export default {
     return this;
   },
   /**
-   * syntactic sugar
+   * syntactic sugar for `next()`
    * chainable
    */
   then() {
@@ -86,7 +86,7 @@ export default {
     return this;
   },
   /**
-   * syntactic sugar
+   * syntactic sugar for `next()`
    * chainable
    */
   drop() {
@@ -95,6 +95,7 @@ export default {
   },
   /**
    * cast the current token from a raw string to something else
+   * does not mutate the current token
    * @returns {number|string}
    */
   cast() {
@@ -103,5 +104,13 @@ export default {
       return Number(Clover.head);
     }
     return Clover.head;
+  },
+  type() {
+    // TODO: any others
+    if (matches(/^0$|^-?[1-9][0-9]*$/)().success) {
+      return 'number';
+    } else {
+      return 'other';
+    }
   }
 };
