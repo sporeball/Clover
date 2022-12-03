@@ -1,4 +1,4 @@
-import Token, { equals } from './token.js';
+import Token, { equals, matches } from './token.js';
 
 /**
  * each command written in a clover program consists of a list of tokens.
@@ -23,6 +23,11 @@ export function evaluate (tokens) {
   commands[Clover.prev](); // run
 }
 
+function focus () {
+  Clover.focus = Token.cast();
+  Token.drop();
+}
+
 function split () {
   Token.assert(equals('by')());
   // option(tk, {
@@ -32,5 +37,6 @@ function split () {
 }
 
 const commands = {
+  focus,
   split
 };

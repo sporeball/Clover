@@ -63,4 +63,23 @@ export default {
     this.next();
     return this;
   },
+  /**
+   * syntactic sugar
+   * chainable
+   */
+  drop() {
+    this.next();
+    return this;
+  },
+  /**
+   * cast the current token from a raw string to something else
+   * @returns {number|string}
+   */
+  cast() {
+    // number
+    if (matches(/^0$|^-?[1-9][0-9]*$/)().success) {
+      return Number(Clover.head);
+    }
+    return Clover.head;
+  }
 };

@@ -16,7 +16,6 @@ export default function parse (code) {
   } catch (e) {
     input = '';
   }
-  console.log(input);
 
   // commands act on the focus value
   // this is equivalent to the original input at first
