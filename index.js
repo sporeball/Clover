@@ -12,7 +12,7 @@ export default function parse (code) {
   // implicit input
   let input;
   try {
-    input = fs.readFileSync('input.txt', { encoding: 'utf-8' });
+    input = fs.readFileSync('input.txt', { encoding: 'utf-8' }).trim();
   } catch (e) {
     input = '';
   }
