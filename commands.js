@@ -1,4 +1,4 @@
-import Token, { equals, matches } from './token.js';
+import Token, { any, equals, matches } from './token.js';
 
 /**
  * each command written in a clover program consists of a list of tokens.
@@ -32,15 +32,17 @@ function focus () {
   Token.drop();
 }
 
-function split () {
-  Token.assert(equals('by')());
+// TODO: turn back on
+// function split () {
+  // Token.assert(equals('by')());
+  // Token.assert(any('by', 'on')());
   // option(tk, {
   //   nl: () => { Clover.focus = Clover.focus.split('\n'); },
   //   block: () => { Clover.focus = Clover.focus.split('\n\n'); }
   // });
-}
+// }
 
 const commands = {
   focus,
-  split
+  // split
 };

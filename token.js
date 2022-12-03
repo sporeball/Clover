@@ -1,6 +1,6 @@
 /**
  * return whether a token is equal to a value
- * use with `assert()`
+ * assertable
  * @param {string} value
  */
 export function equals (value) {
@@ -13,6 +13,26 @@ export function equals (value) {
   };
 }
 
+/**
+ * return whether a token is equal to one of multiple passed values
+ * assertable
+ * @param {...string} values
+ */
+export function any (...values) {
+  return function (token = Clover.head) {
+    const success = values.includes(token);
+    return {
+      success,
+      self_emsg: `expected one of [${values.map(v => `'${v}'`).join(', ')}], got '${token}' instead`
+    };
+  };
+}
+
+/**
+ * return whether a token matches a regular expression
+ * assertable
+ * @param {RegExp} regexp
+ */
 export function matches (regexp) {
   return function (token = Clover.head) {
     const success = token.match(regexp) !== null;
@@ -36,9 +56,11 @@ export default {
     Clover.head = tkstream[0];
   },
   /**
-   * verify that something is true about the current token
+   * verify that something is true
+   * requires an assertable function
+   * throws the associated error message if the assertion returns false
    * chainable
-   * @param {Function} cb condition to test
+   * @param {*} cb a call to an assertable function
    */
   assert(cb) {
     if (cb.success === false) {
