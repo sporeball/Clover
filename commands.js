@@ -17,14 +17,14 @@ export function evaluate (tokens) {
   Token.setStream(tokens);
   // look for a command pattern that starts with the head
   if (!(Clover.head in commands)) {
-    throw new Error(`no pattern for head token ${Clover.head}`);
+    throw new Error(`no pattern for head token '${Clover.head}'`);
   }
   Token.next(); // remove head
   commands[Clover.prev](); // run
 }
 
 function split () {
-  Token.assert(equals('by'));
+  Token.assert(equals('by')());
   // option(tk, {
   //   nl: () => { Clover.focus = Clover.focus.split('\n'); },
   //   block: () => { Clover.focus = Clover.focus.split('\n\n'); }

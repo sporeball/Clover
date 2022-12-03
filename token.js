@@ -4,11 +4,22 @@
  * @param {string} value
  */
 export function equals (value) {
-  return (token) => {
-    if (token !== value) {
-      throw new Error(`expected token '${value}', got '${token}' instead`);
-    }
-    return true;
+  return function (token = Clover.head) {
+    const success = token === value;
+    return {
+      success,
+      self_emsg: `expected token '${value}', got '${token}' instead`
+    };
+  };
+}
+
+export function matches (regexp) {
+  return function (token = Clover.head) {
+    const success = token.match(regexp) !== null;
+    return {
+      success,
+      self_emsg: `token '${token}' does not match regex`
+    };
   };
 }
 
@@ -30,7 +41,9 @@ export default {
    * @param {Function} cb condition to test
    */
   assert(cb) {
-    cb(Clover.head);
+    if (cb.success === false) {
+      throw new Error(cb.self_emsg);
+    }
     return this;
   },
   /**
@@ -51,17 +64,3 @@ export default {
     return this;
   },
 };
-
-/**
- * run code based on a list of options for a token
- * removes the token afterwards
- * @param {string[]} tk entire token stream
- * @param {object} obj options object
- */
-// export function option (tk, obj) {
-//   tk = tk.shift();
-//   if (!(tk in obj)) {
-//     throw new Error(`token '${tk}' is invalid here`);
-//   }
-//   obj[tk]();
-// }
