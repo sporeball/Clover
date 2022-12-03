@@ -10,16 +10,15 @@ export default function parse (code) {
   global.Clover = {};
 
   // implicit input
-  let input;
   try {
-    input = fs.readFileSync('input.txt', { encoding: 'utf-8' }).trim();
+    Clover.input = fs.readFileSync('input.txt', { encoding: 'utf-8' }).trim();
   } catch (e) {
-    input = '';
+    Clover.input = '';
   }
 
   // commands act on the focus value
   // this is equivalent to the original input at first
-  Clover.focus = input;
+  Clover.focus = Clover.input;
 
   code = code.split('\n')
     .map(line => line.replace(/;.*/gm, '').trim()); // clean

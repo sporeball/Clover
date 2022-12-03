@@ -24,7 +24,11 @@ export function evaluate (tokens) {
 }
 
 function focus () {
-  Clover.focus = Token.cast();
+  if (Clover.head === 'input') {
+    Clover.focus = Clover.input;
+  } else {
+    Clover.focus = Token.cast();
+  }
   Token.drop();
 }
 
