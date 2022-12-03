@@ -23,6 +23,12 @@ export default function parse (code) {
   code = code.split('\n')
     .map(line => line.replace(/;.*/gm, '').trim()); // clean
 
+  // remove trailing blank line
+  // (formed by trailing newline in the original code)
+  if (code.at(-1).length === 0) {
+    code = code.slice(0, -1);
+  }
+
   for (const line of code) {
     // skip empty lines
     if (line.length === 0) {
