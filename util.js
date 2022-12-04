@@ -1,5 +1,11 @@
 import colors from 'picocolors';
 
+/**
+ * manipulate a value, and return it for pretty printing
+ * this mostly means giving it a bit of color
+ * @param {*} value
+ * @returns {string}
+ */
 export function pretty (value) {
   // number
   if (isFinite(value)) {
@@ -30,10 +36,22 @@ export function pretty (value) {
   }
 }
 
+/**
+ * pretty print a value
+ * @param {*} value
+ */
 export function pprint (value) {
   console.log(pretty(value));
 }
 
+/**
+ * perform string substitution with format specifiers
+ * supported specifiers include:
+ *   %s  plain string
+ *   %t  Clover token
+ * @param {string} str
+ * @param {...*} subs values to substitute in
+ */
 export function format (str, ...subs) {
   str.match(/%./gm).forEach((match, index) => {
     if (match === '%s') {
