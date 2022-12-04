@@ -20,6 +20,14 @@ export function pretty (value) {
       }
     }).join(', '))}]`;
   }
+  // CloverError
+  else if (value.constructor?.name === 'CloverError') {
+    return `${colors.red('e:')} ${value.message}`;
+  }
+  // uncaught error
+  else if (value instanceof Error && value.message !== 'file not found') {
+    return `${colors.red('e:')} ${value.message} ${colors.red('(uncaught!)')}`;
+  }
 }
 
 export function pprint (value) {

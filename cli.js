@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import parse from './index.js';
+import { pprint } from './util.js';
+
 import fs from 'fs';
-import colors from 'picocolors';
 
 function cli () {
   let code;
@@ -24,10 +25,6 @@ function cli () {
 try {
   cli();
 } catch (e) {
-  const uncaught = (e instanceof Error && e.message !== 'file not found')
-  console.log(
-    `${colors.red('e:')} ${e.message}`
-      .concat(uncaught ? colors.red(' (uncaught)') : '')
-  );
+  pprint(e);
   process.exit(1);
 }

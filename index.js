@@ -9,7 +9,7 @@ import fs from 'fs';
  */
 export default function parse (code) {
   global.Clover = {};
-  global.CloverError = class {
+  global.CloverError = class CloverError {
     constructor (message) {
       this.message = message;
     }
