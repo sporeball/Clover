@@ -1,5 +1,5 @@
 import * as Command from './commands.js';
-import { pprint } from './util.js';
+import { format, pprint } from './util.js';
 
 import fs from 'fs';
 
@@ -10,8 +10,8 @@ import fs from 'fs';
 export default function parse (code) {
   global.Clover = {};
   global.CloverError = class CloverError {
-    constructor (message) {
-      this.message = message;
+    constructor (message, ...subs) {
+      this.message = format(message, ...subs);
     }
   };
 

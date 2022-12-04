@@ -53,7 +53,7 @@ export function pprint (value) {
  * @param {...*} subs values to substitute in
  */
 export function format (str, ...subs) {
-  str.match(/%./gm).forEach((match, index) => {
+  (str.match(/%./gm) || []).forEach((match, index) => {
     if (match === '%s') {
       str = str.replace(match, subs[index]);
     } else if (match === '%t') {

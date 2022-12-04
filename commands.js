@@ -18,7 +18,7 @@ export function evaluate (tokens) {
   Token.setStream(tokens);
   // look for a command pattern that starts with the head
   if (!(Clover.head in commands)) {
-    throw new CloverError(`no pattern for head token '${Clover.head}'`);
+    throw new CloverError('no pattern for head token %t', Clover.head);
   }
   Token.next(); // remove head
   commands[Clover.prev](); // run the command
@@ -27,7 +27,7 @@ export function evaluate (tokens) {
   Token.drop(); // drop the last token
   // throw if there is still something left
   if (Clover.tkstream.length > 0) {
-    throw new CloverError(`found token '${Clover.head}' after end of pattern`);
+    throw new CloverError('found token %t after end of pattern', Clover.head);
   }
 }
 
