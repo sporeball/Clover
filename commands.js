@@ -61,6 +61,10 @@ function multiply () {
   }
 }
 
+function refocus () {
+  Clover.working = Clover.focus;
+}
+
 function subtract () {
   if (Token.type() === 'number') {
     Clover.working -= Token.cast();
@@ -82,5 +86,6 @@ export const commands = {
   divide,
   focus,
   multiply,
+  refocus,
   subtract
 };
