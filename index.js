@@ -1,4 +1,5 @@
 import * as Command from './commands.js';
+import { pprint } from './util.js';
 
 import fs from 'fs';
 
@@ -48,5 +49,5 @@ export default function parse (code) {
   }
 
   // implicit output
-  console.log(Clover.working);
+  pprint(Clover.working);
 }

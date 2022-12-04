@@ -1,4 +1,5 @@
 import Token, { any, equals, matches } from './token.js';
+import { pprint } from './util.js';
 
 /**
  * each command written in a clover program consists of a list of tokens.
@@ -66,7 +67,7 @@ function refocus () {
 }
 
 function show () {
-  console.log(Clover.working);
+  pprint(Clover.working);
   // TODO: make monadic
 }
 

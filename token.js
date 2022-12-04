@@ -1,3 +1,5 @@
+import { format } from './util.js';
+
 /**
  * return whether a token is equal to a value
  * assertable
@@ -8,7 +10,7 @@ export function equals (value) {
     const success = token === value;
     return {
       success,
-      self_emsg: `expected token '${value}', got '${token}' instead`
+      self_emsg: format('expected token %t, got %t instead', value, token)
     };
   };
 }
@@ -23,7 +25,7 @@ export function any (...values) {
     const success = values.includes(token);
     return {
       success,
-      self_emsg: `expected one of [${values.map(v => `'${v}'`).join(', ')}], got '${token}' instead`
+      self_emsg: format('expected one of %t, got %t instead', values, token)
     };
   };
 }
@@ -38,7 +40,7 @@ export function matches (regexp) {
     const success = token.match(regexp) !== null;
     return {
       success,
-      self_emsg: `token '${token}' does not match regex`
+      self_emsg: format('token %t does not match regex', token)
     };
   };
 }
