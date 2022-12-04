@@ -64,7 +64,7 @@ export default {
    */
   assert(cb) {
     if (cb.success === false) {
-      throw new Error(cb.self_emsg);
+      throw new CloverError(cb.self_emsg);
     }
     return this;
   },

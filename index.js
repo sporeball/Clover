@@ -8,6 +8,11 @@ import fs from 'fs';
  */
 export default function parse (code) {
   global.Clover = {};
+  global.CloverError = class {
+    constructor (message) {
+      this.message = message;
+    }
+  };
 
   // implicit input
   try {

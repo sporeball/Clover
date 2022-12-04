@@ -24,6 +24,10 @@ function cli () {
 try {
   cli();
 } catch (e) {
-  console.log(`${colors.red('e:')} ${e.message}`);
+  const uncaught = (e instanceof Error && e.message !== 'file not found')
+  console.log(
+    `${colors.red('e:')} ${e.message}`
+      .concat(uncaught ? colors.red(' (uncaught)') : '')
+  );
   process.exit(1);
 }
