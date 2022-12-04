@@ -65,6 +65,11 @@ function refocus () {
   Clover.working = Clover.focus;
 }
 
+function show () {
+  console.log(Clover.working);
+  // TODO: make monadic
+}
+
 function subtract () {
   if (Token.type() === 'number') {
     Clover.working -= Token.cast();
@@ -87,5 +92,6 @@ export const commands = {
   focus,
   multiply,
   refocus,
+  show,
   subtract
 };
