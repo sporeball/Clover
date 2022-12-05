@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import parse from './index.js';
-import { pprint } from './util.js';
+import parse from './src/index.js';
+import { pprint } from './src/util.js';
 
 import fs from 'fs';
 
