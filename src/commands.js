@@ -1,4 +1,4 @@
-import Token, { any, equals, matches, type } from './token.js';
+import Token, { any, defined, equals, matches, type } from './token.js';
 import { output } from './util.js';
 
 /**
@@ -44,6 +44,7 @@ function divide () {
 }
 
 function focus () {
+  Token.assert(defined());
   if (Token.head === 'input') {
     Clover.focus = Clover.input;
   } else {

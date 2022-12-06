@@ -7,8 +7,12 @@ import colors from 'picocolors';
  * @returns {string}
  */
 export function pretty (value) {
+  // undefined
+  if (value === undefined) {
+    return colors.yellow('(undefined!)');
+  }
   // number
-  if (Number.isInteger(value)) {
+  else if (Number.isInteger(value)) {
     return colors.cyan(value);
   }
   // string
@@ -58,11 +62,10 @@ export function pprint (value) {
  */
 export function format (str, ...subs) {
   (str.match(/%./gm) || []).forEach((match, index) => {
-    if (subs[index] === undefined) {
-      return;
-    }
     if (match === '%s') {
-      str = str.replace(match, subs[index]);
+      if (subs[index] !== undefined) {
+        str = str.replace(match, subs[index]);
+      }
     } else if (match === '%t') {
       str = str.replace(match, pretty(subs[index]));
     }

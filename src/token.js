@@ -17,6 +17,14 @@ export function any (values, token = _stream[0]) {
   };
 }
 
+export function defined (token = _stream[0]) {
+  const success = token !== undefined;
+  return {
+    success,
+    self_emsg: format("expected a token, but didn't get one")
+  };
+}
+
 /**
  * return whether a token is equal to a value
  * assertable
@@ -53,7 +61,9 @@ export function matches (regexp, token = _stream[0]) {
  */
 export function type (t, token = _stream[0]) {
   let returned;
-  if (matches(/^0$|^-?[1-9][0-9]*$/).success) {
+  if (equals(undefined).success) {
+    returned = 'none';
+  } else if (matches(/^0$|^-?[1-9][0-9]*$/).success) {
     returned = 'number';
   } else if (matches(/^'.*'$/).success) {
     returned = 'string';
