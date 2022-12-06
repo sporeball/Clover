@@ -1,13 +1,15 @@
 import * as Command from './commands.js';
-import { format, pprint } from './util.js';
+import { format, output } from './util.js';
 
 import fs from 'fs';
 
 /**
  * parse a clover program
  * @param {string} code
+ * @param {Object} [options]
+ * @param {boolean} options.quiet whether to silence output. good for tests
  */
-export default function parse (code) {
+export default function parse (code, options = {}) {
   global.Clover = {};
   global.CloverError = class CloverError {
     constructor (message, ...subs) {
@@ -21,6 +23,9 @@ export default function parse (code) {
   } catch (e) {
     Clover.input = '';
   }
+
+  Clover.outputs = [];
+  Clover.options = options;
 
   // commands act on the focus value
   // this is equivalent to the original input at first
@@ -49,5 +54,12 @@ export default function parse (code) {
   }
 
   // implicit output
-  pprint(Clover.working);
+  output(Clover.working);
+
+  // for single-item output array, return the item itself instead
+  if (Clover.outputs.length === 1) {
+    Clover.outputs = Clover.outputs[0];
+  }
+
+  return Clover.outputs;
 }

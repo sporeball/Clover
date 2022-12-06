@@ -66,3 +66,15 @@ export function format (str, ...subs) {
   });
   return str;
 }
+
+/**
+ * cause Clover to output a value
+ * updates Clover.outputs
+ * @param {*} value
+ */
+export function output (value) {
+  Clover.outputs.push(value);
+  if (!Clover.options.silent) {
+    pprint(value);
+  }
+}

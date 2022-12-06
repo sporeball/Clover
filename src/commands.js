@@ -67,7 +67,7 @@ function refocus () {
 }
 
 function show () {
-  pprint(Clover.working);
+  output(Clover.working);
   // TODO: make monadic
 }
 
