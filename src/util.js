@@ -32,7 +32,8 @@ export function pretty (value) {
   }
   // uncaught error
   else if (value instanceof Error && value.message !== 'file not found') {
-    return `${colors.red('e:')} ${value.message} ${colors.red('(uncaught!)')}`;
+    return `${colors.red('e:')} ${value.message} ${colors.red('(uncaught!)')}
+${colors.gray(value.stack.split('\n').slice(1).join('\n'))}`;
   }
 }
 
