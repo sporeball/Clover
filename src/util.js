@@ -6,15 +6,17 @@ import colors from 'picocolors';
  * @param {*} value
  * @returns {string}
  */
-// TODO: this does a couple of weird things, e.g. isFinite('')
 export function pretty (value) {
   // number
-  if (isFinite(value)) {
+  if (Number.isInteger(value)) {
     return colors.cyan(value);
   }
   // string
   else if (typeof value === 'string') {
-    return colors.cyan(`'${value}'`);
+    if (value.length === 0) {
+      return colors.gray("''");
+    }
+    return colors.cyan(`'${value.replace('\n', colors.yellow('\\n'))}'`);
   }
   // array
   else if (Array.isArray(value)) {
@@ -25,7 +27,7 @@ export function pretty (value) {
       } else {
         return pretty(i);
       }
-    }).join(', '))}]`;
+    }).join(colors.white(', ')))}]`;
   }
   // CloverError
   else if (value.constructor?.name === 'CloverError') {
