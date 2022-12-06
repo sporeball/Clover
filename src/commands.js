@@ -17,17 +17,17 @@ import { pprint } from './util.js';
 export function evaluate (tokens) {
   Token.stream = tokens;
   // look for a command pattern that starts with the head
-  if (!(Clover.head in commands)) {
-    throw new CloverError('no pattern for head token %t', Clover.head);
+  if (!(Token.head in commands)) {
+    throw new CloverError('no pattern for head token %t', Token.head);
   }
   Token.next(); // remove head
-  commands[Clover.prev](); // run the command
+  commands[Token.prev](); // run the command
 
   // at this point the command should be over
   Token.drop(); // drop the last token
   // throw if there is still something left
-  if (Token.stream.length > 0) {
-    throw new CloverError('found token %t after end of pattern', Clover.head);
+  if (!Token.empty()) {
+    throw new CloverError('found token %t after end of pattern', Token.head);
   }
 }
 
@@ -46,7 +46,7 @@ function divide () {
 }
 
 function focus () {
-  if (Clover.head === 'input') {
+  if (Token.head === 'input') {
     Clover.focus = Clover.input;
   } else {
     Clover.focus = Token.cast();

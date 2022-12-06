@@ -1,20 +1,7 @@
 import { format } from './util.js';
 
 let _stream;
-
-/**
- * return whether a token is equal to a value
- * assertable
- * @param {string} value
- * @param {string} [token]
- */
-export function equals (value, token = _stream[0]) {
-  const success = token === value;
-  return {
-    success,
-    self_emsg: format('expected token %t, got %t instead', value, token)
-  };
-}
+let _prev;
 
 /**
  * return whether a token is equal to one of multiple passed values
@@ -27,6 +14,20 @@ export function any (values, token = _stream[0]) {
   return {
     success,
     self_emsg: format('expected one of %t, got %t instead', values, token)
+  };
+}
+
+/**
+ * return whether a token is equal to a value
+ * assertable
+ * @param {string} value
+ * @param {string} [token]
+ */
+export function equals (value, token = _stream[0]) {
+  const success = token === value;
+  return {
+    success,
+    self_emsg: format('expected token %t, got %t instead', value, token)
   };
 }
 
@@ -68,9 +69,9 @@ export default {
   cast () {
     // number
     if (matches(/^0$|^-?[1-9][0-9]*$/).success) {
-      return Number(Clover.head);
+      return Number(this.head);
     }
-    return Clover.head;
+    return this.head;
   },
   /**
    * syntactic sugar for `next()`
@@ -85,16 +86,25 @@ export default {
    * getter
    */
   get head () {
-    return _stream[0];
+    return this.stream[0];
+  },
+  /**
+   * return whether the current token stream is empty
+   * getter
+   */
+  empty () {
+    return this.stream.length === 0;
   },
   /**
    * move on to the next token of the current token stream
    * chainable
    */
   next () {
-    Clover.prev = this.stream.shift();
-    Clover.head = this.stream[0];
+    _prev = this.stream.shift();
     return this;
+  },
+  get prev () {
+    return _prev;
   },
   /**
    * return what remains of the current token stream
@@ -110,7 +120,6 @@ export default {
    */
   set stream (s) {
     _stream = s;
-    Clover.head = s[0];
   },
   /**
    * syntactic sugar for `next()`
