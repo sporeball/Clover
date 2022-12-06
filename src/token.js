@@ -45,6 +45,28 @@ export function matches (regexp, token = _stream[0]) {
   };
 }
 
+/**
+ * return whether a token is of a certain type
+ * assertable
+ * @param {string} type
+ * @param {string} [token]
+ */
+export function type (t, token = _stream[0]) {
+  let returned;
+  if (matches(/^0$|^-?[1-9][0-9]*$/).success) {
+    returned = 'number';
+  } else if (matches(/^'.*'$/).success) {
+    returned = 'string';
+  } else {
+    returned = 'other';
+  }
+  const success = t === returned;
+  return {
+    success,
+    self_emsg: format('expected token of type %s, got %s instead', t, returned)
+  };
+}
+
 // default object
 // import with the name Token
 export default {
@@ -68,8 +90,11 @@ export default {
    */
   cast () {
     // number
-    if (matches(/^0$|^-?[1-9][0-9]*$/).success) {
+    if (type('number').success) {
       return Number(this.head);
+    }
+    if (type('string').success) {
+      return this.head.slice(1, -1); // remove the extra single quotes
     }
     return this.head;
   },
@@ -92,7 +117,7 @@ export default {
    * return whether the current token stream is empty
    * getter
    */
-  empty () {
+  get empty () {
     return this.stream.length === 0;
   },
   /**
@@ -129,12 +154,4 @@ export default {
     this.next();
     return this;
   },
-  type () {
-    // TODO: any others
-    if (matches(/^0$|^-?[1-9][0-9]*$/).success) {
-      return 'number';
-    } else {
-      return 'other';
-    }
-  }
 };

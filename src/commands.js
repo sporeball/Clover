@@ -1,4 +1,4 @@
-import Token, { any, equals, matches } from './token.js';
+import Token, { any, equals, matches, type } from './token.js';
 import { output } from './util.js';
 
 /**
@@ -26,23 +26,21 @@ export function evaluate (tokens) {
   // at this point the command should be over
   Token.drop(); // drop the last token
   // throw if there is still something left
-  if (!Token.empty()) {
+  if (!Token.empty) {
     throw new CloverError('found token %t after end of pattern', Token.head);
   }
 }
 
 function add () {
-  if (Token.type() === 'number') {
-    Clover.working += Token.cast();
-  }
+  Token.assert(type('number'));
+  Clover.working += Token.cast();
 }
 
 function divide () {
   Token.assert(equals('by'))
-    .then();
-  if (Token.type() === 'number') {
-    Clover.working /= Token.cast();
-  }
+    .then()
+    .assert(type('number'));
+  Clover.working /= Token.cast();
 }
 
 function focus () {
@@ -56,10 +54,9 @@ function focus () {
 
 function multiply () {
   Token.assert(equals('by'))
-    .then();
-  if (Token.type() === 'number') {
-    Clover.working *= Token.cast();
-  }
+    .then()
+    .assert(type('number'));
+  Clover.working *= Token.cast();
 }
 
 function refocus () {
@@ -72,9 +69,8 @@ function show () {
 }
 
 function subtract () {
-  if (Token.type() === 'number') {
-    Clover.working -= Token.cast();
-  }
+  Token.assert(type('number'));
+  Clover.working -= Token.cast();
 }
 
 // TODO: turn back on
