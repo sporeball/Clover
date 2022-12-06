@@ -23,4 +23,5 @@ tentamen.add(
   focus 10`,
   [5, 10]
 );
+// TODO: tests for split command
 tentamen.add('subtract', 'focus 5\nsubtract 5', 0);

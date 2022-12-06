@@ -107,18 +107,24 @@ export default {
     return this;
   },
   /**
+   * return whether the current token stream is empty
+   * getter
+   */
+  get empty () {
+    return this.stream.length === 0;
+  },
+  /**
    * return the first remaining element of the current token stream
    * getter
    */
   get head () {
     return this.stream[0];
   },
-  /**
-   * return whether the current token stream is empty
-   * getter
-   */
-  get empty () {
-    return this.stream.length === 0;
+  iff (assertable, cb) {
+    if (assertable.success === true) {
+      cb();
+    }
+    return this;
   },
   /**
    * move on to the next token of the current token stream

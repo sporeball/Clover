@@ -68,6 +68,19 @@ function show () {
   // TODO: make monadic
 }
 
+function split () {
+  Token.assert(any(['by', 'on']))
+    .then()
+    .iff(equals('nl'), () => {
+      Clover.working = Clover.focus.split('\n');
+    }).iff(equals('block'), () => {
+      Clover.working = Clover.focus.split('\n\n');
+    }).iff(type('string'), () => {
+      Clover.working = Clover.focus.split(Token.cast());
+    });
+  // TODO: giving
+}
+
 function subtract () {
   Token.assert(type('number'));
   Clover.working -= Token.cast();
@@ -90,5 +103,6 @@ export const commands = {
   multiply,
   refocus,
   show,
+  split,
   subtract
 };

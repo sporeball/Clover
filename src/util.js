@@ -6,6 +6,7 @@ import colors from 'picocolors';
  * @param {*} value
  * @returns {string}
  */
+// TODO: this does a couple of weird things, e.g. isFinite('')
 export function pretty (value) {
   // number
   if (isFinite(value)) {
