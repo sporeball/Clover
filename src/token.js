@@ -6,29 +6,27 @@ let _stream;
  * return whether a token is equal to a value
  * assertable
  * @param {string} value
+ * @param {string} [token]
  */
-export function equals (value) {
-  return function (token = Clover.head) {
-    const success = token === value;
-    return {
-      success,
-      self_emsg: format('expected token %t, got %t instead', value, token)
-    };
+export function equals (value, token = _stream[0]) {
+  const success = token === value;
+  return {
+    success,
+    self_emsg: format('expected token %t, got %t instead', value, token)
   };
 }
 
 /**
  * return whether a token is equal to one of multiple passed values
  * assertable
- * @param {...string} values
+ * @param {*[]} values
+ * @param {string} [token]
  */
-export function any (...values) {
-  return function (token = Clover.head) {
-    const success = values.includes(token);
-    return {
-      success,
-      self_emsg: format('expected one of %t, got %t instead', values, token)
-    };
+export function any (values, token = _stream[0]) {
+  const success = values.includes(token);
+  return {
+    success,
+    self_emsg: format('expected one of %t, got %t instead', values, token)
   };
 }
 
@@ -36,14 +34,13 @@ export function any (...values) {
  * return whether a token matches a regular expression
  * assertable
  * @param {RegExp} regexp
+ * @param {string} [token]
  */
-export function matches (regexp) {
-  return function (token = Clover.head) {
-    const success = token.match(regexp) !== null;
-    return {
-      success,
-      self_emsg: format('token %t does not match regex', token)
-    };
+export function matches (regexp, token = _stream[0]) {
+  const success = token.match(regexp) !== null;
+  return {
+    success,
+    self_emsg: format('token %t does not match regex', token)
   };
 }
 
@@ -70,7 +67,7 @@ export default {
    */
   cast () {
     // number
-    if (matches(/^0$|^-?[1-9][0-9]*$/)().success) {
+    if (matches(/^0$|^-?[1-9][0-9]*$/).success) {
       return Number(Clover.head);
     }
     return Clover.head;
@@ -125,7 +122,7 @@ export default {
   },
   type () {
     // TODO: any others
-    if (matches(/^0$|^-?[1-9][0-9]*$/)().success) {
+    if (matches(/^0$|^-?[1-9][0-9]*$/).success) {
       return 'number';
     } else {
       return 'other';

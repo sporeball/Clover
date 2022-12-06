@@ -38,7 +38,7 @@ function add () {
 }
 
 function divide () {
-  Token.assert(equals('by')())
+  Token.assert(equals('by'))
     .then();
   if (Token.type() === 'number') {
     Clover.working /= Token.cast();
@@ -55,7 +55,7 @@ function focus () {
 }
 
 function multiply () {
-  Token.assert(equals('by')())
+  Token.assert(equals('by'))
     .then();
   if (Token.type() === 'number') {
     Clover.working *= Token.cast();
