@@ -15,7 +15,7 @@ import { pprint } from './util.js';
  * @param {string[]} tokens
  */
 export function evaluate (tokens) {
-  Token.setStream(tokens);
+  Token.stream = tokens;
   // look for a command pattern that starts with the head
   if (!(Clover.head in commands)) {
     throw new CloverError('no pattern for head token %t', Clover.head);
@@ -26,7 +26,7 @@ export function evaluate (tokens) {
   // at this point the command should be over
   Token.drop(); // drop the last token
   // throw if there is still something left
-  if (Clover.tkstream.length > 0) {
+  if (Token.stream.length > 0) {
     throw new CloverError('found token %t after end of pattern', Clover.head);
   }
 }

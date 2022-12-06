@@ -1,5 +1,7 @@
 import { format } from './util.js';
 
+let _stream;
+
 /**
  * return whether a token is equal to a value
  * assertable
@@ -49,50 +51,16 @@ export function matches (regexp) {
 // import with the name Token
 export default {
   /**
-   * set the current token stream
-   * updates relevant values in Clover object
-   * @param {string[]} tkstream
-   */
-  setStream(tkstream) {
-    Clover.tkstream = tkstream;
-    Clover.head = tkstream[0];
-  },
-  /**
    * verify that something is true
    * requires an assertable function
    * throws the associated error message if the assertion returns false
    * chainable
    * @param {*} cb a call to an assertable function
    */
-  assert(cb) {
+  assert (cb) {
     if (cb.success === false) {
       throw new CloverError(cb.self_emsg);
     }
-    return this;
-  },
-  /**
-   * move on to the next token of the current token stream
-   * chainable
-   */
-  next() {
-    Clover.prev = Clover.tkstream.shift();
-    Clover.head = Clover.tkstream[0];
-    return this;
-  },
-  /**
-   * syntactic sugar for `next()`
-   * chainable
-   */
-  then() {
-    this.next();
-    return this;
-  },
-  /**
-   * syntactic sugar for `next()`
-   * chainable
-   */
-  drop() {
-    this.next();
     return this;
   },
   /**
@@ -100,14 +68,62 @@ export default {
    * does not mutate the current token
    * @returns {number|string}
    */
-  cast() {
+  cast () {
     // number
     if (matches(/^0$|^-?[1-9][0-9]*$/)().success) {
       return Number(Clover.head);
     }
     return Clover.head;
   },
-  type() {
+  /**
+   * syntactic sugar for `next()`
+   * chainable
+   */
+  drop () {
+    this.next();
+    return this;
+  },
+  /**
+   * return the first remaining element of the current token stream
+   * getter
+   */
+  get head () {
+    return _stream[0];
+  },
+  /**
+   * move on to the next token of the current token stream
+   * chainable
+   */
+  next () {
+    Clover.prev = this.stream.shift();
+    Clover.head = this.stream[0];
+    return this;
+  },
+  /**
+   * return what remains of the current token stream
+   * getter
+   */
+  get stream () {
+    return _stream;
+  },
+  /**
+   * set the current token stream
+   * setter
+   * @param {*[]} s
+   */
+  set stream (s) {
+    _stream = s;
+    Clover.head = s[0];
+  },
+  /**
+   * syntactic sugar for `next()`
+   * chainable
+   */
+  then () {
+    this.next();
+    return this;
+  },
+  type () {
     // TODO: any others
     if (matches(/^0$|^-?[1-9][0-9]*$/)().success) {
       return 'number';
