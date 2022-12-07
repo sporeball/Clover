@@ -56,10 +56,10 @@ export function matches (regexp, token = _stream[0]) {
 /**
  * return whether a token is of a certain type
  * assertable
- * @param {string} type
+ * @param {string} T type
  * @param {string} [token]
  */
-export function type (t, token = _stream[0]) {
+export function type (T, token = _stream[0]) {
   let returned;
   if (equals(undefined, token).success) {
     returned = 'none';
@@ -75,17 +75,18 @@ export function type (t, token = _stream[0]) {
   } else {
     returned = 'other';
   }
-  const success = t === returned;
+  const success = T === returned;
   return {
     success,
     returned,
-    self_emsg: format('expected token of type %s, got %s instead', t, returned)
+    self_emsg: format('expected token of type %s, got %s instead', T, returned)
   };
 }
 
 /**
  * cast a value from some sort of raw string into something else
  * does not mutate the original value
+ * @param {*} value
  * @returns {number|string}
  */
 // TODO: automatic and manual

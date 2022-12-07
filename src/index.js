@@ -8,7 +8,7 @@ import fs from 'fs';
  * parse a clover program
  * @param {string} code
  * @param {Object} [options]
- * @param {boolean} options.quiet whether to silence output. good for tests
+ * @param {boolean} options.silent whether to silence output. good for tests
  */
 export default function parse (code, options = {}) {
   global.Clover = {};
