@@ -68,6 +68,8 @@ export function type (t, token = _stream[0]) {
     || typeof token === 'number'
   ) {
     returned = 'number';
+  // TODO: typeof doesn't make sense for this one
+  // either it matches the regex or it's an unqualified name
   } else if (matches(/^'.*'$/, token).success || typeof token === 'string') {
     returned = 'string';
   } else {
@@ -94,11 +96,10 @@ export function cast (value) {
     return Number(value);
   }
   if (T === 'string') {
+    value = value.replace(/\\n/g, '\n');
     if (value.startsWith("'") && value.endsWith("'")) {
       return value.slice(1, -1); // remove
     }
-    // otherwise it just happens to be any other string
-    // fall through
   }
   return value;
 }
