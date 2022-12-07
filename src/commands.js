@@ -20,11 +20,9 @@ export function evaluate (tokens) {
   if (!(Token.head in commands)) {
     throw new CloverError('no pattern for head token %t', Token.head);
   }
-  Token.next(); // remove head
-  commands[Token.prev](); // run the command
+  commands[Token.head](); // run the command
 
   // at this point the command should be over
-  Token.drop(); // drop the last token
   // throw if there is still something left
   if (!Token.empty) {
     throw new CloverError('found token %t after end of pattern', Token.head);
@@ -46,25 +44,34 @@ function worksWith (T) {
   }
 }
 
+function createCommand (body) {
+  const code = function() {
+    Token.drop(); // remove head
+    body();
+    Token.drop(); // remove the last
+  };
+  return code.bind({});
+}
+
 /**
  * commands below
  */
 
-function add () {
+const add = createCommand(() => {
   worksWith('number');
   Token.assert(type('number'));
   Clover.working += cast(Token.head);
-}
+});
 
-function divide () {
+const divide = createCommand(() => {
   worksWith('number');
   Token.assert(equals('by'))
     .then()
     .assert(type('number'));
   Clover.working /= cast(Token.head);
-}
+});
 
-function focus () {
+const focus = createCommand(() => {
   Token.assert(defined());
   if (Token.head === 'input') {
     Clover.focus = Clover.input;
@@ -72,26 +79,26 @@ function focus () {
     Clover.focus = cast(Token.head);
   }
   Clover.working = Clover.focus;
-}
+});
 
-function multiply () {
+const multiply = createCommand(() => {
   worksWith('number');
   Token.assert(equals('by'))
     .then()
     .assert(type('number'));
   Clover.working *= cast(Token.head);
-}
+});
 
-function refocus () {
+const refocus = createCommand(() => {
   Clover.working = Clover.focus;
-}
+});
 
-function show () {
+const show = createCommand(() => {
   output(Clover.working);
   // TODO: make monadic
-}
+});
 
-function split () {
+const split = createCommand(() => {
   worksWith('string');
   Token.assert(any(['by', 'on']))
     .then()
@@ -107,13 +114,13 @@ function split () {
       Clover.working = Clover.focus.split(cast(Token.head));
   }
   // TODO: giving
-}
+});
 
-function subtract () {
+const subtract = createCommand(() => {
   worksWith('number');
   Token.assert(type('number'));
   Clover.working -= cast(Token.head);
-}
+});
 
 export const commands = {
   add,
