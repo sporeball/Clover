@@ -94,16 +94,17 @@ function show () {
 function split () {
   worksWith('string');
   Token.assert(any(['by', 'on']))
-    .then()
-    .iff(equals('nl'), () => {
+    .then();
+  switch (Token.head) {
+    case 'nl':
       Clover.working = Clover.focus.split('\n');
-    }).iff(equals('block'), () => {
+      break;
+    case 'block':
       Clover.working = Clover.focus.split('\n\n');
-    });
-    // TODO: make this option less trigger-happy and turn it back on
-    // }).iff(type('string'), () => {
-      // Clover.working = Clover.focus.split(cast(Token.head));
-    // });
+      break;
+    default:
+      Clover.working = Clover.focus.split(cast(Token.head));
+  }
   // TODO: giving
 }
 
