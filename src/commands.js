@@ -94,8 +94,11 @@ const refocus = createCommand(() => {
 });
 
 const show = createCommand(() => {
-  output(Clover.working);
-  // TODO: make monadic
+  if (Token.empty) {
+    output(Clover.working);
+  } else {
+    output(cast(Token.head));
+  }
 });
 
 const split = createCommand(() => {
