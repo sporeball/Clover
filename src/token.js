@@ -63,9 +63,12 @@ export function type (t, token = _stream[0]) {
   let returned;
   if (equals(undefined).success) {
     returned = 'none';
-  } else if (matches(/^0$|^-?[1-9][0-9]*$/).success) {
+  } else if (
+    matches(/^0$|^-?[1-9][0-9]*$/).success
+    || typeof token === 'number'
+  ) {
     returned = 'number';
-  } else if (matches(/^'.*'$/).success) {
+  } else if (matches(/^'.*'$/).success || typeof token === 'string') {
     returned = 'string';
   } else {
     returned = 'other';
@@ -73,6 +76,7 @@ export function type (t, token = _stream[0]) {
   const success = t === returned;
   return {
     success,
+    returned,
     self_emsg: format('expected token of type %s, got %s instead', t, returned)
   };
 }
@@ -104,7 +108,11 @@ export default {
       return Number(this.head);
     }
     if (type('string').success) {
-      return this.head.slice(1, -1); // remove the extra single quotes
+      if (this.head.startsWith("'") && this.head.endsWith("'")) {
+        return this.head.slice(1, -1); // remove
+      }
+      // otherwise it just happens to be any other string
+      // fall through
     }
     return this.head;
   },

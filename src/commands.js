@@ -31,12 +31,33 @@ export function evaluate (tokens) {
   }
 }
 
+/**
+ * used in commands to assert that the working value is of a certain type
+ * throws otherwise
+ * @param {string[]} T type
+ */
+function worksWith (T) {
+  const typecheck = type(T, Clover.working);
+  if (!typecheck.success) {
+    throw new CloverError(
+      'expected working value of type %s, got %s instead',
+      T, typecheck.returned
+    );
+  }
+}
+
+/**
+ * commands below
+ */
+
 function add () {
+  worksWith('number');
   Token.assert(type('number'));
   Clover.working += Token.cast();
 }
 
 function divide () {
+  worksWith('number');
   Token.assert(equals('by'))
     .then()
     .assert(type('number'));
@@ -54,6 +75,7 @@ function focus () {
 }
 
 function multiply () {
+  worksWith('number');
   Token.assert(equals('by'))
     .then()
     .assert(type('number'));
@@ -70,6 +92,7 @@ function show () {
 }
 
 function split () {
+  worksWith('string');
   Token.assert(any(['by', 'on']))
     .then()
     .iff(equals('nl'), () => {
@@ -83,6 +106,7 @@ function split () {
 }
 
 function subtract () {
+  worksWith('number');
   Token.assert(type('number'));
   Clover.working -= Token.cast();
 }
