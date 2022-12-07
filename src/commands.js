@@ -1,4 +1,4 @@
-import Token, { any, cast, defined, equals, matches, type } from './token.js';
+import Token, { any, cast, defined, equals, type } from './token.js';
 import { output } from './util.js';
 
 /**
@@ -45,7 +45,7 @@ function worksWith (T) {
 }
 
 function createCommand (body) {
-  const code = function() {
+  const code = function () {
     Token.drop(); // remove head
     body();
     Token.drop(); // remove the last

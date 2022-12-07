@@ -10,20 +10,17 @@ export function pretty (value) {
   // undefined
   if (value === undefined) {
     return colors.yellow('(undefined!)');
-  }
   // number
-  else if (Number.isInteger(value)) {
+  } else if (Number.isInteger(value)) {
     return colors.cyan(value);
-  }
   // string
-  else if (typeof value === 'string') {
+  } else if (typeof value === 'string') {
     if (value.length === 0) {
       return colors.gray("''");
     }
     return colors.cyan(`'${value.replace(/\n/g, colors.yellow('\\n'))}'`);
-  }
   // array
-  else if (Array.isArray(value)) {
+  } else if (Array.isArray(value)) {
     return `[${colors.cyan(value.map(i => {
       // shallow
       if (Array.isArray(i)) {
@@ -32,14 +29,12 @@ export function pretty (value) {
         return pretty(i);
       }
     }).join(colors.white(', ')))}]`;
-  }
   // CloverError
-  else if (value.constructor?.name === 'CloverError') {
+  } else if (value.constructor?.name === 'CloverError') {
     return `${colors.red('e:')} ${value.message}
 ${colors.cyan(`   (line ${Clover.line})`)}`;
-  }
   // uncaught error
-  else if (value instanceof Error && value.message !== 'file not found') {
+  } else if (value instanceof Error && value.message !== 'file not found') {
     return `${colors.red('e:')} ${value.message} ${colors.red('(uncaught!)')}
 ${colors.gray(value.stack.split('\n').slice(1).join('\n'))}`;
   }

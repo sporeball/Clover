@@ -11,7 +11,7 @@
     "clo": "cli.js"
   },
   "scripts": {
-    "test": "node test/test.js"
+    "test": "semistandard && node test/test.js"
   },
   "semistandard": {
     "globals": [

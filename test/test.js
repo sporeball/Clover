@@ -1,7 +1,7 @@
 import parse from '../src/index.js';
 import Tentamen from 'tentamen';
 
-let tentamen = new Tentamen({});
+const tentamen = new Tentamen({});
 tentamen.fn = () => parse(tentamen.input, { silent: true });
 
 tentamen.suite('tests');

@@ -64,8 +64,8 @@ export function type (T, token = _stream[0]) {
   if (equals(undefined, token).success) {
     returned = 'none';
   } else if (
-    matches(/^0$|^-?[1-9][0-9]*$/, token).success
-    || typeof token === 'number'
+    matches(/^0$|^-?[1-9][0-9]*$/, token).success ||
+    typeof token === 'number'
   ) {
     returned = 'number';
   // TODO: typeof doesn't make sense for this one
@@ -182,5 +182,5 @@ export default {
   then () {
     this.next();
     return this;
-  },
+  }
 };
