@@ -31,8 +31,9 @@ export default function parse (code, options = {}) {
   // commands act on the focus value
   // this is equivalent to the original input at first
   Clover.focus = cast(Clover.input);
-
   Clover.working = Clover.focus;
+
+  Clover.line = 0;
 
   code = code.split('\n')
     .map(line => line.replace(/;.*/gm, '').trim()); // clean
@@ -44,6 +45,7 @@ export default function parse (code, options = {}) {
   }
 
   for (const line of code) {
+    Clover.line++;
     // skip empty lines
     if (line.length === 0) {
       continue;

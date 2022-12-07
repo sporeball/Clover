@@ -35,7 +35,8 @@ export function pretty (value) {
   }
   // CloverError
   else if (value.constructor?.name === 'CloverError') {
-    return `${colors.red('e:')} ${value.message}`;
+    return `${colors.red('e:')} ${value.message}
+${colors.cyan(`   (line ${Clover.line})`)}`;
   }
   // uncaught error
   else if (value instanceof Error && value.message !== 'file not found') {
