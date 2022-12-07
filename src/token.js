@@ -1,6 +1,6 @@
 import { format } from './util.js';
 
-let _stream;
+let _stream = [];
 let _prev;
 
 /**
@@ -46,7 +46,7 @@ export function equals (value, token = _stream[0]) {
  * @param {string} [token]
  */
 export function matches (regexp, token = _stream[0]) {
-  const success = token.match(regexp) !== null;
+  const success = typeof token === 'string' && token.match(regexp) !== null;
   return {
     success,
     self_emsg: format('token %t does not match regex', token)
@@ -61,14 +61,14 @@ export function matches (regexp, token = _stream[0]) {
  */
 export function type (t, token = _stream[0]) {
   let returned;
-  if (equals(undefined).success) {
+  if (equals(undefined, token).success) {
     returned = 'none';
   } else if (
-    matches(/^0$|^-?[1-9][0-9]*$/).success
+    matches(/^0$|^-?[1-9][0-9]*$/, token).success
     || typeof token === 'number'
   ) {
     returned = 'number';
-  } else if (matches(/^'.*'$/).success || typeof token === 'string') {
+  } else if (matches(/^'.*'$/, token).success || typeof token === 'string') {
     returned = 'string';
   } else {
     returned = 'other';
@@ -79,6 +79,27 @@ export function type (t, token = _stream[0]) {
     returned,
     self_emsg: format('expected token of type %s, got %s instead', t, returned)
   };
+}
+
+/**
+ * cast a value from some sort of raw string into something else
+ * does not mutate the original value
+ * @returns {number|string}
+ */
+export function cast (value) {
+  const T = type('', value).returned;
+  // number
+  if (T === 'number') {
+    return Number(value);
+  }
+  if (T === 'string') {
+    if (value.startsWith("'") && value.endsWith("'")) {
+      return value.slice(1, -1); // remove
+    }
+    // otherwise it just happens to be any other string
+    // fall through
+  }
+  return value;
 }
 
 // default object
@@ -96,25 +117,6 @@ export default {
       throw new CloverError(cb.self_emsg);
     }
     return this;
-  },
-  /**
-   * cast the current token from a raw string to something else
-   * does not mutate the current token
-   * @returns {number|string}
-   */
-  cast () {
-    // number
-    if (type('number').success) {
-      return Number(this.head);
-    }
-    if (type('string').success) {
-      if (this.head.startsWith("'") && this.head.endsWith("'")) {
-        return this.head.slice(1, -1); // remove
-      }
-      // otherwise it just happens to be any other string
-      // fall through
-    }
-    return this.head;
   },
   /**
    * syntactic sugar for `next()`

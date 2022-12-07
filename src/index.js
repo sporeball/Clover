@@ -1,4 +1,5 @@
 import * as Command from './commands.js';
+import { cast } from './token.js';
 import { format, output } from './util.js';
 
 import fs from 'fs';
@@ -29,7 +30,7 @@ export default function parse (code, options = {}) {
 
   // commands act on the focus value
   // this is equivalent to the original input at first
-  Clover.focus = Clover.input;
+  Clover.focus = cast(Clover.input);
 
   Clover.working = Clover.focus;
 

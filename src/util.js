@@ -20,7 +20,7 @@ export function pretty (value) {
     if (value.length === 0) {
       return colors.gray("''");
     }
-    return colors.cyan(`'${value.replace('\n', colors.yellow('\\n'))}'`);
+    return colors.cyan(`'${value.replace(/\n/g, colors.yellow('\\n'))}'`);
   }
   // array
   else if (Array.isArray(value)) {

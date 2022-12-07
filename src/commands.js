@@ -1,4 +1,4 @@
-import Token, { any, defined, equals, matches, type } from './token.js';
+import Token, { any, cast, defined, equals, matches, type } from './token.js';
 import { output } from './util.js';
 
 /**
@@ -53,7 +53,7 @@ function worksWith (T) {
 function add () {
   worksWith('number');
   Token.assert(type('number'));
-  Clover.working += Token.cast();
+  Clover.working += cast(Token.head);
 }
 
 function divide () {
@@ -61,7 +61,7 @@ function divide () {
   Token.assert(equals('by'))
     .then()
     .assert(type('number'));
-  Clover.working /= Token.cast();
+  Clover.working /= cast(Token.head);
 }
 
 function focus () {
@@ -69,7 +69,7 @@ function focus () {
   if (Token.head === 'input') {
     Clover.focus = Clover.input;
   } else {
-    Clover.focus = Token.cast();
+    Clover.focus = cast(Token.head);
   }
   Clover.working = Clover.focus;
 }
@@ -79,7 +79,7 @@ function multiply () {
   Token.assert(equals('by'))
     .then()
     .assert(type('number'));
-  Clover.working *= Token.cast();
+  Clover.working *= cast(Token.head);
 }
 
 function refocus () {
@@ -99,27 +99,19 @@ function split () {
       Clover.working = Clover.focus.split('\n');
     }).iff(equals('block'), () => {
       Clover.working = Clover.focus.split('\n\n');
-    }).iff(type('string'), () => {
-      Clover.working = Clover.focus.split(Token.cast());
     });
+    // TODO: make this option less trigger-happy and turn it back on
+    // }).iff(type('string'), () => {
+      // Clover.working = Clover.focus.split(cast(Token.head));
+    // });
   // TODO: giving
 }
 
 function subtract () {
   worksWith('number');
   Token.assert(type('number'));
-  Clover.working -= Token.cast();
+  Clover.working -= cast(Token.head);
 }
-
-// TODO: turn back on
-// function split () {
-  // Token.assert(equals('by')());
-  // Token.assert(any('by', 'on')());
-  // option(tk, {
-  //   nl: () => { Clover.focus = Clover.focus.split('\n'); },
-  //   block: () => { Clover.focus = Clover.focus.split('\n\n'); }
-  // });
-// }
 
 export const commands = {
   add,
