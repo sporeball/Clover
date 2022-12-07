@@ -86,6 +86,7 @@ export function type (t, token = _stream[0]) {
  * does not mutate the original value
  * @returns {number|string}
  */
+// TODO: automatic and manual
 export function cast (value) {
   const T = type('', value).returned;
   // number

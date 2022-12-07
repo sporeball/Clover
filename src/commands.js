@@ -94,7 +94,8 @@ function show () {
 function split () {
   worksWith('string');
   Token.assert(any(['by', 'on']))
-    .then();
+    .then()
+    .assert(defined());
   switch (Token.head) {
     case 'nl':
       Clover.working = Clover.focus.split('\n');
