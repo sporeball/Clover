@@ -23,5 +23,22 @@ tentamen.add(
   focus 10`,
   [5, 10]
 );
-// TODO: tests for split command
+tentamen.add(
+  'split (block)',
+  `focus '1\\n2\\n\\n3\\n4'
+  split by block`,
+  ['1\n2', '3\n4']
+);
+tentamen.add(
+  'split (string)',
+  `focus '1a2a3a4'
+  split on 'a'`,
+  ['1', '2', '3', '4']
+);
+tentamen.add(
+  'split (nl)',
+  `focus '1\\n2\\n3\\n4'
+  split on nl`,
+  ['1', '2', '3', '4']
+);
 tentamen.add('subtract', 'focus 5\nsubtract 5', 0);
