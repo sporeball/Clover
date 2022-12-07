@@ -52,7 +52,7 @@ export default function parse (code, options = {}) {
     }
     // each line of code holds a single command
     // tokenize and evaluate
-    const tokens = line.split(/ +/);
+    const tokens = line.match(/'.*'|[^ ]+/g);
     Command.evaluate(tokens);
   }
 
