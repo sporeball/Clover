@@ -106,16 +106,21 @@ const split = createCommand(() => {
   Token.assert(any(['by', 'on']))
     .then()
     .assert(defined());
+  let value;
   switch (Token.head) {
     case 'nl':
-      Clover.working = Clover.focus.split('\n');
+      value = '\n';
       break;
     case 'block':
-      Clover.working = Clover.focus.split('\n\n');
+      value = '\n\n';
+      break;
+    case 'spaces':
+      value = ' ';
       break;
     default:
-      Clover.working = Clover.focus.split(cast(Token.head));
+      value = cast(Token.head);
   }
+  Clover.working = Clover.focus.split(value);
   // TODO: giving
 });
 
