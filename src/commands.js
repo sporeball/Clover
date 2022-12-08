@@ -131,12 +131,12 @@ const refocus = new Command('refocus', () => {
   Clover.working = Clover.focus;
 });
 
-const show = new Command('show %a', () => {
-  if (Token.empty) {
-    output(Clover.working);
-  } else {
-    output(cast(Token.head.value));
-  }
+const show = new Command('show', () => {
+  output(Clover.working);
+});
+
+const showMonadic = new Command('show %a', () => {
+  output(cast(Token.head.value));
 });
 
 const split = new Command('split %a %a', () => {
@@ -176,6 +176,7 @@ export const commands = {
   multiply,
   refocus,
   show,
+  showMonadic,
   split,
   subtract
 };
