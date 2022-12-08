@@ -6,6 +6,12 @@ tentamen.fn = () => parse(tentamen.input, { silent: true });
 
 tentamen.suite('tests');
 tentamen.add('add', 'focus 5\nadd 5', 10);
+tentamen.add(
+  'count',
+  `focus 'aaaaa'
+  count 'a'`,
+  5
+);
 tentamen.add('divide', 'focus 5\ndivide by 5', 1);
 tentamen.add('focus', 'focus 5', 5);
 tentamen.add('multiply', 'focus 5\nmultiply by 5', 25);
