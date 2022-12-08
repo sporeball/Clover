@@ -1,5 +1,5 @@
 import * as Command from './commands.js';
-import { cast } from './token.js';
+import Token, { cast } from './token.js';
 import { format, output } from './util.js';
 
 import fs from 'fs';
@@ -52,7 +52,8 @@ export default function parse (code, options = {}) {
     }
     // each line of code holds a single command
     // tokenize and evaluate
-    const tokens = line.match(/'.*'|[^ ]+/g);
+    const tokens = line.match(/'.*'|[^ ]+/g)
+      .map(token => new Token.Token(token));
     Command.evaluate(tokens);
   }
 
