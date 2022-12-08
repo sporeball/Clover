@@ -10,17 +10,33 @@ import { output } from './util.js';
  * through callbacks.
  */
 
+class Command {
+  constructor (pattern, body) {
+    this.pattern = pattern;
+    this.body = function () {
+      Token.drop();
+      body();
+      Token.drop();
+    };
+  }
+
+  run () {
+    this.body();
+  }
+}
+
 /**
  * execute a command given the tokens
  * @param {string[]} tokens
  */
 export function evaluate (tokens) {
   Token.stream = tokens;
+
   // look for a command pattern that starts with the head
   if (!(Token.head in commands)) {
     throw new CloverError('no pattern for head token %t', Token.head);
   }
-  commands[Token.head](); // run the command
+  commands[Token.head].run(); // run the command
 
   // at this point the command should be over
   // throw if there is still something left
@@ -34,6 +50,8 @@ export function evaluate (tokens) {
  * throws otherwise
  * @param {string[]} T type
  */
+// TODO: this literally ended up exactly the same as Token.assertType
+// could it be consolidated?
 function worksWith (T) {
   const type = typeOf(Clover.working);
   if (type !== T) {
@@ -44,26 +62,17 @@ function worksWith (T) {
   }
 }
 
-function createCommand (body) {
-  const code = function () {
-    Token.drop(); // remove head
-    body();
-    Token.drop(); // remove the last
-  };
-  return code.bind({});
-}
-
 /**
  * commands below
  */
 
-const add = createCommand(() => {
+const add = new Command('add %n', () => {
   worksWith('number');
   Token.assertType('number');
   Clover.working += cast(Token.head);
 });
 
-const count = createCommand(() => {
+const count = new Command('count %a', () => {
   // TODO: update type checking to make this work with arrays as well
   worksWith('string');
   Clover.working = (Clover.working.match(
@@ -72,7 +81,7 @@ const count = createCommand(() => {
     .length;
 });
 
-const divide = createCommand(() => {
+const divide = new Command('divide by %n', () => {
   worksWith('number');
   Token.assertEquals('by')
     .then()
@@ -80,7 +89,7 @@ const divide = createCommand(() => {
   Clover.working /= cast(Token.head);
 });
 
-const focus = createCommand(() => {
+const focus = new Command('focus %a', () => {
   Token.assertDefined();
   if (Token.head === 'input') {
     Clover.focus = Clover.input;
@@ -90,7 +99,7 @@ const focus = createCommand(() => {
   Clover.working = Clover.focus;
 });
 
-const multiply = createCommand(() => {
+const multiply = new Command('multiply by %n', () => {
   worksWith('number');
   Token.assertEquals('by')
     .then()
@@ -98,11 +107,11 @@ const multiply = createCommand(() => {
   Clover.working *= cast(Token.head);
 });
 
-const refocus = createCommand(() => {
+const refocus = new Command('refocus', () => {
   Clover.working = Clover.focus;
 });
 
-const show = createCommand(() => {
+const show = new Command('show %a', () => {
   if (Token.empty) {
     output(Clover.working);
   } else {
@@ -110,7 +119,7 @@ const show = createCommand(() => {
   }
 });
 
-const split = createCommand(() => {
+const split = new Command('split %a %a', () => {
   worksWith('string');
   Token.assertAny(['by', 'on'])
     .then()
@@ -133,7 +142,7 @@ const split = createCommand(() => {
   // TODO: giving
 });
 
-const subtract = createCommand(() => {
+const subtract = new Command('subtract %n', () => {
   worksWith('number');
   Token.assertType('number');
   Clover.working -= cast(Token.head);
