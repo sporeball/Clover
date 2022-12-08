@@ -4,6 +4,17 @@ import reserved from '../util/reserved.js';
 let _stream = [];
 let _prev;
 
+/**
+ * return the format specifier that matches a value (typically a token value)
+ * supported specifiers include:
+ *   %n  number
+ *   %s  string
+ *   %r  reserved word
+ *   %m  mutable
+ *       (understood to be some other unqualified word)
+ *   %a  any
+ * @param {*} value
+ */
 function specifier (value) {
   const T = typeOf(value);
   if (T === 'number') {
@@ -98,7 +109,13 @@ export function cast (value) {
 // default object
 // import with the name Token
 const Token = {
+  /**
+   * class representing a token
+   */
   Token: class Token {
+    /**
+     * @param {*} value
+     */
     constructor (value) {
       this.value = value;
       this.specifier = specifier(value);

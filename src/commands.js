@@ -10,7 +10,14 @@ import { output } from './util.js';
  * through callbacks.
  */
 
+/**
+ * class representing a valid command
+ */
 class Command {
+  /**
+   * @param {string} pattern format string for the command's token pattern
+   * @param {Function} body underlying command code
+   */
   constructor (pattern, body) {
     this.pattern = pattern;
     this.body = function () {
@@ -20,6 +27,9 @@ class Command {
     };
   }
 
+  /**
+   * run the command
+   */
   run () {
     this.body();
   }
@@ -32,16 +42,20 @@ class Command {
 export function evaluate (tokens) {
   Token.stream = tokens;
 
-  // TODO: what a deal! also, what in god's name!
+  // the list of commands that the current token stream might match
   let possible = Object.entries(commands);
+  // for each token...
   for (let i = 0; i < tokens.length; i++) {
+    // filter to those commands where...
     possible = possible.filter(item => {
-      const instance = item[1];
-      const next = instance.pattern.split(' ')[i];
-      return tokens[i].value === next ||
-        tokens[i].specifier === next ||
-        next === '%a';
+      const command = item[1];
+      // the next part of the command pattern...
+      const next = command.pattern.split(' ')[i];
+      return tokens[i].value === next || // equals the token,
+        tokens[i].specifier === next || // the token's format specifier,
+        next === '%a'; // or the "any" specifier
     });
+    // throw if there are no possible options
     if (possible.length === 0) {
       throw new CloverError(
         'no matching command pattern was found (offending token: %t)',
@@ -49,6 +63,7 @@ export function evaluate (tokens) {
       );
     }
   }
+  // at this point there should be only one option left
   const [name, command] = possible[0];
   if (tokens.length < command.pattern.split(' ').length) {
     throw new CloverError(
