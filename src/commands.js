@@ -57,13 +57,12 @@ export function evaluate (tokens) {
     });
     // throw if there are no possible options
     if (possible.length === 0) {
+      // TODO: this could be made slightly clearer for invalid streams such as
+      // (at the time of writing) `add f`
       throw new CloverError(
         'no matching command pattern was found (offending token: %t)',
         tokens[i].value
       );
-    }
-    if (possible.length === 1) {
-      break;
     }
   }
   const [name, command] = possible[0];
