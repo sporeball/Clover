@@ -1,4 +1,4 @@
-import Token, { any, cast, defined, equals, type } from './token.js';
+import Token, { cast, typeOf } from './token.js';
 import { output } from './util.js';
 
 /**
@@ -35,11 +35,11 @@ export function evaluate (tokens) {
  * @param {string[]} T type
  */
 function worksWith (T) {
-  const typecheck = type(T, Clover.working);
-  if (!typecheck.success) {
+  const type = typeOf(Clover.working);
+  if (type !== T) {
     throw new CloverError(
       'expected working value of type %s, got %s instead',
-      T, typecheck.returned
+      T, type
     );
   }
 }
@@ -59,7 +59,7 @@ function createCommand (body) {
 
 const add = createCommand(() => {
   worksWith('number');
-  Token.assert(type('number'));
+  Token.assertType('number');
   Clover.working += cast(Token.head);
 });
 
@@ -74,14 +74,14 @@ const count = createCommand(() => {
 
 const divide = createCommand(() => {
   worksWith('number');
-  Token.assert(equals('by'))
+  Token.assertEquals('by')
     .then()
-    .assert(type('number'));
+    .assertType('number');
   Clover.working /= cast(Token.head);
 });
 
 const focus = createCommand(() => {
-  Token.assert(defined());
+  Token.assertDefined();
   if (Token.head === 'input') {
     Clover.focus = Clover.input;
   } else {
@@ -92,9 +92,9 @@ const focus = createCommand(() => {
 
 const multiply = createCommand(() => {
   worksWith('number');
-  Token.assert(equals('by'))
+  Token.assertEquals('by')
     .then()
-    .assert(type('number'));
+    .assertType('number');
   Clover.working *= cast(Token.head);
 });
 
@@ -112,9 +112,9 @@ const show = createCommand(() => {
 
 const split = createCommand(() => {
   worksWith('string');
-  Token.assert(any(['by', 'on']))
+  Token.assertAny(['by', 'on'])
     .then()
-    .assert(defined());
+    .assertDefined();
   let value;
   switch (Token.head) {
     case 'nl':
@@ -135,7 +135,7 @@ const split = createCommand(() => {
 
 const subtract = createCommand(() => {
   worksWith('number');
-  Token.assert(type('number'));
+  Token.assertType('number');
   Clover.working -= cast(Token.head);
 });
 

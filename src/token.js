@@ -1,4 +1,4 @@
-import { format } from './util.js';
+// import { format } from './util.js';
 
 let _stream = [];
 let _prev;
@@ -9,20 +9,12 @@ let _prev;
  * @param {*[]} values
  * @param {string} [token]
  */
-export function any (values, token = _stream[0]) {
-  const success = values.includes(token);
-  return {
-    success,
-    self_emsg: format('expected one of %t, got %t instead', values, token)
-  };
+export function any (values, token) {
+  return values.includes(token);
 }
 
-export function defined (token = _stream[0]) {
-  const success = token !== undefined;
-  return {
-    success,
-    self_emsg: format("expected a token, but didn't get one")
-  };
+export function defined (token) {
+  return token !== undefined;
 }
 
 /**
@@ -31,12 +23,8 @@ export function defined (token = _stream[0]) {
  * @param {string} value
  * @param {string} [token]
  */
-export function equals (value, token = _stream[0]) {
-  const success = token === value;
-  return {
-    success,
-    self_emsg: format('expected token %t, got %t instead', value, token)
-  };
+export function equals (value, token) {
+  return token === value;
 }
 
 /**
@@ -45,54 +33,40 @@ export function equals (value, token = _stream[0]) {
  * @param {RegExp} regexp
  * @param {string} [token]
  */
-export function matches (regexp, token = _stream[0]) {
-  const success = typeof token === 'string' && token.match(regexp) !== null;
-  return {
-    success,
-    self_emsg: format('token %t does not match regex', token)
-  };
+export function matches (regexp, token) {
+  return typeof token === 'string' && token.match(regexp) !== null;
 }
 
 /**
  * return whether a token is of a certain type
  * assertable
- * @param {string} T type
  * @param {string} [token]
  */
-export function type (T, token = _stream[0]) {
-  let returned;
-  if (equals(undefined, token).success) {
-    returned = 'none';
-  } else if (
-    matches(/^0$|^-?[1-9][0-9]*$/, token).success ||
-    typeof token === 'number'
+export function typeOf (token) {
+  if (token === undefined) {
+    return 'none';
+  } else if (typeof token === 'number' ||
+    (typeof token === 'string' && token !== '' && !isNaN(Number(token)))
   ) {
-    returned = 'number';
-  // TODO: typeof doesn't make sense for this one
-  // either it matches the regex or it's an unqualified name
-  } else if (matches(/^'.*'$/, token).success || typeof token === 'string') {
-    returned = 'string';
+    return 'number';
+  } else if (matches(/^'.*'$/, token)) {
+    return 'string';
+  } else if (typeof token === 'string') {
+    return 'string';
   } else {
-    returned = 'other';
+    return 'other';
   }
-  const success = T === returned;
-  return {
-    success,
-    returned,
-    self_emsg: format('expected token of type %s, got %s instead', T, returned)
-  };
 }
 
 /**
- * cast a value from some sort of raw string into something else
+ * cast a value from a Clover type to a primitive JavaScript type
  * does not mutate the original value
  * @param {*} value
  * @returns {number|string}
  */
 // TODO: automatic and manual
 export function cast (value) {
-  const T = type('', value).returned;
-  // number
+  const T = typeOf(value);
   if (T === 'number') {
     return Number(value);
   }
@@ -107,17 +81,40 @@ export function cast (value) {
 
 // default object
 // import with the name Token
-export default {
-  /**
-   * verify that something is true
-   * requires an assertable function
-   * throws the associated error message if the assertion returns false
-   * chainable
-   * @param {*} cb a call to an assertable function
-   */
-  assert (cb) {
-    if (cb.success === false) {
-      throw new CloverError(cb.self_emsg);
+const Token = {
+  assertAny (values) {
+    if (!any(values, this.head)) {
+      throw new CloverError(
+        'expected one of %t, got %t instead', values, this.head
+      );
+    }
+    return this;
+  },
+  assertDefined () {
+    if (!defined(this.head)) {
+      throw new CloverError("expected a token, but didn't get one");
+    }
+  },
+  assertEquals (value) {
+    if (!equals(value, this.head)) {
+      throw new CloverError(
+        'expected token %t, got %t instead', value, this.head
+      );
+    }
+    return this;
+  },
+  assertMatches (regexp) {
+    if (!matches(regexp, this.head)) {
+      throw new CloverError('token %t does not match regex', this.head);
+    }
+    return this;
+  },
+  assertType (T) {
+    const t = typeOf(this.head);
+    if (t !== T) {
+      throw new CloverError(
+        'expected token of type %s, got %s instead', T, t
+      );
     }
     return this;
   },
@@ -142,12 +139,6 @@ export default {
    */
   get head () {
     return this.stream[0];
-  },
-  iff (assertable, cb) {
-    if (assertable.success === true) {
-      cb();
-    }
-    return this;
   },
   /**
    * move on to the next token of the current token stream
@@ -184,3 +175,5 @@ export default {
     return this;
   }
 };
+
+export default Token;
