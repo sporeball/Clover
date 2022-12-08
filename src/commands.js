@@ -63,6 +63,15 @@ const add = createCommand(() => {
   Clover.working += cast(Token.head);
 });
 
+const count = createCommand(() => {
+  // TODO: update type checking to make this work with arrays as well
+  worksWith('string');
+  Clover.working = (Clover.working.match(
+    new RegExp(cast(Token.head), 'g')
+  ) || [])
+    .length;
+});
+
 const divide = createCommand(() => {
   worksWith('number');
   Token.assert(equals('by'))
@@ -132,6 +141,7 @@ const subtract = createCommand(() => {
 
 export const commands = {
   add,
+  count,
   divide,
   focus,
   multiply,
