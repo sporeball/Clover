@@ -1,4 +1,4 @@
-import Token, { cast, typeOf } from './token.js';
+import Token, { cast } from './token.js';
 import { output } from './util.js';
 
 /**
@@ -90,7 +90,7 @@ export function evaluate (tokens) {
 // TODO: this literally ended up exactly the same as Token.assertType
 // could it be consolidated?
 function worksWith (T) {
-  const type = typeOf(Clover.working);
+  const type = typeof Clover.working;
   if (type !== T) {
     throw new CloverError(
       'expected working value of type %s, got %s instead',
@@ -103,13 +103,10 @@ function worksWith (T) {
  * commands below
  */
 
-// TODO: many of the assertions are now not necessary
-// figure out what to do
-
 const add = new Command('add %n', () => {
   worksWith('number');
   Token.drop();
-  Clover.working += cast(Token.head.value);
+  Clover.working += cast(Token.head);
 });
 
 const count = new Command('count %a', () => {
@@ -117,7 +114,7 @@ const count = new Command('count %a', () => {
   worksWith('string');
   Token.drop();
   Clover.working = (Clover.working.match(
-    new RegExp(cast(Token.head.value), 'g')
+    new RegExp(cast(Token.head), 'g')
   ) || [])
     .length;
 });
@@ -125,7 +122,7 @@ const count = new Command('count %a', () => {
 const divide = new Command('divide by %n', () => {
   worksWith('number');
   Token.drop(2);
-  Clover.working /= cast(Token.head.value);
+  Clover.working /= cast(Token.head);
 });
 
 const focus = new Command('focus %a', () => {
@@ -133,7 +130,7 @@ const focus = new Command('focus %a', () => {
   if (Token.head === 'input') {
     Clover.focus = Clover.input;
   } else {
-    Clover.focus = cast(Token.head.value);
+    Clover.focus = cast(Token.head);
   }
   Clover.working = Clover.focus;
 });
@@ -141,7 +138,7 @@ const focus = new Command('focus %a', () => {
 const multiply = new Command('multiply by %n', () => {
   worksWith('number');
   Token.drop(2);
-  Clover.working *= cast(Token.head.value);
+  Clover.working *= cast(Token.head);
 });
 
 const refocus = new Command('refocus', () => {
@@ -154,7 +151,7 @@ const show = new Command('show', () => {
 
 const showMonadic = new Command('show %a', () => {
   Token.drop();
-  output(cast(Token.head.value));
+  output(cast(Token.head));
 });
 
 const split = new Command('split %a %a', () => {
@@ -174,7 +171,7 @@ const split = new Command('split %a %a', () => {
       value = ' ';
       break;
     default:
-      value = cast(Token.head.value);
+      value = cast(Token.head);
   }
   Clover.working = Clover.focus.split(value);
   // TODO: giving
@@ -183,7 +180,7 @@ const split = new Command('split %a %a', () => {
 const subtract = new Command('subtract %n', () => {
   worksWith('number');
   Token.drop();
-  Clover.working -= cast(Token.head.value);
+  Clover.working -= cast(Token.head);
 });
 
 export const commands = {
