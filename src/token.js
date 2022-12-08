@@ -161,8 +161,10 @@ const Token = {
    * syntactic sugar for `next()`
    * chainable
    */
-  drop () {
-    this.next();
+  drop (count = 1) {
+    for (let i = 0; i < count; i++) {
+      this.next();
+    }
     return this;
   },
   /**

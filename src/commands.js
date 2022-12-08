@@ -21,7 +21,7 @@ class Command {
   constructor (pattern, body) {
     this.pattern = pattern;
     this.body = function () {
-      Token.drop();
+      // Token.drop();
       body();
       Token.drop();
     };
@@ -62,8 +62,10 @@ export function evaluate (tokens) {
         tokens[i].value
       );
     }
+    if (possible.length === 1) {
+      break;
+    }
   }
-  // at this point there should be only one option left
   const [name, command] = possible[0];
   if (tokens.length < command.pattern.split(' ').length) {
     throw new CloverError(
@@ -101,15 +103,19 @@ function worksWith (T) {
  * commands below
  */
 
+// TODO: many of the assertions are now not necessary
+// figure out what to do
+
 const add = new Command('add %n', () => {
   worksWith('number');
-  Token.assertType('number');
+  Token.drop();
   Clover.working += cast(Token.head.value);
 });
 
 const count = new Command('count %a', () => {
   // TODO: update type checking to make this work with arrays as well
   worksWith('string');
+  Token.drop();
   Clover.working = (Clover.working.match(
     new RegExp(cast(Token.head.value), 'g')
   ) || [])
@@ -118,14 +124,12 @@ const count = new Command('count %a', () => {
 
 const divide = new Command('divide by %n', () => {
   worksWith('number');
-  Token.assertEquals('by')
-    .then()
-    .assertType('number');
+  Token.drop(2);
   Clover.working /= cast(Token.head.value);
 });
 
 const focus = new Command('focus %a', () => {
-  Token.assertDefined();
+  Token.drop();
   if (Token.head === 'input') {
     Clover.focus = Clover.input;
   } else {
@@ -136,9 +140,7 @@ const focus = new Command('focus %a', () => {
 
 const multiply = new Command('multiply by %n', () => {
   worksWith('number');
-  Token.assertEquals('by')
-    .then()
-    .assertType('number');
+  Token.drop(2);
   Clover.working *= cast(Token.head.value);
 });
 
@@ -151,14 +153,15 @@ const show = new Command('show', () => {
 });
 
 const showMonadic = new Command('show %a', () => {
+  Token.drop();
   output(cast(Token.head.value));
 });
 
 const split = new Command('split %a %a', () => {
   worksWith('string');
+  Token.drop();
   Token.assertAny(['by', 'on'])
-    .then()
-    .assertDefined();
+    .drop();
   let value;
   switch (Token.head.value) {
     case 'nl':
@@ -179,7 +182,7 @@ const split = new Command('split %a %a', () => {
 
 const subtract = new Command('subtract %n', () => {
   worksWith('number');
-  Token.assertType('number');
+  Token.drop();
   Clover.working -= cast(Token.head.value);
 });
 
