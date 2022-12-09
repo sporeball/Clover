@@ -1,3 +1,4 @@
+import Mutables from './mutable.js';
 import reserved from '../util/reserved.js';
 
 /**
@@ -38,11 +39,8 @@ export function matches (value, regexp) {
  * return the type of a value
  * works with Tokens and with primitive values
  * @param {*} v
- * @param {Object} [options]
- * @param {boolean} [options.srm]
- *   whether to return the type 'mutable' for unknown strings
  */
-export function typeOf (v, options = {}) {
+export function typeOf (v) {
   let value = v; // true value to work with
   if (v instanceof Token.Token) {
     value = value.value; // haha...
@@ -55,16 +53,15 @@ export function typeOf (v, options = {}) {
     (typeof value === 'string' && value !== '' && !isNaN(Number(value)))
   ) {
     return 'number';
-  } else if (matches(/^'.*'$/, value)) {
+  } else if (matches(value, /^'.*'$/)) {
     return 'string';
   } else if (typeof value === 'string') {
-    if (options.srm) {
+    if (value.startsWith(':')) {
       return 'mutable';
     }
     return 'string';
-  } else {
-    return 'other';
   }
+  return 'other';
 }
 
 /**
@@ -82,6 +79,9 @@ export function cast (v) {
   const T = typeOf(value);
   if (T === 'number') {
     return Number(value);
+  }
+  if (T === 'mutable') {
+    return Mutables[value];
   }
   if (T === 'string') {
     value = value.replace(/\\n/g, '\n');
@@ -104,7 +104,7 @@ export function cast (v) {
  * @param {*} value
  */
 function specifier (value) {
-  const T = typeOf(value, { srm: true });
+  const T = typeOf(value);
   // console.log(value, T);
   if (T === 'number') {
     return '%n';
@@ -163,7 +163,7 @@ const Token = {
     return this;
   },
   assertType (value, T) {
-    const t = typeOf(value, { srm: true });
+    const t = typeOf(value);
     if (t !== T) {
       throw new CloverError(
         'expected token of type %s, got %s instead', T, t

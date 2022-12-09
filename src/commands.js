@@ -1,4 +1,4 @@
-import Token, { cast, typeOf } from './token.js';
+import Token, { cast } from './token.js';
 import Mutables, { accesses } from './mutable.js';
 import { output } from './util.js';
 
@@ -167,15 +167,7 @@ const show = new Command('show', () => {
 
 const showMonadic = new Command('show %a', args => {
   const [value] = args;
-  // TODO: this will quickly become unsustainable
-  // figure out the best way to unify the type checks
-  switch (typeOf(value, { srm: true })) {
-    case 'mutable':
-      output(Mutables[value]);
-      break;
-    default:
-      output(cast(value));
-  }
+  output(cast(value));
 });
 
 const split = new Command('split %a %a', args => {
