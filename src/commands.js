@@ -161,6 +161,11 @@ const refocus = new Command('refocus', () => {
   Clover.working = Clover.focus;
 });
 
+const set = new Command('set %m to %a', args => {
+  const [mut, value] = args;
+  Mutables[mut] = cast(value);
+});
+
 const show = new Command('show', () => {
   output(Clover.working);
 });
@@ -217,6 +222,7 @@ export const commands = {
   focus,
   multiply,
   refocus,
+  set,
   show,
   showMonadic,
   split,
