@@ -1,4 +1,5 @@
-import Token, { cast } from './token.js';
+import Token, { cast, typeOf } from './token.js';
+import Mutables, { accesses } from './mutable.js';
 import { output } from './util.js';
 
 /**
@@ -97,8 +98,6 @@ export function evaluate (tokens) {
  * assert that the working value is of a certain type
  * @param {string[]} T type
  */
-// TODO: this literally ended up exactly the same as Token.assertType
-// could it be consolidated?
 function worksWith (T) {
   const type = typeof Clover.working;
   if (type !== T) {
@@ -117,6 +116,13 @@ const add = new Command('add %n', args => {
   worksWith('number');
   const [value] = args;
   Clover.working += cast(value);
+});
+
+const addToMut = new Command('add to %m', args => {
+  worksWith('number');
+  accesses(args[0], 'number');
+  const [mut] = args;
+  Mutables[mut] += Clover.working;
 });
 
 const count = new Command('count %a', args => {
@@ -161,7 +167,15 @@ const show = new Command('show', () => {
 
 const showMonadic = new Command('show %a', args => {
   const [value] = args;
-  output(cast(value));
+  // TODO: this will quickly become unsustainable
+  // figure out the best way to unify the type checks
+  switch (typeOf(value, { srm: true })) {
+    case 'mutable':
+      output(Mutables[value]);
+      break;
+    default:
+      output(cast(value));
+  }
 });
 
 const split = new Command('split %a %a', args => {
@@ -198,6 +212,7 @@ const subtract = new Command('subtract %n', args => {
 
 export const commands = {
   add,
+  addToMut,
   count,
   divide,
   focus,
