@@ -30,15 +30,15 @@ tentamen.add(
   [5, 10]
 );
 tentamen.add(
-  'split (block)',
+  'split (blocks)',
   `focus '1\\n2\\n\\n3\\n4'
-  split by block`,
+  split by blocks`,
   ['1\n2', '3\n4']
 );
 tentamen.add(
-  'split (nl)',
+  'split (newlines)',
   `focus '1\\n2\\n3\\n4'
-  split on nl`,
+  split on newlines`,
   ['1', '2', '3', '4']
 );
 tentamen.add(
