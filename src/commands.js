@@ -20,9 +20,9 @@ class Command {
    */
   constructor (pattern, body) {
     this.pattern = pattern;
-    this.body = function () {
+    this.body = function (args) {
       // Token.drop();
-      body();
+      body(args);
       Token.drop();
     };
   }
@@ -30,8 +30,8 @@ class Command {
   /**
    * run the command
    */
-  run () {
-    this.body();
+  run (args) {
+    this.body(args);
   }
 }
 
@@ -39,6 +39,7 @@ class Command {
  * execute a command given the tokens
  * @param {string[]} tokens
  */
+// TODO: some would probably call this function overloaded
 export function evaluate (tokens) {
   Token.stream = tokens;
 
@@ -65,20 +66,43 @@ export function evaluate (tokens) {
       );
     }
   }
-  const [name, command] = possible[0];
-  if (tokens.length < command.pattern.split(' ').length) {
+
+  // at this point there is just one option left
+  const [, command] = possible[0];
+  const patternTokens = command.pattern.split(' ');
+  if (tokens.length < patternTokens.length) {
     throw new CloverError(
       'no matching command pattern was found (ran out of tokens)'
     );
   }
-  // look for a command pattern that starts with the head
-  commands[name].run(); // run the command
+
+  // some tokens simply help to form the pattern, and can be dropped.
+  // to find the indices of any arguments...
+  const argIndices = patternTokens
+    // for each segment of the pattern...
+    .map((seg, i, arr) => {
+      // replace with its index if it is given by a format specifier,
+      if (arr[i].startsWith('%')) {
+        return i;
+      }
+      // or with null otherwise,
+      return null;
+    })
+    // and remove null values
+    .filter(x => x !== null);
+
+  // filter the token stream to the values...
+  const args = Token.stream.map(token => token.value)
+    // of the tokens with those indices
+    .filter((token, i) => argIndices.includes(i));
+
+  command.run(args);
 
   // at this point the command should be over
   // throw if there is still something left
-  if (!Token.empty) {
-    throw new CloverError('found token %t after end of pattern', Token.head);
-  }
+  // if (!Token.empty) {
+  //   throw new CloverError('found token %t after end of pattern', Token.head);
+  // }
 }
 
 /**
@@ -102,42 +126,42 @@ function worksWith (T) {
  * commands below
  */
 
-const add = new Command('add %n', () => {
+const add = new Command('add %n', args => {
   worksWith('number');
-  Token.drop();
-  Clover.working += cast(Token.head);
+  const [value] = args;
+  Clover.working += cast(value);
 });
 
-const count = new Command('count %a', () => {
+const count = new Command('count %a', args => {
   // TODO: update type checking to make this work with arrays as well
   worksWith('string');
-  Token.drop();
+  const [value] = args;
   Clover.working = (Clover.working.match(
-    new RegExp(cast(Token.head), 'g')
+    new RegExp(cast(value), 'g')
   ) || [])
     .length;
 });
 
-const divide = new Command('divide by %n', () => {
+const divide = new Command('divide by %n', args => {
   worksWith('number');
-  Token.drop(2);
-  Clover.working /= cast(Token.head);
+  const [value] = args;
+  Clover.working /= cast(value);
 });
 
-const focus = new Command('focus %a', () => {
-  Token.drop();
-  if (Token.head === 'input') {
+const focus = new Command('focus %a', args => {
+  const [value] = args;
+  if (value === 'input') {
     Clover.focus = Clover.input;
   } else {
-    Clover.focus = cast(Token.head);
+    Clover.focus = cast(value);
   }
   Clover.working = Clover.focus;
 });
 
-const multiply = new Command('multiply by %n', () => {
+const multiply = new Command('multiply by %n', args => {
   worksWith('number');
-  Token.drop(2);
-  Clover.working *= cast(Token.head);
+  const [value] = args;
+  Clover.working *= cast(value);
 });
 
 const refocus = new Command('refocus', () => {
@@ -148,12 +172,12 @@ const show = new Command('show', () => {
   output(Clover.working);
 });
 
-const showMonadic = new Command('show %a', () => {
-  Token.drop();
-  output(cast(Token.head));
+const showMonadic = new Command('show %a', args => {
+  const [value] = args;
+  output(cast(value));
 });
 
-const split = new Command('split %a %a', () => {
+const split = new Command('split %a %a', args => {
   worksWith('string');
   Token.drop();
   Token.assertAny(['by', 'on'])
@@ -176,10 +200,10 @@ const split = new Command('split %a %a', () => {
   // TODO: giving
 });
 
-const subtract = new Command('subtract %n', () => {
+const subtract = new Command('subtract %n', args => {
   worksWith('number');
-  Token.drop();
-  Clover.working -= cast(Token.head);
+  const [value] = args;
+  Clover.working -= cast(value);
 });
 
 export const commands = {
