@@ -80,3 +80,12 @@ export function output (value) {
     pprint(value);
   }
 }
+
+/**
+ * escape special characters in a string
+ * useful anywhere that `String.prototype.match` is being used
+ * @param {string} str
+ */
+export function escape (str) {
+  return str.replace(/[.*+?^$()[\]{}|\\]/g, match => '\\' + match);
+}

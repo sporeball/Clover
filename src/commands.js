@@ -1,6 +1,6 @@
 import Token, { cast } from './token.js';
 import Mutables, { accesses } from './mutable.js';
-import { output } from './util.js';
+import { output, escape } from './util.js';
 
 /**
  * each command written in a clover program consists of a list of tokens.
@@ -130,7 +130,7 @@ const count = new Command('count %a', args => {
   worksWith('string');
   const [value] = args;
   Clover.working = (Clover.working.match(
-    new RegExp(cast(value), 'g')
+    new RegExp(escape(cast(value)), 'g')
   ) || [])
     .length;
 });
@@ -202,6 +202,13 @@ const subtract = new Command('subtract %n', args => {
   Clover.working -= cast(value);
 });
 
+const subtractFromMut = new Command('subtract from %m', args => {
+  worksWith('number');
+  accesses(args[0], 'number');
+  const [mut] = args;
+  Mutables[mut] -= Clover.working;
+});
+
 export const commands = {
   add,
   addToMut,
@@ -213,5 +220,6 @@ export const commands = {
   show,
   showMonadic,
   split,
-  subtract
+  subtract,
+  subtractFromMut
 };
