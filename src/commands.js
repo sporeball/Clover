@@ -20,11 +20,7 @@ class Command {
    */
   constructor (pattern, body) {
     this.pattern = pattern;
-    this.body = function (args) {
-      // Token.drop();
-      body(args);
-      Token.drop();
-    };
+    this.body = body;
   }
 
   /**
@@ -41,8 +37,6 @@ class Command {
  */
 // TODO: some would probably call this function overloaded
 export function evaluate (tokens) {
-  Token.stream = tokens;
-
   // the list of commands that the current token stream might match
   let possible = Object.entries(commands);
   // for each token...
@@ -92,22 +86,15 @@ export function evaluate (tokens) {
     .filter(x => x !== null);
 
   // filter the token stream to the values...
-  const args = Token.stream.map(token => token.value)
+  const args = tokens.map(token => token.value)
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i));
 
   command.run(args);
-
-  // at this point the command should be over
-  // throw if there is still something left
-  // if (!Token.empty) {
-  //   throw new CloverError('found token %t after end of pattern', Token.head);
-  // }
 }
 
 /**
- * used in commands to assert that the working value is of a certain type
- * throws otherwise
+ * assert that the working value is of a certain type
  * @param {string[]} T type
  */
 // TODO: this literally ended up exactly the same as Token.assertType

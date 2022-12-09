@@ -1,8 +1,4 @@
-// import { specifier } from './util.js';
 import reserved from '../util/reserved.js';
-
-let _stream = [];
-let _prev;
 
 /**
  * return whether a value is equal to one of multiple passed values
@@ -126,7 +122,6 @@ function specifier (value) {
 }
 
 // default object
-// import with the name Token
 const Token = {
   /**
    * class representing a token
@@ -174,64 +169,6 @@ const Token = {
         'expected token of type %s, got %s instead', T, t
       );
     }
-    return this;
-  },
-  /**
-   * syntactic sugar for `next()`
-   * chainable
-   */
-  drop (count = 1) {
-    for (let i = 0; i < count; i++) {
-      this.next();
-    }
-    return this;
-  },
-  /**
-   * return whether the current token stream is empty
-   * getter
-   */
-  get empty () {
-    return this.stream.length === 0;
-  },
-  /**
-   * return the first remaining element of the current token stream
-   * getter
-   */
-  get head () {
-    return this.stream[0];
-  },
-  /**
-   * move on to the next token of the current token stream
-   * chainable
-   */
-  next () {
-    _prev = this.stream.shift();
-    return this;
-  },
-  get prev () {
-    return _prev;
-  },
-  /**
-   * return what remains of the current token stream
-   * getter
-   */
-  get stream () {
-    return _stream;
-  },
-  /**
-   * set the current token stream
-   * setter
-   * @param {*[]} s
-   */
-  set stream (s) {
-    _stream = s;
-  },
-  /**
-   * syntactic sugar for `next()`
-   * chainable
-   */
-  then () {
-    this.next();
     return this;
   }
 };
