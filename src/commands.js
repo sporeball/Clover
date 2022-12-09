@@ -184,11 +184,12 @@ const split = new Command('split %a %a', args => {
   Token.assertAny(connector, ['by', 'on']);
 
   let value;
+  // TODO: singular and plural
   switch (splitter) {
-    case 'nl':
+    case 'newlines':
       value = '\n';
       break;
-    case 'block':
+    case 'blocks':
       value = '\n\n';
       break;
     case 'spaces':
