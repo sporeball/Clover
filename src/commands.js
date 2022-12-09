@@ -179,11 +179,12 @@ const showMonadic = new Command('show %a', args => {
 
 const split = new Command('split %a %a', args => {
   worksWith('string');
-  Token.drop();
-  Token.assertAny(['by', 'on'])
-    .drop();
+  const [connector, splitter] = args;
+
+  Token.assertAny(connector, ['by', 'on']);
+
   let value;
-  switch (Token.head.value) {
+  switch (splitter) {
     case 'nl':
       value = '\n';
       break;
@@ -194,8 +195,9 @@ const split = new Command('split %a %a', args => {
       value = ' ';
       break;
     default:
-      value = cast(Token.head);
+      value = cast(splitter);
   }
+
   Clover.working = Clover.focus.split(value);
   // TODO: giving
 });

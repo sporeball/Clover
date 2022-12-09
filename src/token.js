@@ -5,63 +5,37 @@ let _stream = [];
 let _prev;
 
 /**
- * return the format specifier that matches a value (typically a token value)
- * supported specifiers include:
- *   %n  number
- *   %s  string
- *   %r  reserved word
- *   %m  mutable
- *       (understood to be some other unqualified word)
- *   %a  any
+ * return whether a value is equal to one of multiple passed values
+ * @param {*} value the value to check
+ * @param {*[]} values array of valid values
+ */
+export function any (value, values) {
+  return values.includes(value);
+}
+
+/**
  * @param {*} value
  */
-function specifier (value) {
-  const T = typeOf(value, { srm: true });
-  // console.log(value, T);
-  if (T === 'number') {
-    return '%n';
-  }
-  if (T === 'string') {
-    return '%s';
-  }
-  if (T === 'reserved') {
-    return '%r';
-  }
-  if (T === 'mutable') {
-    return '%m';
-  }
-  return '%a';
+export function defined (value) {
+  return value !== undefined;
 }
 
 /**
- * return whether a token is equal to one of multiple passed values
- * @param {*[]} values
- * @param {string} [token]
+ * return whether one value is equal to another
+ * @param {*} v1
+ * @param {*} v2
  */
-export function any (values, token) {
-  return values.includes(token);
-}
-
-export function defined (token) {
-  return token !== undefined;
+export function equal (v1, v2) {
+  return v1 === v2;
 }
 
 /**
- * return whether a token is equal to a value
- * @param {string} value
- * @param {string} [token]
- */
-export function equals (value, token) {
-  return token === value;
-}
-
-/**
- * return whether a token matches a regular expression
+ * return whether a value matches a regular expression
+ * @param {*} value
  * @param {RegExp} regexp
- * @param {string} [token]
  */
-export function matches (regexp, token) {
-  return typeof token === 'string' && token.match(regexp) !== null;
+export function matches (value, regexp) {
+  return typeof value === 'string' && value.match(regexp) !== null;
 }
 
 /**
@@ -122,6 +96,35 @@ export function cast (v) {
   return value;
 }
 
+/**
+ * return the format specifier that matches a token value
+ * supported specifiers include:
+ *   %n  number
+ *   %s  string
+ *   %r  reserved word
+ *   %m  mutable
+ *       (understood to be some other unqualified word)
+ *   %a  any
+ * @param {*} value
+ */
+function specifier (value) {
+  const T = typeOf(value, { srm: true });
+  // console.log(value, T);
+  if (T === 'number') {
+    return '%n';
+  }
+  if (T === 'string') {
+    return '%s';
+  }
+  if (T === 'reserved') {
+    return '%r';
+  }
+  if (T === 'mutable') {
+    return '%m';
+  }
+  return '%a';
+}
+
 // default object
 // import with the name Token
 const Token = {
@@ -137,35 +140,35 @@ const Token = {
       this.specifier = specifier(value);
     }
   },
-  assertAny (values) {
-    if (!any(values, this.head.value)) {
+  assertAny (value, values) {
+    if (!any(value, values)) {
       throw new CloverError(
-        'expected one of %t, got %t instead', values, this.head.value
+        'expected one of %t, got %t instead', values, value
       );
     }
     return this;
   },
-  assertDefined () {
-    if (!defined(this.head.value)) {
+  assertDefined (value) {
+    if (!defined(value)) {
       throw new CloverError("expected a token, but didn't get one");
     }
   },
-  assertEquals (value) {
-    if (!equals(value, this.head.value)) {
+  assertEqual (v1, v2) {
+    if (!equal(v1, v2)) {
       throw new CloverError(
-        'expected token %t, got %t instead', value, this.head.value
+        'expected token %t, got %t instead', v1, v2
       );
     }
     return this;
   },
-  assertMatches (regexp) {
-    if (!matches(regexp, this.head.value)) {
-      throw new CloverError('token %t does not match regex', this.head.value);
+  assertMatches (value, regexp) {
+    if (!matches(value, regexp)) {
+      throw new CloverError('token %t does not match regex', value);
     }
     return this;
   },
-  assertType (T) {
-    const t = typeOf(this.head.value);
+  assertType (value, T) {
+    const t = typeOf(value, { srm: true });
     if (t !== T) {
       throw new CloverError(
         'expected token of type %s, got %s instead', T, t
