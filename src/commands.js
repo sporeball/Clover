@@ -233,6 +233,9 @@ const quiet = new Verb('quiet', () => {
  */
 
 const countOf = new Noun('count of %a', count.body);
+const equals = new Noun('equals %m', args => {
+  Clover.mutables[args[0]] = Clover.working;
+});
 const over = new Noun('over %a', divide.body);
 const minus = new Noun('minus %a', subtract.body);
 const plus = new Noun('plus %a', add.body);
@@ -257,6 +260,7 @@ export const commands = {
   quiet,
   // nouns
   countOf,
+  equals,
   over,
   minus,
   plus,
