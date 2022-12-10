@@ -145,11 +145,7 @@ const divide = new Command('divide by %a', args => {
 
 const focus = new Command('focus %a', args => {
   const [value] = args;
-  if (value === 'input') {
-    Clover.focus = Clover.input;
-  } else {
-    Clover.focus = cast(value);
-  }
+  Clover.focus = cast(value);
   Clover.working = Clover.focus;
 });
 
@@ -218,6 +214,10 @@ const subtractFromMut = new Command('subtract from %m', args => {
   Clover.mutables[mut] -= Clover.working;
 });
 
+const quiet = new Command('quiet', () => {
+  Clover.quiet = true;
+});
+
 export const commands = {
   add,
   addToMut,
@@ -231,5 +231,6 @@ export const commands = {
   showMonadic,
   split,
   subtract,
-  subtractFromMut
+  subtractFromMut,
+  quiet
 };

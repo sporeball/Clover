@@ -89,8 +89,9 @@ tentamen.add(
 );
 tentamen.add(
   'showMonadic',
-  "show 'a'",
-  ['a', undefined] // don't forget the implicit
+  `show 'a'
+  quiet`,
+  'a'
 );
 tentamen.add(
   'split (blocks)',
@@ -124,5 +125,6 @@ tentamen.add(
   focus :mut`,
   -5
 );
+tentamen.add('quiet', 'quiet', []);
 
 tentamen.done();
