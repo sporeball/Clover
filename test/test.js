@@ -33,11 +33,11 @@ tentamen.done = (function () {
     const p = (100 * ((numCommands - uncovered.length) / numCommands))
       .toFixed(2);
     if (uncovered.length === 0) {
-      console.log(colors.green('  o  ') + `${p}% coverage`);
+      console.log(colors.green('  o  ') + `${p}% command coverage`);
     } else {
       console.log(
         colors.red('  X  ') +
-        colors.yellow(`${p}% coverage (${uncovered.length} commands untested)`)
+        colors.yellow(`${p}% command coverage (${uncovered.length} commands untested)`)
       );
       console.log(`     (${uncovered.join(', ')})`);
     }
@@ -54,7 +54,6 @@ tentamen.add(
   'addToMut',
   `focus 5
   add to :mut
-  focus 10
   focus :mut`,
   5
 );
@@ -84,8 +83,8 @@ tentamen.add(
   'show',
   `focus 5
   show
-  focus 10`,
-  [5, 10]
+  quiet`,
+  5
 );
 tentamen.add(
   'showMonadic',
@@ -94,27 +93,9 @@ tentamen.add(
   'a'
 );
 tentamen.add(
-  'split (blocks)',
-  `focus '1\\n2\\n\\n3\\n4'
-  split by blocks`,
-  ['1\n2', '3\n4']
-);
-tentamen.add(
-  'split (newlines)',
+  'split',
   `focus '1\\n2\\n3\\n4'
   split on newlines`,
-  ['1', '2', '3', '4']
-);
-tentamen.add(
-  'split (spaces)',
-  `focus '1 2 3 4'
-  split on spaces`,
-  ['1', '2', '3', '4']
-);
-tentamen.add(
-  'split (string)',
-  `focus '1a2a3a4'
-  split on 'a'`,
   ['1', '2', '3', '4']
 );
 tentamen.add('subtract', 'focus 5\nsubtract 5', 0);
