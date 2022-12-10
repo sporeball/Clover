@@ -46,21 +46,26 @@ export function typeOf (v) {
   }
   if (value === undefined) {
     return 'none';
-  } else if (reserved.includes(value)) {
+  }
+  if (reserved.includes(value)) {
     return 'reserved';
-  } else if (
+  }
+  if (
     Array.isArray(value) ||
     matches(value, /^\[.*\]$/)
   ) {
     return 'array';
-  } else if (
+  }
+  if (
     typeof value === 'number' ||
     (typeof value === 'string' && value !== '' && !isNaN(Number(value)))
   ) {
     return 'number';
-  } else if (matches(value, /^'.*'$/)) {
+  }
+  if (matches(value, /^'.*'$/)) {
     return 'string';
-  } else if (typeof value === 'string') {
+  }
+  if (typeof value === 'string') {
     if (value.startsWith(':')) {
       return 'mutable';
     }
