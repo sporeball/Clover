@@ -136,9 +136,14 @@ const addToMut = new NumberCommand('add to %m', args => {
   Clover.mutables[mut] += Clover.working;
 });
 
-const count = new StringCommand('count %a', args => {
-  // TODO: update type checking to make this work with arrays as well
+const count = new Command('count %a', args => {
   const [value] = args;
+  if (typeOf(Clover.working) === 'array') {
+    Clover.working = Clover.working
+      .filter(x => x === cast(value))
+      .length;
+    return;
+  }
   Clover.working = (Clover.working.match(
     new RegExp(escape(cast(value)), 'g')
   ) || [])
