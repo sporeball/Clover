@@ -32,6 +32,32 @@ class Command {
   }
 }
 
+class NumberCommand extends Command {
+  run (args) {
+    const T = typeof Clover.working;
+    if (T !== 'number') {
+      throw new CloverError(
+        'expected working value of type number, got %s instead',
+        T
+      );
+    }
+    this.body(args);
+  }
+}
+
+class StringCommand extends Command {
+  run (args) {
+    const T = typeof Clover.working;
+    if (T !== 'string') {
+      throw new CloverError(
+        'expected working value of type string, got %s instead',
+        T
+      );
+    }
+    this.body(args);
+  }
+}
+
 /**
  * execute a command given the tokens
  * @param {string[]} tokens
@@ -95,40 +121,23 @@ export function evaluate (tokens) {
 }
 
 /**
- * assert that the working value is of a certain type
- * @param {string[]} T type
- */
-function worksWith (T) {
-  const type = typeof Clover.working;
-  if (type !== T) {
-    throw new CloverError(
-      'expected working value of type %s, got %s instead',
-      T, type
-    );
-  }
-}
-
-/**
  * commands below
  */
 
-const add = new Command('add %a', args => {
-  worksWith('number');
+const add = new NumberCommand('add %a', args => {
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working += cast(value);
 });
 
-const addToMut = new Command('add to %m', args => {
-  worksWith('number');
+const addToMut = new NumberCommand('add to %m', args => {
   accesses(args[0], 'number');
   const [mut] = args;
   Clover.mutables[mut] += Clover.working;
 });
 
-const count = new Command('count %a', args => {
+const count = new StringCommand('count %a', args => {
   // TODO: update type checking to make this work with arrays as well
-  worksWith('string');
   const [value] = args;
   Clover.working = (Clover.working.match(
     new RegExp(escape(cast(value)), 'g')
@@ -136,8 +145,7 @@ const count = new Command('count %a', args => {
     .length;
 });
 
-const divide = new Command('divide by %a', args => {
-  worksWith('number');
+const divide = new NumberCommand('divide by %a', args => {
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working /= cast(value);
@@ -149,8 +157,7 @@ const focus = new Command('focus %a', args => {
   Clover.working = Clover.focus;
 });
 
-const multiply = new Command('multiply by %a', args => {
-  worksWith('number');
+const multiply = new NumberCommand('multiply by %a', args => {
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working *= cast(value);
@@ -174,8 +181,7 @@ const showMonadic = new Command('show %a', args => {
   output(cast(value));
 });
 
-const split = new Command('split %a %a', args => {
-  worksWith('string');
+const split = new StringCommand('split %a %a', args => {
   const [connector, splitter] = args;
 
   Token.assertAny(connector, ['by', 'on']);
@@ -200,15 +206,13 @@ const split = new Command('split %a %a', args => {
   // TODO: giving
 });
 
-const subtract = new Command('subtract %a', args => {
-  worksWith('number');
+const subtract = new NumberCommand('subtract %a', args => {
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working -= cast(value);
 });
 
-const subtractFromMut = new Command('subtract from %m', args => {
-  worksWith('number');
+const subtractFromMut = new NumberCommand('subtract from %m', args => {
   accesses(args[0], 'number');
   const [mut] = args;
   Clover.mutables[mut] -= Clover.working;
