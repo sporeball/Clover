@@ -198,6 +198,9 @@ const split = new Verb('split %a %a', args => {
     case 'spaces':
       value = ' ';
       break;
+    case 'chars':
+      value = '';
+      break;
     default:
       value = cast(splitter);
   }
