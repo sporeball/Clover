@@ -162,6 +162,13 @@ const multiply = new Verb('multiply by %a', args => {
   Clover.working *= cast(value);
 });
 
+const product = new Verb('product', () => {
+  worksWith('array');
+  // TODO: should it throw if it finds non-numbers instead?
+  Clover.working = Clover.working.filter(v => typeOf(v) === 'number')
+    .reduce((a, c) => a * cast(c), 1);
+});
+
 const refocus = new Verb('refocus', () => {
   Clover.working = Clover.focus;
 });
@@ -248,6 +255,7 @@ const equals = new Noun('equals %m', args => {
 });
 const over = new Noun('over %a', divide.body);
 const minus = new Noun('minus %a', subtract.body);
+const multiplied = new Noun('multiplied', product.body);
 const plus = new Noun('plus %a', add.body);
 const splitted = new Noun('splitted %a %a', split.body);
 const summed = new Noun('summed', sum.body);
@@ -261,6 +269,7 @@ export const commands = {
   divide,
   focus,
   multiply,
+  product,
   refocus,
   set,
   show,
@@ -276,6 +285,7 @@ export const commands = {
   equals,
   over,
   minus,
+  multiplied,
   plus,
   splitted,
   summed,

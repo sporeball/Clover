@@ -68,6 +68,12 @@ tentamen.add('divide', 'focus 5\ndivide by 5', 1);
 tentamen.add('focus', 'focus 5', 5);
 tentamen.add('multiply', 'focus 5\nmultiply by 5', 25);
 tentamen.add(
+  'product',
+  `focus [1 2 3 4 5 6 7 8 9 10]
+  product`,
+  3628800
+);
+tentamen.add(
   'refocus',
   `focus 5
   plus 5
