@@ -28,6 +28,8 @@ export default function parse (code, options = {}) {
   Clover.outputs = [];
   Clover.options = options;
 
+  Clover.mutables = {};
+
   // commands act on the focus value
   // this is equivalent to the original input at first
   Clover.focus = cast(Clover.input);

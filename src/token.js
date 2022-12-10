@@ -1,4 +1,3 @@
-import Mutables from './mutable.js';
 import reserved from '../util/reserved.js';
 
 /**
@@ -81,7 +80,7 @@ export function cast (v) {
     return Number(value);
   }
   if (T === 'mutable') {
-    return Mutables[value];
+    return Clover.mutables[value];
   }
   if (T === 'string') {
     value = value.replace(/\\n/g, '\n');

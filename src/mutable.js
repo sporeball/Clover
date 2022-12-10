@@ -1,17 +1,13 @@
-const Mutables = {};
-
 export function accesses (mutable, type) {
-  if (Mutables[mutable] !== undefined) {
+  if (Clover.mutables[mutable] !== undefined) {
     return;
   }
   switch (type) {
     case 'number':
-      Mutables[mutable] = 0;
+      Clover.mutables[mutable] = 0;
       break;
     case 'string':
-      Mutables[mutable] = '';
+      Clover.mutables[mutable] = '';
       break;
   }
 }
-
-export default Mutables;

@@ -1,5 +1,5 @@
 import Token, { cast } from './token.js';
-import Mutables, { accesses } from './mutable.js';
+import { accesses } from './mutable.js';
 import { output, escape } from './util.js';
 
 /**
@@ -122,7 +122,7 @@ const addToMut = new Command('add to %m', args => {
   worksWith('number');
   accesses(args[0], 'number');
   const [mut] = args;
-  Mutables[mut] += Clover.working;
+  Clover.mutables[mut] += Clover.working;
 });
 
 const count = new Command('count %a', args => {
@@ -163,7 +163,7 @@ const refocus = new Command('refocus', () => {
 
 const set = new Command('set %m to %a', args => {
   const [mut, value] = args;
-  Mutables[mut] = cast(value);
+  Clover.mutables[mut] = cast(value);
 });
 
 const show = new Command('show', () => {
@@ -211,7 +211,7 @@ const subtractFromMut = new Command('subtract from %m', args => {
   worksWith('number');
   accesses(args[0], 'number');
   const [mut] = args;
-  Mutables[mut] -= Clover.working;
+  Clover.mutables[mut] -= Clover.working;
 });
 
 export const commands = {
