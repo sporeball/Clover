@@ -107,6 +107,12 @@ tentamen.add(
   focus :mut`,
   -5
 );
+tentamen.add(
+  'sum',
+  `focus [1 2 3 4 5 6 7 8 9 10]
+  sum`,
+  55
+);
 tentamen.add('quiet', 'quiet', []);
 
 tentamen.done();

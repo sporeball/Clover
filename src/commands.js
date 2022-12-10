@@ -39,7 +39,7 @@ class Noun extends Command {
 }
 
 function worksWith (T) {
-  const t = typeof Clover.working;
+  const t = typeOf(Clover.working);
   if (T !== t) {
     throw new CloverError(
       'expected working value of type %s, got %s instead',
@@ -227,6 +227,13 @@ const subtractFromMut = new Verb('subtract from %m', args => {
   Clover.mutables[mut] -= Clover.working;
 });
 
+const sum = new Verb('sum', () => {
+  worksWith('array');
+  // TODO: should it throw if it finds non-numbers instead?
+  Clover.working = Clover.working.filter(v => typeOf(v) === 'number')
+    .reduce((a, c) => a + cast(c), 0);
+});
+
 const quiet = new Verb('quiet', () => {
   Clover.quiet = true;
 });
@@ -243,6 +250,7 @@ const over = new Noun('over %a', divide.body);
 const minus = new Noun('minus %a', subtract.body);
 const plus = new Noun('plus %a', add.body);
 const splitted = new Noun('splitted %a %a', split.body);
+const summed = new Noun('summed', sum.body);
 const times = new Noun('times %a', multiply.body);
 
 export const commands = {
@@ -260,7 +268,9 @@ export const commands = {
   split,
   subtract,
   subtractFromMut,
+  sum,
   quiet,
+
   // nouns
   countOf,
   equals,
@@ -268,5 +278,6 @@ export const commands = {
   minus,
   plus,
   splitted,
+  summed,
   times
 };
