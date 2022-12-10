@@ -6,7 +6,8 @@ import Tentamen from 'tentamen';
 const tentamen = new Tentamen({});
 tentamen.fn = () => parse(tentamen.input, { silent: true });
 
-const uncovered = Object.keys(commands);
+const uncovered = Object.keys(commands)
+  .filter(key => commands[key].constructor.name === 'Verb');
 
 // hijack tentamen's methods to add coverage information
 tentamen.add = (function () {
@@ -69,7 +70,7 @@ tentamen.add('multiply', 'focus 5\nmultiply by 5', 25);
 tentamen.add(
   'refocus',
   `focus 5
-  add 5
+  plus 5
   refocus`,
   5
 );

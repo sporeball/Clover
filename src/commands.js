@@ -12,7 +12,7 @@ import { output, escape } from './util.js';
  */
 
 /**
- * class representing a valid command
+ * command superclass
  */
 class Command {
   /**
@@ -23,38 +23,28 @@ class Command {
     this.pattern = pattern;
     this.body = body;
   }
+}
 
-  /**
-   * run the command
-   */
+class Verb extends Command {
+  run (args) {
+    this.body(args);
+    Clover.focus = Clover.working;
+  }
+}
+
+class Noun extends Command {
   run (args) {
     this.body(args);
   }
 }
 
-class NumberCommand extends Command {
-  run (args) {
-    const T = typeof Clover.working;
-    if (T !== 'number') {
-      throw new CloverError(
-        'expected working value of type number, got %s instead',
-        T
-      );
-    }
-    this.body(args);
-  }
-}
-
-class StringCommand extends Command {
-  run (args) {
-    const T = typeof Clover.working;
-    if (T !== 'string') {
-      throw new CloverError(
-        'expected working value of type string, got %s instead',
-        T
-      );
-    }
-    this.body(args);
+function worksWith (T) {
+  const t = typeof Clover.working;
+  if (T !== t) {
+    throw new CloverError(
+      'expected working value of type %s, got %s instead',
+      T, t
+    );
   }
 }
 
@@ -121,22 +111,24 @@ export function evaluate (tokens) {
 }
 
 /**
- * commands below
+ * verbs below
  */
 
-const add = new NumberCommand('add %a', args => {
+const add = new Verb('add %a', args => {
+  worksWith('number');
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working += cast(value);
 });
 
-const addToMut = new NumberCommand('add to %m', args => {
+const addToMut = new Verb('add to %m', args => {
+  worksWith('number');
   accesses(args[0], 'number');
   const [mut] = args;
   Clover.mutables[mut] += Clover.working;
 });
 
-const count = new Command('count %a', args => {
+const count = new Verb('count %a', args => {
   const [value] = args;
   if (typeOf(Clover.working) === 'array') {
     Clover.working = Clover.working
@@ -150,43 +142,46 @@ const count = new Command('count %a', args => {
     .length;
 });
 
-const divide = new NumberCommand('divide by %a', args => {
+const divide = new Verb('divide by %a', args => {
+  worksWith('number');
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working /= cast(value);
 });
 
-const focus = new Command('focus %a', args => {
+const focus = new Verb('focus %a', args => {
   const [value] = args;
   Clover.focus = cast(value);
   Clover.working = Clover.focus;
 });
 
-const multiply = new NumberCommand('multiply by %a', args => {
+const multiply = new Verb('multiply by %a', args => {
+  worksWith('number');
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working *= cast(value);
 });
 
-const refocus = new Command('refocus', () => {
+const refocus = new Verb('refocus', () => {
   Clover.working = Clover.focus;
 });
 
-const set = new Command('set %m to %a', args => {
+const set = new Verb('set %m to %a', args => {
   const [mut, value] = args;
   Clover.mutables[mut] = cast(value);
 });
 
-const show = new Command('show', () => {
+const show = new Verb('show', () => {
   output(Clover.working);
 });
 
-const showMonadic = new Command('show %a', args => {
+const showMonadic = new Verb('show %a', args => {
   const [value] = args;
   output(cast(value));
 });
 
-const split = new StringCommand('split %a %a', args => {
+const split = new Verb('split %a %a', args => {
+  worksWith('string');
   const [connector, splitter] = args;
 
   Token.assertAny(connector, ['by', 'on']);
@@ -207,27 +202,45 @@ const split = new StringCommand('split %a %a', args => {
       value = cast(splitter);
   }
 
+  if (typeOf(Clover.working) === 'array') {
+    Clover.working = Clover.working.map(x => x.split(value));
+    return;
+  }
   Clover.working = Clover.focus.split(value);
   // TODO: giving
 });
 
-const subtract = new NumberCommand('subtract %a', args => {
+const subtract = new Verb('subtract %a', args => {
+  worksWith('number');
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working -= cast(value);
 });
 
-const subtractFromMut = new NumberCommand('subtract from %m', args => {
+const subtractFromMut = new Verb('subtract from %m', args => {
+  worksWith('number');
   accesses(args[0], 'number');
   const [mut] = args;
   Clover.mutables[mut] -= Clover.working;
 });
 
-const quiet = new Command('quiet', () => {
+const quiet = new Verb('quiet', () => {
   Clover.quiet = true;
 });
 
+/**
+ * nouns below
+ */
+
+const countOf = new Noun('count of %a', count.body);
+const over = new Noun('over %a', divide.body);
+const minus = new Noun('minus %a', subtract.body);
+const plus = new Noun('plus %a', add.body);
+const splitted = new Noun('splitted %a %a', split.body);
+const times = new Noun('times %a', multiply.body);
+
 export const commands = {
+  // verbs
   add,
   addToMut,
   count,
@@ -241,5 +254,12 @@ export const commands = {
   split,
   subtract,
   subtractFromMut,
-  quiet
+  quiet,
+  // nouns
+  countOf,
+  over,
+  minus,
+  plus,
+  splitted,
+  times
 };
