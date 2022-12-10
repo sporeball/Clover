@@ -51,6 +51,14 @@ tentamen.done = (function () {
 tentamen.suite('tests');
 tentamen.add('add', 'focus 5\nadd 5', 10);
 tentamen.add(
+  'addToMut',
+  `focus 5
+  add to :mut
+  focus 10
+  focus :mut`,
+  5
+);
+tentamen.add(
   'count',
   `focus 'aaaaa'
   count 'a'`,
@@ -67,11 +75,22 @@ tentamen.add(
   5
 );
 tentamen.add(
+  'set',
+  `set :mut to 5
+  focus :mut`,
+  5
+);
+tentamen.add(
   'show',
   `focus 5
   show
   focus 10`,
   [5, 10]
+);
+tentamen.add(
+  'showMonadic',
+  "show 'a'",
+  ['a', undefined] // don't forget the implicit
 );
 tentamen.add(
   'split (blocks)',
@@ -98,5 +117,12 @@ tentamen.add(
   ['1', '2', '3', '4']
 );
 tentamen.add('subtract', 'focus 5\nsubtract 5', 0);
+tentamen.add(
+  'subtractFromMut',
+  `focus 5
+  subtract from :mut
+  focus :mut`,
+  -5
+);
 
 tentamen.done();
