@@ -1,4 +1,4 @@
-import Token, { cast } from './token.js';
+import Token, { typeOf, cast } from './token.js';
 import { accesses } from './mutable.js';
 import { output, escape } from './util.js';
 
@@ -112,9 +112,10 @@ function worksWith (T) {
  * commands below
  */
 
-const add = new Command('add %n', args => {
+const add = new Command('add %a', args => {
   worksWith('number');
   const [value] = args;
+  Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working += cast(value);
 });
 
@@ -135,9 +136,10 @@ const count = new Command('count %a', args => {
     .length;
 });
 
-const divide = new Command('divide by %n', args => {
+const divide = new Command('divide by %a', args => {
   worksWith('number');
   const [value] = args;
+  Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working /= cast(value);
 });
 
@@ -151,9 +153,10 @@ const focus = new Command('focus %a', args => {
   Clover.working = Clover.focus;
 });
 
-const multiply = new Command('multiply by %n', args => {
+const multiply = new Command('multiply by %a', args => {
   worksWith('number');
   const [value] = args;
+  Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working *= cast(value);
 });
 
@@ -201,9 +204,10 @@ const split = new Command('split %a %a', args => {
   // TODO: giving
 });
 
-const subtract = new Command('subtract %n', args => {
+const subtract = new Command('subtract %a', args => {
   worksWith('number');
   const [value] = args;
+  Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working -= cast(value);
 });
 
