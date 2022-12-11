@@ -58,6 +58,12 @@ export function evaluate (line) {
     tokens = tokens.slice(0, rhsIndex);
   }
 
+  let mappingList;
+  if (typeOf(tokens[0]) === 'mutable') {
+    mappingList = tokens[0].value;
+    tokens = tokens.slice(1);
+  }
+
   // for each token...
   for (let i = 0; i < tokens.length; i++) {
     // filter to those commands where...
@@ -109,7 +115,12 @@ export function evaluate (line) {
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i));
 
-  command.run(args);
+  if (mappingList) {
+    Clover.working = Clover.mutables[mappingList];
+    apply.run([`(${tokens.map(token => token.value).join(' ')})`]);
+  } else {
+    command.run(args);
+  }
 
   if (rhs) {
     const {value, specifier} = rhs[0];
