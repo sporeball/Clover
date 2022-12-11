@@ -86,7 +86,7 @@ export function escape (str) {
 }
 
 export function arrayDepth (arr) {
-  return Array.isArray(arr) ? 
-    1 + Math.max(0, ...arr.map(getArrayDepth)) :
-    0;
+  return Array.isArray(arr)
+    ? 1 + Math.max(0, ...arr.map(arrayDepth))
+    : 0;
 }

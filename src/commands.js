@@ -23,16 +23,7 @@ class Command {
     this.pattern = pattern;
     this.body = body;
   }
-}
 
-class Verb extends Command {
-  run (args) {
-    this.body(args);
-    Clover.focus = Clover.working;
-  }
-}
-
-class Noun extends Command {
   run (args) {
     this.body(args);
   }
@@ -118,21 +109,14 @@ export function evaluate (line) {
  * verbs below
  */
 
-const add = new Verb('add %a', args => {
+const add = new Command('add %a', args => {
   worksWith('number');
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working += cast(value);
 });
 
-const addToMut = new Verb('add to %m', args => {
-  worksWith('number');
-  accesses(args[0], 'number');
-  const [mut] = args;
-  Clover.mutables[mut] += Clover.working;
-});
-
-const apply = new Verb('apply %c', args => {
+const apply = new Command('apply %c', args => {
   worksWith('array');
   const [command] = args;
   let cachedFocus = Clover.focus;
@@ -147,7 +131,7 @@ const apply = new Verb('apply %c', args => {
   Clover.focus = cachedFocus;
 });
 
-const count = new Verb('count %a', args => {
+const count = new Command('count %a', args => {
   const [value] = args;
   if (typeOf(Clover.working) === 'array') {
     Clover.working = Clover.working
@@ -161,20 +145,24 @@ const count = new Verb('count %a', args => {
     .length;
 });
 
-const divide = new Verb('divide by %a', args => {
+const divide = new Command('divide by %a', args => {
   worksWith('number');
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working /= cast(value);
 });
 
-const focus = new Verb('focus %a', args => {
+const focus = new Command('focus', () => {
+  Clover.working = Clover.focus;
+});
+
+const focusMonadic = new Command('focus %a', args => {
   const [value] = args;
   Clover.focus = cast(value);
   Clover.working = Clover.focus;
 });
 
-const group = new Verb('group each %n', args => {
+const group = new Command('groups of %n', args => {
   worksWith('array');
   let [size] = args;
   size = cast(size);
@@ -188,39 +176,39 @@ const group = new Verb('group each %n', args => {
   Clover.working = [...newArray];
 });
 
-const multiply = new Verb('multiply by %a', args => {
+const multiply = new Command('multiply by %a', args => {
   worksWith('number');
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working *= cast(value);
 });
 
-const product = new Verb('product', () => {
+const product = new Command('product', () => {
   worksWith('array');
   // TODO: should it throw if it finds non-numbers instead?
   Clover.working = Clover.working.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a * cast(c), 1);
 });
 
-const refocus = new Verb('refocus', () => {
-  Clover.working = Clover.focus;
-});
+// const refocus = new Verb('refocus', () => {
+//   Clover.working = Clover.focus;
+// });
 
-const set = new Verb('set %m to %a', args => {
+const set = new Command('set %m to %a', args => {
   const [mut, value] = args;
   Clover.mutables[mut] = cast(value);
 });
 
-const show = new Verb('show', () => {
+const show = new Command('show', () => {
   output(Clover.working);
 });
 
-const showMonadic = new Verb('show %a', args => {
+const showMonadic = new Command('show %a', args => {
   const [value] = args;
   output(cast(value));
 });
 
-const split = new Verb('split %a %a', args => {
+const split = new Command('split %a %a', args => {
   worksWith('string');
   const [connector, splitter] = args;
 
@@ -249,80 +237,35 @@ const split = new Verb('split %a %a', args => {
   // TODO: giving
 });
 
-const subtract = new Verb('subtract %a', args => {
+const subtract = new Command('subtract %a', args => {
   worksWith('number');
   const [value] = args;
   Token.assertAny(typeOf(value), ['number', 'mutable']);
   Clover.working -= cast(value);
 });
 
-const subtractFromMut = new Verb('subtract from %m', args => {
-  worksWith('number');
-  accesses(args[0], 'number');
-  const [mut] = args;
-  Clover.mutables[mut] -= Clover.working;
-});
-
-const sum = new Verb('sum', () => {
+const sum = new Command('sum', () => {
   worksWith('array');
   // TODO: should it throw if it finds non-numbers instead?
   Clover.working = Clover.working.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a + cast(c), 0);
 });
 
-const quiet = new Verb('quiet', () => {
-  Clover.quiet = true;
-});
-
-/**
- * nouns below
- */
-
-const applying = new Noun('applying %c', apply.body);
-const countOf = new Noun('count of %a', count.body);
-const equals = new Noun('equals %m', args => {
-  Clover.mutables[args[0]] = Clover.working;
-});
-const grouped = new Noun('grouped into %n', group.body);
-const over = new Noun('over %a', divide.body);
-const minus = new Noun('minus %a', subtract.body);
-const multiplied = new Noun('multiplied', product.body);
-const plus = new Noun('plus %a', add.body);
-const splitted = new Noun('splitted %a %a', split.body);
-const summed = new Noun('summed', sum.body);
-const times = new Noun('times %a', multiply.body);
-
 export const commands = {
   // verbs
   add,
-  addToMut,
   apply,
   count,
   divide,
   focus,
+  focusMonadic,
   group,
   multiply,
   product,
-  refocus,
   set,
   show,
   showMonadic,
   split,
   subtract,
-  subtractFromMut,
-  sum,
-  quiet,
-
-  // nouns
-  applying,
-  countOf,
-  equals,
-  grouped,
-  over,
-  minus,
-  multiplied,
-  plus,
-  splitted,
-  summed,
-  times
+  sum
 };

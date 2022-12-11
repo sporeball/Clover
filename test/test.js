@@ -52,13 +52,6 @@ tentamen.done = (function () {
 tentamen.suite('tests');
 tentamen.add('add', 'focus 5\nadd 5', 10);
 tentamen.add(
-  'addToMut',
-  `focus 5
-  add to :mut
-  focus :mut`,
-  5
-);
-tentamen.add(
   'count',
   `focus 'aaaaa'
   count 'a'`,
@@ -69,7 +62,7 @@ tentamen.add('focus', 'focus 5', 5);
 tentamen.add(
   'group',
   `focus [1 2 3 4 5 6 7]
-  group each 2`,
+  groups of 2`,
   [[1, 2], [3, 4], [5, 6], [7]]
 );
 tentamen.add('multiply', 'focus 5\nmultiply by 5', 25);
@@ -80,13 +73,6 @@ tentamen.add(
   3628800
 );
 tentamen.add(
-  'refocus',
-  `focus 5
-  plus 5
-  refocus`,
-  5
-);
-tentamen.add(
   'set',
   `set :mut to 5
   focus :mut`,
@@ -95,15 +81,14 @@ tentamen.add(
 tentamen.add(
   'show',
   `focus 5
-  show
-  quiet`,
-  5
+  show`,
+  [5, 5] // implicit
 );
 tentamen.add(
   'showMonadic',
-  `show 'a'
-  quiet`,
-  'a'
+  `focus 5
+  show 'a'`,
+  ['a', 5] // implicit
 );
 tentamen.add(
   'split',
@@ -113,18 +98,10 @@ tentamen.add(
 );
 tentamen.add('subtract', 'focus 5\nsubtract 5', 0);
 tentamen.add(
-  'subtractFromMut',
-  `focus 5
-  subtract from :mut
-  focus :mut`,
-  -5
-);
-tentamen.add(
   'sum',
   `focus [1 2 3 4 5 6 7 8 9 10]
   sum`,
   55
 );
-tentamen.add('quiet', 'quiet', []);
 
 tentamen.done();
