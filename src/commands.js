@@ -188,6 +188,11 @@ const divide = new Command('divide by %a', args => {
   Clover.working /= cast(value);
 });
 
+const flat = new Command('flatten', () => {
+  worksWith('array');
+  Clover.working = Clover.working.flat();
+});
+
 const focus = new Command('focus', () => {
   Clover.working = Clover.focus;
 });
@@ -294,6 +299,7 @@ export const commands = {
   comp,
   count,
   divide,
+  flat,
   focus,
   focusMonadic,
   group,
