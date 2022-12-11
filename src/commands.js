@@ -46,10 +46,17 @@ function worksWith (T) {
 // TODO: some would probably call this function overloaded
 export function evaluate (line) {
   // tokenize
-  const tokens = line.match(/'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g)
+  let tokens = line.match(/'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g)
     .map(token => new Token.Token(token));
   // the list of commands that these tokens might match
   let possible = Object.entries(commands);
+
+  let rhs;
+  const rhsIndex = tokens.findIndex(token => token.value === '=');
+  if (rhsIndex > -1) {
+    rhs = tokens.slice(rhsIndex + 1);
+    tokens = tokens.slice(0, rhsIndex);
+  }
 
   // for each token...
   for (let i = 0; i < tokens.length; i++) {
@@ -103,6 +110,14 @@ export function evaluate (line) {
     .filter((token, i) => argIndices.includes(i));
 
   command.run(args);
+
+  if (rhs) {
+    const {value, specifier} = rhs[0];
+    if (specifier !== '%m') {
+      throw new CloverError('invalid right-hand side value %t', value);
+    }
+    Clover.mutables[value] = Clover.working;
+  }
 }
 
 /**
