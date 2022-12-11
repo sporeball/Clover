@@ -50,6 +50,9 @@ export function typeOf (v) {
   if (reserved.includes(value)) {
     return 'reserved';
   }
+  if (matches(value, /:(0|[1-9]\d*)$/)) {
+    return 'index';
+  }
   if (
     Array.isArray(value) ||
     matches(value, /^\[.*\]$/)
@@ -87,6 +90,17 @@ export function cast (v) {
     value = value.value; // haha...
   }
   const T = typeOf(value);
+  if (T === 'index') {
+    const index = Number(value.slice(value.lastIndexOf(':') + 1));
+    value = value.slice(0, value.lastIndexOf(':'));
+    if (typeOf(value) === 'mutable' && Clover.mutables[value] === undefined) {
+      throw new CloverError(
+        'cannot index %s before initialization',
+        value
+      );
+    }
+    return cast(value)[index];
+  }
   if (T === 'array') {
     if (Array.isArray(value)) {
       return value;

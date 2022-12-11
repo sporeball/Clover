@@ -56,7 +56,7 @@ export default function parse (code, options = {}) {
     }
     // each line of code holds a single command
     // tokenize and evaluate
-    const tokens = line.match(/'.*'|\[.*\]|[^ ]+/g)
+    const tokens = line.match(/'.*'|\[.*\](:(0|[1-9]\d*))?|[^ ]+/g)
       .map(token => new Token.Token(token));
     Command.evaluate(tokens);
   }
