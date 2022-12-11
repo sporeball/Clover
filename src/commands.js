@@ -155,6 +155,20 @@ const focus = new Verb('focus %a', args => {
   Clover.working = Clover.focus;
 });
 
+const group = new Verb('group each %n', args => {
+  worksWith('array');
+  let [size] = args;
+  size = cast(size);
+  if (size === 0) {
+    throw new CloverError('cannot split into groups of 0');
+  }
+  const newArray = [];
+  for (let i = 0; i < Clover.working.length; i += size) {
+    newArray.push(Clover.working.slice(i, i + size));
+  }
+  Clover.working = [...newArray];
+});
+
 const multiply = new Verb('multiply by %a', args => {
   worksWith('number');
   const [value] = args;
@@ -253,6 +267,7 @@ const countOf = new Noun('count of %a', count.body);
 const equals = new Noun('equals %m', args => {
   Clover.mutables[args[0]] = Clover.working;
 });
+const grouped = new Noun('grouped into %n', group.body);
 const over = new Noun('over %a', divide.body);
 const minus = new Noun('minus %a', subtract.body);
 const multiplied = new Noun('multiplied', product.body);
@@ -268,6 +283,7 @@ export const commands = {
   count,
   divide,
   focus,
+  group,
   multiply,
   product,
   refocus,
@@ -283,6 +299,7 @@ export const commands = {
   // nouns
   countOf,
   equals,
+  grouped,
   over,
   minus,
   multiplied,

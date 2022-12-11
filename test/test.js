@@ -66,6 +66,12 @@ tentamen.add(
 );
 tentamen.add('divide', 'focus 5\ndivide by 5', 1);
 tentamen.add('focus', 'focus 5', 5);
+tentamen.add(
+  'group',
+  `focus [1 2 3 4 5 6 7]
+  group each 2`,
+  [[1, 2], [3, 4], [5, 6], [7]]
+);
 tentamen.add('multiply', 'focus 5\nmultiply by 5', 25);
 tentamen.add(
   'product',

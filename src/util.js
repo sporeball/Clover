@@ -22,12 +22,7 @@ export function pretty (value) {
   // array
   } else if (Array.isArray(value)) {
     return `[${colors.cyan(value.map(i => {
-      // shallow
-      if (Array.isArray(i)) {
-        return colors.blue('(Array)');
-      } else {
-        return pretty(i);
-      }
+      return pretty(i);
     }).join(colors.white(', ')))}]`;
   // CloverError
   } else if (value.constructor?.name === 'CloverError') {
