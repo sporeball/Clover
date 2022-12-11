@@ -84,3 +84,9 @@ export function output (value) {
 export function escape (str) {
   return str.replace(/[.*+?^$()[\]{}|\\]/g, match => '\\' + match);
 }
+
+export function arrayDepth (arr) {
+  return Array.isArray(arr) ? 
+    1 + Math.max(0, ...arr.map(getArrayDepth)) :
+    0;
+}

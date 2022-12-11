@@ -1,6 +1,6 @@
 import Token, { typeOf, cast } from './token.js';
 import { accesses } from './mutable.js';
-import { output, escape } from './util.js';
+import { output, escape, arrayDepth } from './util.js';
 
 /**
  * each command written in a clover program consists of a list of tokens.
@@ -49,13 +49,17 @@ function worksWith (T) {
 }
 
 /**
- * execute a command given the tokens
- * @param {string[]} tokens
+ * execute a command
+ * @param {string} line
  */
 // TODO: some would probably call this function overloaded
-export function evaluate (tokens) {
-  // the list of commands that the current token stream might match
+export function evaluate (line) {
+  // tokenize
+  const tokens = line.match(/'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g)
+    .map(token => new Token.Token(token));
+  // the list of commands that these tokens might match
   let possible = Object.entries(commands);
+
   // for each token...
   for (let i = 0; i < tokens.length; i++) {
     // filter to those commands where...
@@ -126,6 +130,21 @@ const addToMut = new Verb('add to %m', args => {
   accesses(args[0], 'number');
   const [mut] = args;
   Clover.mutables[mut] += Clover.working;
+});
+
+const apply = new Verb('apply %c', args => {
+  worksWith('array');
+  const [command] = args;
+  let cachedFocus = Clover.focus;
+  let cached = [...Clover.working];
+  cached.forEach((x, i, r) => {
+    Clover.focus = r[i];
+    Clover.working = r[i];
+    evaluate(cast(command));
+    r[i] = Clover.working;
+  });
+  Clover.working = cached;
+  Clover.focus = cachedFocus;
 });
 
 const count = new Verb('count %a', args => {
@@ -226,10 +245,6 @@ const split = new Verb('split %a %a', args => {
       value = cast(splitter);
   }
 
-  if (typeOf(Clover.working) === 'array') {
-    Clover.working = Clover.working.map(x => x.split(value));
-    return;
-  }
   Clover.working = Clover.focus.split(value);
   // TODO: giving
 });
@@ -263,6 +278,7 @@ const quiet = new Verb('quiet', () => {
  * nouns below
  */
 
+const applying = new Noun('applying %c', apply.body);
 const countOf = new Noun('count of %a', count.body);
 const equals = new Noun('equals %m', args => {
   Clover.mutables[args[0]] = Clover.working;
@@ -280,6 +296,7 @@ export const commands = {
   // verbs
   add,
   addToMut,
+  apply,
   count,
   divide,
   focus,
@@ -297,6 +314,7 @@ export const commands = {
   quiet,
 
   // nouns
+  applying,
   countOf,
   equals,
   grouped,

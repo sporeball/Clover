@@ -50,6 +50,9 @@ export function typeOf (v) {
   if (reserved.includes(value)) {
     return 'reserved';
   }
+  if (matches(value, /^\(.*\)/)) {
+    return 'command';
+  }
   if (matches(value, /:(0|[1-9]\d*)$/)) {
     return 'index';
   }
@@ -90,6 +93,9 @@ export function cast (v) {
     value = value.value; // haha...
   }
   const T = typeOf(value);
+  if (T === 'command') {
+    return value.slice(1, -1);
+  }
   if (T === 'index') {
     const index = Number(value.slice(value.lastIndexOf(':') + 1));
     value = value.slice(0, value.lastIndexOf(':'));
@@ -141,6 +147,9 @@ function specifier (value) {
   // console.log(value, T);
   if (T === 'reserved') {
     return '%r';
+  }
+  if (T === 'command') {
+    return '%c';
   }
   if (T === 'array') {
     return '%l'; // for "list"
