@@ -131,6 +131,16 @@ const apply = new Command('apply %c', args => {
   Clover.focus = cachedFocus;
 });
 
+const comp = new Command('comp %l', args => {
+  worksWith('array');
+  const list = cast(args[0]);
+  const unique = list.filter((x, i, r) => r.indexOf(x) === i);
+  const obj = Object.fromEntries(
+    unique.map((x, i) => [x, Clover.working[i]])
+  );
+  Clover.working = list.map(item => obj[item]);
+});
+
 const count = new Command('count %a', args => {
   const [value] = args;
   if (typeOf(Clover.working) === 'array') {
@@ -255,6 +265,7 @@ export const commands = {
   // verbs
   add,
   apply,
+  comp,
   count,
   divide,
   focus,
