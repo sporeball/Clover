@@ -24,6 +24,16 @@ export function pretty (value) {
     return `[${colors.cyan(value.map(i => {
       return pretty(i);
     }).join(colors.white(', ')))}]`;
+  } else if (value.self) {
+    return '{ '
+      + Object.entries(value).map(entry => {
+        const [k, v] = entry;
+        if (k === 'self') {
+          return undefined;
+        }
+        return `${k} = ${pretty(v)}`;
+      }).filter(v => v).join(', ')
+      + ' }';
   // CloverError
   } else if (value.constructor?.name === 'CloverError') {
     return `${colors.red('e:')} ${value.message}

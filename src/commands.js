@@ -115,12 +115,26 @@ export function evaluate (line) {
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i));
 
-  Clover.working = command.run(Clover.working, args);
+  if (Array.isArray(Clover.working) && Clover.working.every(i => i.self)) {
+    Clover.working = Clover.working.map(item => {
+      item.working = command.run(item.working, args);
+      return item;
+    });
+  } else {
+    Clover.working = command.run(Clover.working, args);
+  }
 
   if (rhs) {
     const {value, specifier} = rhs[0];
     if (specifier !== '%m') {
       throw new CloverError('invalid right-hand side value %t', value);
+    }
+    if (Clover.working.every(i => i.self)) {
+      Clover.mutables[value] = Clover.working.map(item => item.working);
+      Clover.working = Clover.working.map(item => {
+        item[value] = item.working;
+        return item;
+      });
     }
     Clover.mutables[value] = Clover.working;
   }
@@ -215,6 +229,24 @@ const group = new Command('groups of %n', (value, args) => {
   return [...newArray];
 });
 
+const itemize = new Command('itemize %m', (value, args) => {
+  const [dest] = args;
+  Token.assertType(value, 'array');
+  if (!dest.endsWith('s')) {
+    throw new CloverError('itemize list should be a plural word');
+  }
+  Clover.mutables[dest] = value;
+  let prop = dest.slice(0, -1);
+  value = value.map((item, index) => {
+    let obj = {};
+    obj.self = obj;
+    obj.working = item;
+    obj[prop] = obj.working;
+    return obj;
+  });
+  return value;
+});
+
 const multiply = new Command('multiply by %a', (value, args) => {
   const [multiplier] = args;
   Token.assertType(value, 'number');
@@ -254,7 +286,7 @@ const split = new Command('split %a %a', (value, args) => {
 
   Token.assertType(value, 'string');
   Token.assertAny(connector, ['by', 'on']);
-  Token.assertType(splitter, 'string');
+  // Token.assertType(splitter, 'string');
 
   // TODO: singular and plural
   switch (splitter) {
@@ -296,6 +328,7 @@ export const commands = {
   focus,
   focusMonadic,
   group,
+  itemize,
   multiply,
   product,
   // set,
