@@ -24,8 +24,8 @@ class Command {
     this.body = body;
   }
 
-  run (args) {
-    this.body(args);
+  run (value, args) {
+    return this.body(value, args);
   }
 }
 
@@ -115,12 +115,7 @@ export function evaluate (line) {
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i));
 
-  if (mappingList) {
-    Clover.working = Clover.mutables[mappingList];
-    apply.run([`(${tokens.map(token => token.value).join(' ')})`]);
-  } else {
-    command.run(args);
-  }
+  Clover.working = command.run(Clover.working, args);
 
   if (rhs) {
     const {value, specifier} = rhs[0];
@@ -132,16 +127,17 @@ export function evaluate (line) {
 }
 
 /**
- * verbs below
+ * commands below
  */
 
-const add = new Command('add %a', args => {
-  worksWith('number');
-  const [value] = args;
-  Token.assertAny(typeOf(value), ['number', 'mutable']);
-  Clover.working += cast(value);
+const add = new Command('add %a', (value, args) => {
+  const [addend] = args;
+  Token.assertType(value, 'number');
+  Token.assertAny(typeOf(addend), ['number', 'mutable']);
+  return value + cast(addend);
 });
 
+// FIXME
 const apply = new Command('apply %c', args => {
   worksWith('array');
   const [command] = args;
@@ -157,77 +153,79 @@ const apply = new Command('apply %c', args => {
   Clover.focus = cachedFocus;
 });
 
-const comp = new Command('comp %l', args => {
-  worksWith('array');
+const comp = new Command('comp %l', (value, args) => {
   const list = cast(args[0]);
+  Token.assertType(value, 'array');
   const unique = list.filter((x, i, r) => r.indexOf(x) === i);
   const obj = Object.fromEntries(
-    unique.map((x, i) => [x, Clover.working[i]])
+    unique.map((x, i) => [x, value[i]])
   );
-  Clover.working = list.map(item => obj[item]);
+  return list.map(item => obj[item]);
 });
 
-const count = new Command('count %a', args => {
-  const [value] = args;
-  if (typeOf(Clover.working) === 'array') {
-    Clover.working = Clover.working
-      .filter(x => x === cast(value))
-      .length;
-    return;
+const count = new Command('count %a', (value, args) => {
+  const [searchValue] = args;
+  Token.assertAny(typeOf(value), ['array', 'string']);
+  switch (typeOf(value)) {
+    case 'array':
+      return value
+        .filter(x => x === cast(searchValue))
+        .length;
+    case 'string':
+      return (value.match(
+        new RegExp(escape(cast(searchValue)), 'g')
+      ) || [])
+        .length;
   }
-  Clover.working = (Clover.working.match(
-    new RegExp(escape(cast(value)), 'g')
-  ) || [])
-    .length;
 });
 
-const divide = new Command('divide by %a', args => {
-  worksWith('number');
-  const [value] = args;
-  Token.assertAny(typeOf(value), ['number', 'mutable']);
-  Clover.working /= cast(value);
+const divide = new Command('divide by %a', (value, args) => {
+  const [divisor] = args;
+  Token.assertType(value, 'number');
+  Token.assertAny(typeOf(divisor), ['number', 'mutable']);
+  return value / cast(divisor);
 });
 
-const flat = new Command('flatten', () => {
-  worksWith('array');
-  Clover.working = Clover.working.flat();
+const flat = new Command('flatten', (value) => {
+  Token.assertType(value, 'array');
+  return value.flat();
 });
 
-const focus = new Command('focus', () => {
-  Clover.working = Clover.focus;
+const focus = new Command('focus', (value) => {
+  return Clover.focus;
 });
 
-const focusMonadic = new Command('focus %a', args => {
-  const [value] = args;
-  Clover.focus = cast(value);
-  Clover.working = Clover.focus;
+const focusMonadic = new Command('focus %a', (value, args) => {
+  const [focusValue] = args;
+  Clover.focus = cast(focusValue);
+  return Clover.focus;
 });
 
-const group = new Command('groups of %n', args => {
-  worksWith('array');
-  let [size] = args;
-  size = cast(size);
+const group = new Command('groups of %n', (value, args) => {
+  const size = cast(args[0]);
+  Token.assertType(size, 'number');
   if (size === 0) {
     throw new CloverError('cannot split into groups of 0');
   }
+  Token.assertType(value, 'array');
   const newArray = [];
   for (let i = 0; i < Clover.working.length; i += size) {
     newArray.push(Clover.working.slice(i, i + size));
   }
-  Clover.working = [...newArray];
+  return [...newArray];
 });
 
-const multiply = new Command('multiply by %a', args => {
-  worksWith('number');
-  const [value] = args;
-  Token.assertAny(typeOf(value), ['number', 'mutable']);
-  Clover.working *= cast(value);
+const multiply = new Command('multiply by %a', (value, args) => {
+  const [multiplier] = args;
+  Token.assertType(value, 'number');
+  Token.assertAny(typeOf(multiplier), ['number', 'mutable']);
+  return value * cast(multiplier);
 });
 
-const product = new Command('product', () => {
-  worksWith('array');
+const product = new Command('product', (value) => {
+  Token.assertType(value, 'array');
   // TODO: should it throw if it finds non-numbers instead?
-  Clover.working = Clover.working.filter(v => typeOf(v) === 'number')
+  return value.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a * cast(c), 1);
 });
 
@@ -235,60 +233,55 @@ const product = new Command('product', () => {
 //   Clover.working = Clover.focus;
 // });
 
-const set = new Command('set %m to %a', args => {
-  const [mut, value] = args;
-  Clover.mutables[mut] = cast(value);
+// const set = new Command('set %m to %a', args => {
+//   const [mut, value] = args;
+//   Clover.mutables[mut] = cast(value);
+// });
+
+// const show = new Command('show', () => {
+//   output(Clover.working);
+//   return Clover.working;
+// });
+
+const showMonadic = new Command('show %a', (value, args) => {
+  const [showValue] = args;
+  output(cast(showValue));
+  return value;
 });
 
-const show = new Command('show', () => {
-  output(Clover.working);
-});
-
-const showMonadic = new Command('show %a', args => {
-  const [value] = args;
-  output(cast(value));
-});
-
-const split = new Command('split %a %a', args => {
-  worksWith('string');
+const split = new Command('split %a %a', (value, args) => {
   const [connector, splitter] = args;
 
+  Token.assertType(value, 'string');
   Token.assertAny(connector, ['by', 'on']);
+  Token.assertType(splitter, 'string');
 
-  let value;
   // TODO: singular and plural
   switch (splitter) {
     case 'newlines':
-      value = '\n';
-      break;
+      return value.split('\n');
     case 'blocks':
-      value = '\n\n';
-      break;
+      return value.split('\n\n');
     case 'spaces':
-      value = ' ';
-      break;
+      return value.split(' ');
     case 'chars':
-      value = '';
-      break;
+      return value.split('');
     default:
-      value = cast(splitter);
+      return value.split(cast(splitter));
   }
-
-  Clover.working = Clover.focus.split(value);
-  // TODO: giving
 });
 
-const subtract = new Command('subtract %a', args => {
-  worksWith('number');
-  const [value] = args;
-  Token.assertAny(typeOf(value), ['number', 'mutable']);
-  Clover.working -= cast(value);
+const subtract = new Command('subtract %a', (value, args) => {
+  const [subtrahend] = args;
+  Token.assertType(value, 'number');
+  Token.assertAny(typeOf(subtrahend), ['number', 'mutable']);
+  return value - cast(subtrahend);
 });
 
-const sum = new Command('sum', () => {
-  worksWith('array');
+const sum = new Command('sum', (value) => {
+  Token.assertType(value, 'array');
   // TODO: should it throw if it finds non-numbers instead?
-  Clover.working = Clover.working.filter(v => typeOf(v) === 'number')
+  return value.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a + cast(c), 0);
 });
 
@@ -305,8 +298,8 @@ export const commands = {
   group,
   multiply,
   product,
-  set,
-  show,
+  // set,
+  // show,
   showMonadic,
   split,
   subtract,
