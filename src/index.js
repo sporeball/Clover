@@ -56,7 +56,7 @@ export default function parse (code, options = {}) {
     }
     // each line of code holds a single command
     // tokenize and evaluate
-    Command.evaluate(line);
+    Clover.working = Command.evaluate(line, Clover.working);
   }
 
   // implicit output

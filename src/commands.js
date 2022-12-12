@@ -44,7 +44,7 @@ function worksWith (T) {
  * @param {string} line
  */
 // TODO: some would probably call this function overloaded
-export function evaluate (line) {
+export function evaluate (line, value) {
   // tokenize
   let tokens = line.match(/'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g)
     .map(token => new Token.Token(token));
@@ -56,12 +56,6 @@ export function evaluate (line) {
   if (rhsIndex > -1) {
     rhs = tokens.slice(rhsIndex + 1);
     tokens = tokens.slice(0, rhsIndex);
-  }
-
-  let mappingList;
-  if (typeOf(tokens[0]) === 'mutable') {
-    mappingList = tokens[0].value;
-    tokens = tokens.slice(1);
   }
 
   // for each token...
@@ -115,29 +109,33 @@ export function evaluate (line) {
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i));
 
-  if (Array.isArray(Clover.working) && Clover.working.every(i => i.self)) {
-    Clover.working = Clover.working.map(item => {
+  if (Array.isArray(value) && value.every(i => i.self)) {
+    value = value.map(item => {
       item.working = command.run(item.working, args);
       return item;
     });
   } else {
-    Clover.working = command.run(Clover.working, args);
+    value = command.run(value, args);
   }
 
   if (rhs) {
-    const {value, specifier} = rhs[0];
+    const v = rhs[0].value;
+    const specifier = rhs[0].specifier;
     if (specifier !== '%m') {
-      throw new CloverError('invalid right-hand side value %t', value);
+      throw new CloverError('invalid right-hand side value %t', v);
     }
-    if (Clover.working.every(i => i.self)) {
-      Clover.mutables[value] = Clover.working.map(item => item.working);
-      Clover.working = Clover.working.map(item => {
-        item[value] = item.working;
+    if (value.every(i => i.self)) {
+      Clover.mutables[v] = value.map(item => item.working);
+      value = value.map(item => {
+        item[v] = item.working;
         return item;
       });
+    } else {
+      Clover.mutables[v] = value;
     }
-    Clover.mutables[value] = Clover.working;
   }
+
+  return value;
 }
 
 /**
@@ -151,20 +149,10 @@ const add = new Command('add %a', (value, args) => {
   return value + cast(addend);
 });
 
-// FIXME
-const apply = new Command('apply %c', args => {
-  worksWith('array');
+const apply = new Command('apply %c', (value, args) => {
   const [command] = args;
-  let cachedFocus = Clover.focus;
-  let cached = [...Clover.working];
-  cached.forEach((x, i, r) => {
-    Clover.focus = r[i];
-    Clover.working = r[i];
-    evaluate(cast(command));
-    r[i] = Clover.working;
-  });
-  Clover.working = cached;
-  Clover.focus = cachedFocus;
+  Token.assertType(value, 'array');
+  return value.map((x, i, r) => evaluate(cast(command), x));
 });
 
 const comp = new Command('comp %l', (value, args) => {
