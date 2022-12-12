@@ -223,8 +223,8 @@ const group = new Command('groups of %n', (value, args) => {
   }
   Token.assertType(value, 'array');
   const newArray = [];
-  for (let i = 0; i < Clover.working.length; i += size) {
-    newArray.push(Clover.working.slice(i, i + size));
+  for (let i = 0; i < value.length; i += size) {
+    newArray.push(value.slice(i, i + size));
   }
   return [...newArray];
 });
