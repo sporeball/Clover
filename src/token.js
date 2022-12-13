@@ -106,6 +106,9 @@ export function cast (v) {
     return value;
   }
   if (T === 'mutable') {
+    if (value.startsWith('::')) {
+      return Clover.mutables.scoped[value];
+    }
     return Clover.mutables[value];
   }
   return value;

@@ -19,6 +19,7 @@ export default function parse (code, options = {}) {
   };
 
   Clover.mutables = {};
+  Clover.mutables.scoped = {};
 
   // implicit input
   try {

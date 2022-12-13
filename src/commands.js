@@ -108,11 +108,15 @@ export function evaluate (line, value) {
   // if the command is being executed on an itemized list...
   if (Array.isArray(value) && value.every(i => i.self)) {
     // replace each item's working value
-    value = value.map(item => {
+    value = value.map((item, index) => {
       // with the result of the command run on that value
       if (command instanceof SpecialCommand) {
         return command.run(item, args);
       }
+      const scoped = Object.fromEntries(
+        Object.entries(item).filter(e => e[0].startsWith('::'))
+      );
+      Clover.mutables.scoped = scoped;
       item.working = command.run(item.working, args);
       return item;
     });
@@ -132,9 +136,14 @@ export function evaluate (line, value) {
     }
     // if the command was executed on an itemized list...
     if (Array.isArray(value) && value.every(i => i.self)) {
+      if (!v.startsWith('::')) {
+        throw new CloverError(
+          'rhs mutable should start with :: when working with an itemized list'
+        );
+      }
       // set the mutable to the list of working values
       // of all items in the list,
-      Clover.mutables[v] = value.map(item => item.working);
+      Clover.mutables[v.slice(1)] = value.map(item => item.working);
       // and for each item in the itemized list,
       value = value.map(item => {
         // set the mutable to its own working value
@@ -237,6 +246,9 @@ const group = new Command('groups of %n', (value, args) => {
 const itemize = new Command('itemize %m', (value, args) => {
   const [dest] = args;
   assert.type(value, 'array');
+  if (!dest.startsWith('::')) {
+    throw new CloverError('itemize list should start with ::');
+  }
   if (!dest.endsWith('s')) {
     throw new CloverError('itemize list should be a plural word');
   }
