@@ -344,6 +344,15 @@ const sum = new Command('sum', (value) => {
     .reduce((a, c) => a + cast(c), 0);
 });
 
+const unitemize = new SpecialCommand('unitemize', (value) => {
+  if (!value.self) {
+    throw new CloverError(
+      'ensure current value is an itemized list'
+    );
+  }
+  return value.working;
+});
+
 export const commands = {
   // verbs
   add,
@@ -365,5 +374,6 @@ export const commands = {
   showMonadic,
   split,
   subtract,
-  sum
+  sum,
+  unitemize
 };
