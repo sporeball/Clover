@@ -32,6 +32,13 @@ class Command {
 
 class SpecialCommand extends Command { }
 
+class Sugar extends Command {
+  constructor (pattern, cmd) {
+    super(pattern);
+    this.body = cmd.body;
+  }
+}
+
 /**
  * execute a command
  * @param {string} line
@@ -264,12 +271,12 @@ const itemize = new Command('itemize %m', (value, args) => {
   return value;
 });
 
-const maximum = new Command('max', (value) => {
+const maximum = new Command('maximum', (value) => {
   assert.type(value, 'array');
   return Math.max(...value.filter(Number));
 });
 
-const minimum = new Command('min', (value) => {
+const minimum = new Command('minimum', (value) => {
   assert.type(value, 'array');
   return Math.min(...value.filter(Number));
 });
@@ -353,8 +360,11 @@ const unitemize = new SpecialCommand('unitemize', (value) => {
   return value.working;
 });
 
+const max = new Sugar('max', maximum);
+const min = new Sugar('min', minimum);
+
 export const commands = {
-  // verbs
+  // commands
   add,
   apply,
   comp,
@@ -365,8 +375,8 @@ export const commands = {
   focusMonadic,
   group,
   itemize,
-  minimum,
   maximum,
+  minimum,
   multiply,
   product,
   // set,
@@ -375,5 +385,8 @@ export const commands = {
   split,
   subtract,
   sum,
-  unitemize
+  unitemize,
+  // syntactic sugar
+  max,
+  min
 };
