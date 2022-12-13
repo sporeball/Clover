@@ -30,6 +30,8 @@ class Command {
   }
 }
 
+class SpecialCommand extends Command { }
+
 /**
  * execute a command
  * @param {string} line
@@ -43,9 +45,12 @@ export function evaluate (line, value) {
   let possible = Object.entries(commands);
 
   let rhs;
+  // if the command has a right-hand side...
   const rhsIndex = tokens.findIndex(token => token.value === '=');
   if (rhsIndex > -1) {
+    // store it for later
     rhs = tokens.slice(rhsIndex + 1);
+    // and remove it from the list of tokens
     tokens = tokens.slice(0, rhsIndex);
   }
 
@@ -100,28 +105,45 @@ export function evaluate (line, value) {
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i));
 
+  // if the command is being executed on an itemized list...
   if (Array.isArray(value) && value.every(i => i.self)) {
+    // replace each item's working value
     value = value.map(item => {
+      // with the result of the command run on that value
+      if (command instanceof SpecialCommand) {
+        return command.run(item, args);
+      }
       item.working = command.run(item.working, args);
       return item;
     });
+  // otherwise (single value)...
   } else {
+    // replace that value
     value = command.run(value, args);
   }
 
+  // if the command had a right-hand side...
   if (rhs) {
+    // ensure it consisted of a mutable
     const v = rhs[0].value;
     const specifier = rhs[0].specifier;
     if (specifier !== '%m') {
       throw new CloverError('invalid right-hand side value %t', v);
     }
-    if (value.every(i => i.self)) {
+    // if the command was executed on an itemized list...
+    if (Array.isArray(value) && value.every(i => i.self)) {
+      // set the mutable to the list of working values
+      // of all items in the list,
       Clover.mutables[v] = value.map(item => item.working);
+      // and for each item in the itemized list,
       value = value.map(item => {
+        // set the mutable to its own working value
         item[v] = item.working;
         return item;
       });
+    // otherwise (single value)...
     } else {
+      // set the mutable to the value
       Clover.mutables[v] = value;
     }
   }
@@ -188,10 +210,14 @@ const focus = new Command('focus', (value) => {
   return Clover.focus;
 });
 
-const focusMonadic = new Command('focus %a', (value, args) => {
+const focusMonadic = new SpecialCommand('focus %a', (value, args) => {
   const [focusValue] = args;
-  Clover.focus = cast(focusValue);
-  return Clover.focus;
+  if (value.self && value[focusValue]) {
+    value.working = value[focusValue];
+    return value;
+  } else {
+    return cast(focusValue);
+  }
 });
 
 const group = new Command('groups of %n', (value, args) => {
