@@ -2,13 +2,26 @@ import { matches } from './util.js';
 import reserved from '../util/reserved.js';
 
 /**
+ * class representing a token
+ */
+export class Token {
+  /**
+   * @param {*} value
+   */
+  constructor (value) {
+    this.value = value;
+    this.specifier = specifier(value);
+  }
+}
+
+/**
  * return the type of a value
  * works with Tokens and with primitive values
  * @param {*} v
  */
 export function typeOf (v) {
   let value = v; // true value to work with
-  if (v instanceof Token.Token) {
+  if (v instanceof Token) {
     value = value.value; // haha...
   }
   if (value === undefined) {
@@ -56,7 +69,7 @@ export function typeOf (v) {
 // TODO: automatic and manual
 export function cast (v) {
   let value = v; // true value to work with
-  if (v instanceof Token.Token) {
+  if (v instanceof Token) {
     value = value.value; // haha...
   }
   const T = typeOf(value);
@@ -132,21 +145,3 @@ function specifier (value) {
   }
   return '%a';
 }
-
-// default object
-const Token = {
-  /**
-   * class representing a token
-   */
-  Token: class Token {
-    /**
-     * @param {*} value
-     */
-    constructor (value) {
-      this.value = value;
-      this.specifier = specifier(value);
-    }
-  }
-};
-
-export default Token;

@@ -1,5 +1,5 @@
 import assert from './assert.js';
-import Token, { typeOf, cast } from './token.js';
+import { Token, typeOf, cast } from './token.js';
 // import { accesses } from './mutable.js';
 import { output, escape } from './util.js';
 
@@ -38,7 +38,7 @@ class Command {
 export function evaluate (line, value) {
   // tokenize
   let tokens = line.match(/'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g)
-    .map(token => new Token.Token(token));
+    .map(token => new Token(token));
   // the list of commands that these tokens might match
   let possible = Object.entries(commands);
 
