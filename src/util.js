@@ -1,6 +1,40 @@
 import colors from 'picocolors';
 
 /**
+ * return whether a value is equal to one of multiple passed values
+ * @param {*} value the value to check
+ * @param {*[]} values array of valid values
+ */
+export function any (value, values) {
+  return values.includes(value);
+}
+
+/**
+ * @param {*} value
+ */
+export function defined (value) {
+  return value !== undefined;
+}
+
+/**
+ * return whether one value is equal to another
+ * @param {*} v1
+ * @param {*} v2
+ */
+export function equal (v1, v2) {
+  return v1 === v2;
+}
+
+/**
+ * return whether a value matches a regular expression
+ * @param {*} value
+ * @param {RegExp} regexp
+ */
+export function matches (value, regexp) {
+  return typeof value === 'string' && value.match(regexp) !== null;
+}
+
+/**
  * manipulate a value, and return it for pretty printing
  * this mostly means giving it a bit of color
  * @param {*} value
@@ -25,15 +59,15 @@ export function pretty (value) {
       return pretty(i);
     }).join(colors.white(', ')))}]`;
   } else if (value.self) {
-    return '{ '
-      + Object.entries(value).map(entry => {
+    return '{ ' +
+      Object.entries(value).map(entry => {
         const [k, v] = entry;
         if (k === 'self') {
           return undefined;
         }
         return `${k} = ${pretty(v)}`;
-      }).filter(v => v).join(', ')
-      + ' }';
+      }).filter(v => v).join(', ') +
+      ' }';
   // CloverError
   } else if (value.constructor?.name === 'CloverError') {
     return `${colors.red('e:')} ${value.message}

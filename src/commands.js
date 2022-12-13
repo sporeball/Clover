@@ -1,6 +1,7 @@
+import assert from './assert.js';
 import Token, { typeOf, cast } from './token.js';
-import { accesses } from './mutable.js';
-import { output, escape, arrayDepth } from './util.js';
+// import { accesses } from './mutable.js';
+import { output, escape } from './util.js';
 
 /**
  * each command written in a clover program consists of a list of tokens.
@@ -26,16 +27,6 @@ class Command {
 
   run (value, args) {
     return this.body(value, args);
-  }
-}
-
-function worksWith (T) {
-  const t = typeOf(Clover.working);
-  if (T !== t) {
-    throw new CloverError(
-      'expected working value of type %s, got %s instead',
-      T, t
-    );
   }
 }
 
@@ -144,20 +135,20 @@ export function evaluate (line, value) {
 
 const add = new Command('add %a', (value, args) => {
   const [addend] = args;
-  Token.assertType(value, 'number');
-  Token.assertAny(typeOf(addend), ['number', 'mutable']);
+  assert.type(value, 'number');
+  assert.any(typeOf(addend), ['number', 'mutable']);
   return value + cast(addend);
 });
 
 const apply = new Command('apply %c', (value, args) => {
   const [command] = args;
-  Token.assertType(value, 'array');
+  assert.type(value, 'array');
   return value.map((x, i, r) => evaluate(cast(command), x));
 });
 
 const comp = new Command('comp %l', (value, args) => {
   const list = cast(args[0]);
-  Token.assertType(value, 'array');
+  assert.type(value, 'array');
   const unique = list.filter((x, i, r) => r.indexOf(x) === i);
   const obj = Object.fromEntries(
     unique.map((x, i) => [x, value[i]])
@@ -167,7 +158,7 @@ const comp = new Command('comp %l', (value, args) => {
 
 const count = new Command('count %a', (value, args) => {
   const [searchValue] = args;
-  Token.assertAny(typeOf(value), ['array', 'string']);
+  assert.any(typeOf(value), ['array', 'string']);
   switch (typeOf(value)) {
     case 'array':
       return value
@@ -183,13 +174,13 @@ const count = new Command('count %a', (value, args) => {
 
 const divide = new Command('divide by %a', (value, args) => {
   const [divisor] = args;
-  Token.assertType(value, 'number');
-  Token.assertAny(typeOf(divisor), ['number', 'mutable']);
+  assert.type(value, 'number');
+  assert.any(typeOf(divisor), ['number', 'mutable']);
   return value / cast(divisor);
 });
 
 const flat = new Command('flatten', (value) => {
-  Token.assertType(value, 'array');
+  assert.type(value, 'array');
   return value.flat();
 });
 
@@ -205,11 +196,11 @@ const focusMonadic = new Command('focus %a', (value, args) => {
 
 const group = new Command('groups of %n', (value, args) => {
   const size = cast(args[0]);
-  Token.assertType(size, 'number');
+  assert.type(size, 'number');
   if (size === 0) {
     throw new CloverError('cannot split into groups of 0');
   }
-  Token.assertType(value, 'array');
+  assert.type(value, 'array');
   const newArray = [];
   for (let i = 0; i < value.length; i += size) {
     newArray.push(value.slice(i, i + size));
@@ -219,14 +210,14 @@ const group = new Command('groups of %n', (value, args) => {
 
 const itemize = new Command('itemize %m', (value, args) => {
   const [dest] = args;
-  Token.assertType(value, 'array');
+  assert.type(value, 'array');
   if (!dest.endsWith('s')) {
     throw new CloverError('itemize list should be a plural word');
   }
   Clover.mutables[dest] = value;
-  let prop = dest.slice(0, -1);
+  const prop = dest.slice(0, -1);
   value = value.map((item, index) => {
-    let obj = {};
+    const obj = {};
     obj.self = obj;
     obj.working = item;
     obj[prop] = obj.working;
@@ -237,13 +228,13 @@ const itemize = new Command('itemize %m', (value, args) => {
 
 const multiply = new Command('multiply by %a', (value, args) => {
   const [multiplier] = args;
-  Token.assertType(value, 'number');
-  Token.assertAny(typeOf(multiplier), ['number', 'mutable']);
+  assert.type(value, 'number');
+  assert.any(typeOf(multiplier), ['number', 'mutable']);
   return value * cast(multiplier);
 });
 
 const product = new Command('product', (value) => {
-  Token.assertType(value, 'array');
+  assert.type(value, 'array');
   // TODO: should it throw if it finds non-numbers instead?
   return value.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a * cast(c), 1);
@@ -272,8 +263,8 @@ const showMonadic = new Command('show %a', (value, args) => {
 const split = new Command('split %a %a', (value, args) => {
   const [connector, splitter] = args;
 
-  Token.assertType(value, 'string');
-  Token.assertAny(connector, ['by', 'on']);
+  assert.type(value, 'string');
+  assert.any(connector, ['by', 'on']);
   // Token.assertType(splitter, 'string');
 
   // TODO: singular and plural
@@ -293,13 +284,13 @@ const split = new Command('split %a %a', (value, args) => {
 
 const subtract = new Command('subtract %a', (value, args) => {
   const [subtrahend] = args;
-  Token.assertType(value, 'number');
-  Token.assertAny(typeOf(subtrahend), ['number', 'mutable']);
+  assert.type(value, 'number');
+  assert.any(typeOf(subtrahend), ['number', 'mutable']);
   return value - cast(subtrahend);
 });
 
 const sum = new Command('sum', (value) => {
-  Token.assertType(value, 'array');
+  assert.type(value, 'array');
   // TODO: should it throw if it finds non-numbers instead?
   return value.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a + cast(c), 0);
