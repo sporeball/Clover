@@ -252,6 +252,16 @@ const itemize = new Command('itemize %m', (value, args) => {
   return value;
 });
 
+const maximum = new Command('max', (value) => {
+  assert.type(value, 'array');
+  return Math.max(...value.filter(Number));
+});
+
+const minimum = new Command('min', (value) => {
+  assert.type(value, 'array');
+  return Math.min(...value.filter(Number));
+});
+
 const multiply = new Command('multiply by %a', (value, args) => {
   const [multiplier] = args;
   assert.type(value, 'number');
@@ -334,6 +344,8 @@ export const commands = {
   focusMonadic,
   group,
   itemize,
+  minimum,
+  maximum,
   multiply,
   product,
   // set,
