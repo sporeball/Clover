@@ -297,10 +297,10 @@ const product = new Command('product', (value) => {
 //   Clover.mutables[mut] = cast(value);
 // });
 
-// const show = new Command('show', () => {
-//   output(Clover.working);
-//   return Clover.working;
-// });
+const show = new Command('show', () => {
+  output(Clover.working);
+  return Clover.working;
+});
 
 const showMonadic = new Command('show %a', (value, args) => {
   const [showValue] = args;
@@ -370,7 +370,7 @@ export const commands = {
   multiply,
   product,
   // set,
-  // show,
+  show,
   showMonadic,
   split,
   subtract,
