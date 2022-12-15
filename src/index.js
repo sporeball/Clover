@@ -5,7 +5,7 @@ import { format, output } from './util.js';
 import fs from 'fs';
 
 /**
- * parse a clover program
+ * parse a Clover program
  * @param {string} code
  * @param {Object} [options]
  * @param {boolean} options.silent whether to silence output. good for tests

@@ -21,14 +21,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sporeball/clover.git"
+    "url": "git+https://github.com/sporeball/Clover.git"
   },
   "author": "sporeball",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sporeball/clover/issues"
+    "url": "https://github.com/sporeball/Clover/issues"
   },
-  "homepage": "https://github.com/sporeball/clover#readme",
+  "homepage": "https://github.com/sporeball/Clover#readme",
   "dependencies": {
     "picocolors": "^1.0.0"
   },

@@ -4,7 +4,7 @@ import { Token, typeOf, cast } from './token.js';
 import { output, escape } from './util.js';
 
 /**
- * each command written in a clover program consists of a list of tokens.
+ * each command written in a Clover program consists of a list of tokens.
  * if this list begins with a valid token, the interpreter will call a
  * corresponding function, which runs code for that command if the list
  * follows a valid pattern.
