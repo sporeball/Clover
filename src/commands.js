@@ -30,8 +30,14 @@ class Command {
   }
 }
 
+/**
+ * special commands act on an entire list item, not just its working value
+ */
 class SpecialCommand extends Command { }
 
+/**
+ * sugar commands are one-liners which alias to another command
+ */
 class Sugar extends Command {
   constructor (pattern, cmd) {
     super(pattern);
@@ -114,8 +120,10 @@ export function evaluate (line, value) {
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i));
 
+  // special commands replace the entire item,
   if (command instanceof SpecialCommand) {
     value = command.run(value, args);
+  // while other commands replace only its working value
   } else {
     value.working = command.run(value.working, args);
   }
@@ -128,6 +136,7 @@ export function evaluate (line, value) {
     if (specifier !== '%m') {
       throw new CloverError('invalid right-hand side value %t', v);
     }
+    // add that mutable to the item
     value[v] = value.working;
     // move the working value to the end
     delete value.working;
