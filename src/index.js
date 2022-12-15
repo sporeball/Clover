@@ -18,16 +18,14 @@ export default function parse (code, options = {}) {
     }
   };
 
-  Clover.mutables = {};
-  Clover.mutables.scoped = {};
-
   // implicit input
+  let input;
   try {
-    Clover.mutables[':input'] = cast(
+    input = cast(
       fs.readFileSync('input.txt', { encoding: 'utf-8' }).trim()
     );
   } catch (e) {
-    Clover.mutables[':input'] = '';
+    input = '';
   }
 
   Clover.outputs = [];
@@ -35,8 +33,10 @@ export default function parse (code, options = {}) {
 
   // commands act on the focus value
   // this is equivalent to the original input at first
-  Clover.focus = Clover.mutables[':input'];
-  Clover.working = Clover.focus;
+  Clover.focus = [{
+    input,
+    working: input
+  }];
 
   Clover.line = 0;
 
@@ -57,18 +57,16 @@ export default function parse (code, options = {}) {
     }
     // each line of code holds a single command
     // tokenize and evaluate
-    Clover.working = Command.evaluate(line, Clover.working);
+    Clover.focus = Clover.focus.flatMap(item => {
+      item = Command.evaluate(line, item);
+      return item;
+    });
   }
 
   // implicit output
   // (if the `quiet` command has not been used)
   if (!Clover.quiet) {
-    output(Clover.working);
-  }
-
-  // for single-item output array, return the item itself instead
-  if (Clover.outputs.length === 1) {
-    Clover.outputs = Clover.outputs[0];
+    output(Clover.focus);
   }
 
   return Clover.outputs;

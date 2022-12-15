@@ -46,7 +46,9 @@ class Sugar extends Command {
 // TODO: some would probably call this function overloaded
 export function evaluate (line, value) {
   // tokenize
-  let tokens = line.match(/'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g)
+  let tokens = line.match(
+    /'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
+  )
     .map(token => new Token(token));
   // the list of commands that these tokens might match
   let possible = Object.entries(commands);
@@ -112,25 +114,10 @@ export function evaluate (line, value) {
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i));
 
-  // if the command is being executed on an itemized list...
-  if (Array.isArray(value) && value.every(i => i.self)) {
-    // replace each item's working value
-    value = value.map((item, index) => {
-      // with the result of the command run on that value
-      if (command instanceof SpecialCommand) {
-        return command.run(item, args);
-      }
-      const scoped = Object.fromEntries(
-        Object.entries(item).filter(e => e[0].startsWith('::'))
-      );
-      Clover.mutables.scoped = scoped;
-      item.working = command.run(item.working, args);
-      return item;
-    });
-  // otherwise (single value)...
-  } else {
-    // replace that value
+  if (command instanceof SpecialCommand) {
     value = command.run(value, args);
+  } else {
+    value.working = command.run(value.working, args);
   }
 
   // if the command had a right-hand side...
@@ -141,27 +128,10 @@ export function evaluate (line, value) {
     if (specifier !== '%m') {
       throw new CloverError('invalid right-hand side value %t', v);
     }
-    // if the command was executed on an itemized list...
-    if (Array.isArray(value) && value.every(i => i.self)) {
-      if (!v.startsWith('::')) {
-        throw new CloverError(
-          'rhs mutable should start with :: when working with an itemized list'
-        );
-      }
-      // set the mutable to the list of working values
-      // of all items in the list,
-      Clover.mutables[v.slice(1)] = value.map(item => item.working);
-      // and for each item in the itemized list,
-      value = value.map(item => {
-        // set the mutable to its own working value
-        item[v] = item.working;
-        return item;
-      });
-    // otherwise (single value)...
-    } else {
-      // set the mutable to the value
-      Clover.mutables[v] = value;
-    }
+    value[v] = value.working;
+    // move the working value to the end
+    delete value.working;
+    value.working = value[v];
   }
 
   return value;
@@ -180,8 +150,10 @@ const add = new Command('add %a', (value, args) => {
 
 const apply = new Command('apply %c', (value, args) => {
   const [command] = args;
-  assert.type(value, 'array');
-  return value.map((x, i, r) => evaluate(cast(command), x));
+  return value.map((x, i, r) => {
+    const obj = { working: x };
+    return evaluate(cast(command), obj).working; // collapse
+  });
 });
 
 const comp = new Command('comp %l', (value, args) => {
@@ -228,12 +200,12 @@ const focus = new Command('focus', (value) => {
 
 const focusMonadic = new SpecialCommand('focus %a', (value, args) => {
   const [focusValue] = args;
-  if (value.self && value[focusValue]) {
+  if (typeOf(focusValue) === 'mutable') {
     value.working = value[focusValue];
-    return value;
   } else {
-    return cast(focusValue);
+    value.working = cast(focusValue);
   }
+  return value;
 });
 
 const group = new Command('groups of %n', (value, args) => {
@@ -250,25 +222,31 @@ const group = new Command('groups of %n', (value, args) => {
   return [...newArray];
 });
 
-const itemize = new Command('itemize %m', (value, args) => {
+const itemize = new SpecialCommand('itemize %m', (value, args) => {
   const [dest] = args;
-  assert.type(value, 'array');
-  if (!dest.startsWith('::')) {
-    throw new CloverError('itemize list should start with ::');
+  // assert.type(value, 'array');
+  if (value.length > 1) {
+    throw new CloverError(
+      'ensure focus contains only one item object before itemizing'
+    );
   }
   if (!dest.endsWith('s')) {
     throw new CloverError('itemize list should be a plural word');
   }
-  Clover.mutables[dest] = value;
   const prop = dest.slice(0, -1);
-  value = value.map((item, index) => {
-    const obj = {};
-    obj.self = obj;
-    obj.working = item;
-    obj[prop] = obj.working;
-    return obj;
-  });
-  return value;
+  const srcWorking = value.working;
+  const srcItemCount = value.working.length;
+  return Array(srcItemCount)
+    .fill(0) // dummy value
+    .map((item, index) => {
+      item = { ...value };
+      item[prop] = srcWorking[index];
+      // move the working value to the end
+      delete item.working;
+      item.working = srcWorking[index];
+      // done
+      return item;
+    });
 });
 
 const maximum = new Command('maximum', (value) => {

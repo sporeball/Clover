@@ -58,11 +58,11 @@ export function pretty (value) {
     return `[${colors.cyan(value.map(i => {
       return pretty(i);
     }).join(colors.white(', ')))}]`;
-  } else if (value.self) {
+  } else if (value.working) {
     return '{ ' +
       Object.entries(value).map(entry => {
         const [k, v] = entry;
-        if (k === 'self') {
+        if (k === 'input') {
           return undefined;
         }
         return `${k} = ${pretty(v)}`;
