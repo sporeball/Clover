@@ -13,7 +13,7 @@ import { output, escape } from './util.js';
  */
 
 /**
- * command superclass
+ * regular commands access the working value of all items
  */
 class Command {
   /**
@@ -31,9 +31,14 @@ class Command {
 }
 
 /**
- * special commands act on an entire list item, not just its working value
+ * item commands can access all properties of an item
  */
-class SpecialCommand extends Command { }
+class ItemCommand extends Command { }
+
+/**
+ * list commands access and replace the entire list of items
+ */
+class ListCommand extends Command { }
 
 /**
  * sugar commands are one-liners which alias to another command
@@ -45,30 +50,15 @@ class Sugar extends Command {
   }
 }
 
-/**
- * execute a command
- * @param {string} line
- */
-// TODO: some would probably call this function overloaded
-export function evaluate (line, value) {
-  // tokenize
-  let tokens = line.match(
+function tokenize (line) {
+  return line.match(
     /'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
   )
     .map(token => new Token(token));
-  // the list of commands that these tokens might match
+}
+
+function getCommand (tokens) {
   let possible = Object.entries(commands);
-
-  let rhs;
-  // if the command has a right-hand side...
-  const rhsIndex = tokens.findIndex(token => token.value === '=');
-  if (rhsIndex > -1) {
-    // store it for later
-    rhs = tokens.slice(rhsIndex + 1);
-    // and remove it from the list of tokens
-    tokens = tokens.slice(0, rhsIndex);
-  }
-
   // for each token...
   for (let i = 0; i < tokens.length; i++) {
     // filter to those commands where...
@@ -90,16 +80,18 @@ export function evaluate (line, value) {
       );
     }
   }
-
-  // at this point there is just one option left
   const [, command] = possible[0];
+  return command;
+}
+
+function getArgs (command, tokens) {
   const patternTokens = command.pattern.split(' ');
+  // make sure that there is the correct amount of tokens first
   if (tokens.length < patternTokens.length) {
     throw new CloverError(
       'no matching command pattern was found (ran out of tokens)'
     );
   }
-
   // some tokens simply help to form the pattern, and can be dropped.
   // to find the indices of any arguments...
   const argIndices = patternTokens
@@ -114,18 +106,44 @@ export function evaluate (line, value) {
     })
     // and remove null values
     .filter(x => x !== null);
-
   // filter the token stream to the values...
   const args = tokens.map(token => token.value)
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i));
+  return args;
+}
 
-  // special commands replace the entire item,
-  if (command instanceof SpecialCommand) {
-    value = command.run(value, args);
-  // while other commands replace only its working value
+/**
+ * execute a command
+ * @param {string} line
+ */
+export function evaluate (line) {
+  let tokens = tokenize(line);
+  let rhs;
+
+  // if the command has a right-hand side...
+  const rhsIndex = tokens.findIndex(token => token.value === '=');
+  if (rhsIndex > -1) {
+    // store it for later
+    rhs = tokens.slice(rhsIndex + 1);
+    // and remove it from the list of tokens
+    tokens = tokens.slice(0, rhsIndex);
+  }
+
+  // at this point there is just one option left
+  const command = getCommand(tokens);
+  const args = getArgs(command, tokens);
+
+  if (command instanceof ListCommand) {
+    Clover.focus = command.run(Clover.focus, args);
+  } else if (command instanceof ItemCommand) {
+    Clover.focus = Clover.focus.map(item => command.run(item, args));
   } else {
-    value.working = command.run(value.working, args);
+    Clover.focus.forEach(item => {
+      Clover.evItem = item;
+      item.working = command.run(item.working, args);
+      return item;
+    });
   }
 
   // if the command had a right-hand side...
@@ -137,13 +155,13 @@ export function evaluate (line, value) {
       throw new CloverError('invalid right-hand side value %t', v);
     }
     // add that mutable to the item
-    value[v] = value.working;
-    // move the working value to the end
-    delete value.working;
-    value.working = value[v];
+    Clover.focus.forEach(item => {
+      item[v] = item.working;
+      // move the working value to the end
+      delete item.working;
+      item.working = item[v];
+    });
   }
-
-  return value;
 }
 
 /**
@@ -158,11 +176,11 @@ const add = new Command('add %a', (value, args) => {
 });
 
 const apply = new Command('apply %c', (value, args) => {
-  const [command] = args;
-  return value.map((x, i, r) => {
-    const obj = { working: x };
-    return evaluate(cast(command), obj).working; // collapse
-  });
+  const tokens = tokenize(cast(args[0]));
+  const command = getCommand(tokens);
+  const commandArgs = getArgs(command, tokens);
+  assert.type(value, 'array');
+  return value.map((x, i, r) => command.run(x, commandArgs));
 });
 
 const comp = new Command('comp %l', (value, args) => {
@@ -203,18 +221,9 @@ const flat = new Command('flatten', (value) => {
   return value.flat();
 });
 
-const focus = new Command('focus', (value) => {
-  return Clover.focus;
-});
-
-const focusMonadic = new SpecialCommand('focus %a', (value, args) => {
+const focusMonadic = new Command('focus %a', (value, args) => {
   const [focusValue] = args;
-  if (typeOf(focusValue) === 'mutable') {
-    value.working = value[focusValue];
-  } else {
-    value.working = cast(focusValue);
-  }
-  return value;
+  return cast(focusValue);
 });
 
 const group = new Command('groups of %n', (value, args) => {
@@ -231,7 +240,7 @@ const group = new Command('groups of %n', (value, args) => {
   return [...newArray];
 });
 
-const itemize = new SpecialCommand('itemize %m', (value, args) => {
+const itemize = new ListCommand('itemize %m', (value, args) => {
   const [dest] = args;
   // assert.type(value, 'array');
   if (value.length > 1) {
@@ -242,13 +251,14 @@ const itemize = new SpecialCommand('itemize %m', (value, args) => {
   if (!dest.endsWith('s')) {
     throw new CloverError('itemize list should be a plural word');
   }
+  const src = value[0];
   const prop = dest.slice(0, -1);
-  const srcWorking = value.working;
-  const srcItemCount = value.working.length;
+  const srcWorking = src.working;
+  const srcItemCount = src.working.length;
   return Array(srcItemCount)
-    .fill(0) // dummy value
+    .fill(undefined) // dummy value
     .map((item, index) => {
-      item = { ...value };
+      item = { ...src };
       item[prop] = srcWorking[index];
       // move the working value to the end
       delete item.working;
@@ -338,14 +348,14 @@ const sum = new Command('sum', (value) => {
     .reduce((a, c) => a + cast(c), 0);
 });
 
-const unitemize = new SpecialCommand('unitemize', (value) => {
-  if (!value.self) {
-    throw new CloverError(
-      'ensure current value is an itemized list'
-    );
-  }
-  return value.working;
-});
+// const unitemize = new SpecialCommand('unitemize', (value) => {
+//   if (!value.self) {
+//     throw new CloverError(
+//       'ensure current value is an itemized list'
+//     );
+//   }
+//   return value.working;
+// });
 
 const max = new Sugar('max', maximum);
 const min = new Sugar('min', minimum);
@@ -358,7 +368,6 @@ export const commands = {
   count,
   divide,
   flat,
-  focus,
   focusMonadic,
   group,
   itemize,
@@ -372,7 +381,7 @@ export const commands = {
   split,
   subtract,
   sum,
-  unitemize,
+  // unitemize,
   // syntactic sugar
   max,
   min

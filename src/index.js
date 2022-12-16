@@ -57,11 +57,7 @@ export default function parse (code, options = {}) {
     }
     // each line of code holds a single command
     // tokenize and evaluate
-    Clover.focus = Clover.focus.flatMap(item => {
-      Clover.evItem = item;
-      item = Command.evaluate(line, item);
-      return item;
-    });
+    Command.evaluate(line);
   }
 
   // implicit output
