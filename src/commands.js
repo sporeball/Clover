@@ -348,14 +348,12 @@ const sum = new Command('sum', (value) => {
     .reduce((a, c) => a + cast(c), 0);
 });
 
-// const unitemize = new SpecialCommand('unitemize', (value) => {
-//   if (!value.self) {
-//     throw new CloverError(
-//       'ensure current value is an itemized list'
-//     );
-//   }
-//   return value.working;
-// });
+const unitemize = new ListCommand('unitemize', (value) => {
+  return [{
+    input: value[0].input, // same everywhere
+    working: value.map(item => item.working)
+  }];
+});
 
 const max = new Sugar('max', maximum);
 const min = new Sugar('min', minimum);
@@ -381,7 +379,7 @@ export const commands = {
   split,
   subtract,
   sum,
-  // unitemize,
+  unitemize,
   // syntactic sugar
   max,
   min
