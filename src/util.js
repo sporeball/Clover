@@ -55,19 +55,27 @@ export function pretty (value) {
     return colors.cyan(`'${value.replace(/\n/g, colors.yellow('\\n'))}'`);
   // array
   } else if (Array.isArray(value)) {
-    return `[${colors.cyan(value.map(i => {
-      return pretty(i);
-    }).join(colors.white(', ')))}]`;
+    if (value[0].working) {
+      return pretty(value[0]) +
+        (value.length > 1
+          ? `,\n${colors.cyan(`... (${value.length - 1} more)`)}`
+          : ''
+        );
+    } else {
+      return `[${colors.cyan(value.map(i => {
+        return pretty(i);
+      }).join(colors.white(', ')))}]`;
+    }
   } else if (value.working) {
-    return '{ ' +
+    return '{\n  ' +
       Object.entries(value).map(entry => {
         const [k, v] = entry;
         if (k === 'input') {
           return undefined;
         }
-        return `${k} = ${pretty(v)}`;
-      }).filter(v => v).join(', ') +
-      ' }';
+        return `${k.startsWith(':') ? colors.yellow(k) : k} = ${pretty(v)}`;
+      }).filter(v => v).join(',\n  ') +
+      '\n}';
   // CloverError
   } else if (value.constructor?.name === 'CloverError') {
     return `${colors.red('e:')} ${value.message}
