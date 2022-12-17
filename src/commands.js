@@ -275,6 +275,13 @@ const itemize = new ListCommand('itemize %m', (value, args) => {
     });
 });
 
+const last = new Command('last', (value) => {
+  if (typeOf(value) === 'array') {
+    return value[value.length - 1];
+  }
+  return value;
+});
+
 const maximum = new Command('maximum', (value) => {
   assert.type(value, 'array');
   return Math.max(...value.filter(Number));
@@ -368,6 +375,7 @@ export const commands = {
   focusMonadic,
   group,
   itemize,
+  last,
   maximum,
   minimum,
   multiply,

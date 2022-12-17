@@ -93,6 +93,12 @@ tentamen.add(
   multiply by 2`,
   [2, 4, 6, 8, 10]
 );
+tentamen.add(
+  'last',
+  `focus [1 2 3 4 5]
+  last`,
+  5
+);
 tentamen.add('maximum', 'focus [1 5 6 2 3 4]\nmaximum', 6);
 tentamen.add('minimum', 'focus [6 2 1 5 4 3]\nminimum', 1);
 tentamen.add('multiply', 'focus 5\nmultiply by 5', 25);
