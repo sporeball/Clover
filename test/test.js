@@ -89,7 +89,7 @@ tentamen.add(
   'itemize',
   // in this form, we expect that an apply should not be required
   `focus [1 2 3 4 5]
-  itemize :numbers
+  itemize numbers
   multiply by 2`,
   [2, 4, 6, 8, 10]
 );
@@ -137,7 +137,7 @@ tentamen.add(
   'unitemize',
   // in this form, we expect that an apply should be required
   `focus [1 2 3 4 5]
-  itemize :numbers
+  itemize numbers
   unitemize
   apply (multiply by 2)`,
   [2, 4, 6, 8, 10]

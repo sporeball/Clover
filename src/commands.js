@@ -109,7 +109,8 @@ function getArgs (command, tokens) {
   // filter the token stream to the values...
   const args = tokens.map(token => token.value)
     // of the tokens with those indices
-    .filter((token, i) => argIndices.includes(i));
+    .filter((token, i) => argIndices.includes(i))
+    .map(token => cast(token));
   return args;
 }
 
@@ -132,16 +133,18 @@ export function evaluate (line) {
 
   // at this point there is just one option left
   const command = getCommand(tokens);
-  const args = getArgs(command, tokens);
 
   if (command instanceof ListCommand) {
-    Clover.focus = command.run(Clover.focus, args);
+    Clover.focus = command.run(Clover.focus, getArgs(command, tokens));
   } else if (command instanceof ItemCommand) {
-    Clover.focus = Clover.focus.map(item => command.run(item, args));
+    Clover.focus = Clover.focus.map(item => {
+      Clover.evItem = item;
+      return command.run(item, getArgs(command, tokens));
+    });
   } else {
     Clover.focus.forEach(item => {
       Clover.evItem = item;
-      item.working = command.run(item.working, args);
+      item.working = command.run(item.working, getArgs(command, tokens));
       return item;
     });
   }
@@ -172,11 +175,11 @@ const add = new Command('add %a', (value, args) => {
   const [addend] = args;
   assert.type(value, 'number');
   assert.any(typeOf(addend), ['number', 'mutable']);
-  return value + cast(addend);
+  return value + addend;
 });
 
 const apply = new Command('apply %c', (value, args) => {
-  const tokens = tokenize(cast(args[0]));
+  const tokens = tokenize(args[0]);
   const command = getCommand(tokens);
   const commandArgs = getArgs(command, tokens);
   assert.type(value, 'array');
@@ -184,7 +187,7 @@ const apply = new Command('apply %c', (value, args) => {
 });
 
 const comp = new Command('comp %l', (value, args) => {
-  const list = cast(args[0]);
+  const [list] = args;
   assert.type(value, 'array');
   const unique = list.filter((x, i, r) => r.indexOf(x) === i);
   const obj = Object.fromEntries(
@@ -199,18 +202,18 @@ const count = new Command('count %a', (value, args) => {
   switch (typeOf(value)) {
     case 'array':
       return value
-        .filter(x => x === cast(searchValue))
+        .filter(x => x === searchValue)
         .length;
     case 'string':
       return (value.match(
-        new RegExp(escape(cast(searchValue)), 'g')
+        new RegExp(escape(searchValue), 'g')
       ) || [])
         .length;
   }
 });
 
 const countTo = new Command('count to %n', (value, args) => {
-  const end = cast(args[0]);
+  const [end] = args;
   return Array(end)
     .fill(undefined)
     .map((x, i) => i + 1);
@@ -220,7 +223,7 @@ const divide = new Command('divide by %a', (value, args) => {
   const [divisor] = args;
   assert.type(value, 'number');
   assert.any(typeOf(divisor), ['number', 'mutable']);
-  return value / cast(divisor);
+  return value / divisor;
 });
 
 const flat = new Command('flatten', (value) => {
@@ -230,11 +233,11 @@ const flat = new Command('flatten', (value) => {
 
 const focusMonadic = new Command('focus %a', (value, args) => {
   const [focusValue] = args;
-  return cast(focusValue);
+  return focusValue;
 });
 
 const group = new Command('groups of %n', (value, args) => {
-  const size = cast(args[0]);
+  const [size] = args;
   assert.type(size, 'number');
   if (size === 0) {
     throw new CloverError('cannot split into groups of 0');
@@ -247,7 +250,7 @@ const group = new Command('groups of %n', (value, args) => {
   return [...newArray];
 });
 
-const itemize = new ListCommand('itemize %m', (value, args) => {
+const itemize = new ListCommand('itemize %s', (value, args) => {
   const [dest] = args;
   // assert.type(value, 'array');
   if (value.length > 1) {
@@ -296,14 +299,14 @@ const multiply = new Command('multiply by %a', (value, args) => {
   const [multiplier] = args;
   assert.type(value, 'number');
   assert.any(typeOf(multiplier), ['number', 'mutable']);
-  return value * cast(multiplier);
+  return value * multiplier;
 });
 
 const product = new Command('product', (value) => {
   assert.type(value, 'array');
   // TODO: should it throw if it finds non-numbers instead?
   return value.filter(v => typeOf(v) === 'number')
-    .reduce((a, c) => a * cast(c), 1);
+    .reduce((a, c) => a * c, 1);
 });
 
 const show = new ListCommand('show', (value) => {
@@ -313,7 +316,7 @@ const show = new ListCommand('show', (value) => {
 
 const showMonadic = new ListCommand('show %a', (value, args) => {
   const [showValue] = args;
-  output(cast(showValue));
+  output(showValue);
   return value;
 });
 
@@ -335,7 +338,7 @@ const split = new Command('split %a %a', (value, args) => {
     case 'chars':
       return value.split('');
     default:
-      return value.split(cast(splitter));
+      return value.split(splitter);
   }
 });
 
@@ -343,14 +346,14 @@ const subtract = new Command('subtract %a', (value, args) => {
   const [subtrahend] = args;
   assert.type(value, 'number');
   assert.any(typeOf(subtrahend), ['number', 'mutable']);
-  return value - cast(subtrahend);
+  return value - subtrahend;
 });
 
 const sum = new Command('sum', (value) => {
   assert.type(value, 'array');
   // TODO: should it throw if it finds non-numbers instead?
   return value.filter(v => typeOf(v) === 'number')
-    .reduce((a, c) => a + cast(c), 0);
+    .reduce((a, c) => a + c, 0);
 });
 
 const unitemize = new ListCommand('unitemize', (value) => {

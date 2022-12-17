@@ -92,7 +92,7 @@ export function cast (v) {
       return value;
     }
     return value.slice(1, -1)
-      .match(/\[.*?\]|'.*'|[^\[\]' ]+/g)
+      .match(/\[.*?\]|'.*'|[^[\]' ]+/g)
       .map(match => cast(match));
   }
   if (T === 'number') {
