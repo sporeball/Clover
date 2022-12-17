@@ -52,19 +52,48 @@ tentamen.done = (function () {
 tentamen.suite('tests');
 tentamen.add('add', 'focus 5\nadd 5', 10);
 tentamen.add(
+  'apply',
+  `focus [1 2 3 4 5]
+  apply (multiply by 2)`,
+  [2, 4, 6, 8, 10]
+);
+tentamen.add(
+  'comp',
+  `focus [1 2 3]
+  comp [one one one two two three]`,
+  [1, 1, 1, 2, 2, 3]
+);
+tentamen.add(
   'count',
   `focus 'aaaaa'
   count 'a'`,
   5
 );
 tentamen.add('divide', 'focus 5\ndivide by 5', 1);
-tentamen.add('focus', 'focus 5', 5);
+tentamen.add(
+  'flat',
+  `focus [1 2 3 4]
+  groups of 2
+  flatten`,
+  [1, 2, 3, 4]
+);
+tentamen.add('focusMonadic', 'focus 5', 5);
 tentamen.add(
   'group',
   `focus [1 2 3 4 5 6 7]
   groups of 2`,
   [[1, 2], [3, 4], [5, 6], [7]]
 );
+tentamen.add(
+  'itemize',
+  // in this form, we expect that an apply should not be required
+  `focus [1 2 3 4 5]
+  itemize :numbers
+  multiply by 2`,
+  [2, 4, 6, 8, 10]
+);
+tentamen.add('maximum', 'focus [1 5 6 2 3 4]\nmaximum', 6);
+tentamen.add('minimum', 'focus [6 2 1 5 4 3]\nminimum', 1);
 tentamen.add('multiply', 'focus 5\nmultiply by 5', 25);
 tentamen.add(
   'product',
@@ -96,6 +125,15 @@ tentamen.add(
   `focus [1 2 3 4 5 6 7 8 9 10]
   sum`,
   55
+);
+tentamen.add(
+  'unitemize',
+  // in this form, we expect that an apply should be required
+  `focus [1 2 3 4 5]
+  itemize :numbers
+  unitemize
+  apply (multiply by 2)`,
+  [2, 4, 6, 8, 10]
 );
 
 tentamen.done();
