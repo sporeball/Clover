@@ -55,7 +55,7 @@ export function pretty (value) {
     return colors.cyan(`'${value.replace(/\n/g, colors.yellow('\\n'))}'`);
   // array
   } else if (Array.isArray(value)) {
-    if (value[0].working) {
+    if (value[0].working !== undefined) {
       return pretty(value[0]) +
         (value.length > 1
           ? `,\n${colors.cyan(`... (${value.length - 1} more)`)}`
@@ -66,7 +66,7 @@ export function pretty (value) {
         return pretty(i);
       }).join(colors.white(', ')))}]`;
     }
-  } else if (value.working) {
+  } else if (value.working !== undefined) {
     return '{\n  ' +
       Object.entries(value).map(entry => {
         const [k, v] = entry;

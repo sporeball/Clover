@@ -292,21 +292,12 @@ const product = new Command('product', (value) => {
     .reduce((a, c) => a * cast(c), 1);
 });
 
-// const refocus = new Verb('refocus', () => {
-//   Clover.working = Clover.focus;
-// });
-
-// const set = new Command('set %m to %a', args => {
-//   const [mut, value] = args;
-//   Clover.mutables[mut] = cast(value);
-// });
-
-const show = new Command('show', () => {
-  output(Clover.working);
-  return Clover.working;
+const show = new ListCommand('show', (value) => {
+  output(Clover.focus);
+  return value;
 });
 
-const showMonadic = new Command('show %a', (value, args) => {
+const showMonadic = new ListCommand('show %a', (value, args) => {
   const [showValue] = args;
   output(cast(showValue));
   return value;

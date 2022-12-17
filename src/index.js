@@ -61,10 +61,19 @@ export default function parse (code, options = {}) {
   }
 
   // implicit output
-  // (if the `quiet` command has not been used)
-  if (!Clover.quiet) {
-    output(Clover.focus);
-  }
+  output(Clover.focus);
 
-  return Clover.outputs;
+  // collapse
+  let collapsed = Clover.outputs.flat(Infinity)
+    .map(item => {
+      if (item.working === undefined) {
+        return item;
+      }
+      return item.working;
+    });
+  // for a single-item array, return the item itself instead
+  if (collapsed.length === 1) {
+    collapsed = collapsed[0];
+  }
+  return collapsed;
 }

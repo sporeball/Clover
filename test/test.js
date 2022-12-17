@@ -72,12 +72,6 @@ tentamen.add(
   3628800
 );
 tentamen.add(
-  'set',
-  `set :mut to 5
-  focus :mut`,
-  5
-);
-tentamen.add(
   'show',
   `focus 5
   show`,
