@@ -79,7 +79,7 @@ export function cast (v) {
   if (T === 'index') {
     const index = Number(value.slice(value.lastIndexOf(':') + 1));
     value = value.slice(0, value.lastIndexOf(':'));
-    if (typeOf(value) === 'mutable' && Clover.mutables[value] === undefined) {
+    if (typeOf(value) === 'mutable' && Clover.evItem[value] === undefined) {
       throw new CloverError(
         'cannot index %s before initialization',
         value
