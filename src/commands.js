@@ -209,6 +209,13 @@ const count = new Command('count %a', (value, args) => {
   }
 });
 
+const countTo = new Command('count to %n', (value, args) => {
+  const end = cast(args[0]);
+  return Array(end)
+    .fill(undefined)
+    .map((x, i) => i + 1);
+});
+
 const divide = new Command('divide by %a', (value, args) => {
   const [divisor] = args;
   assert.type(value, 'number');
@@ -355,6 +362,7 @@ export const commands = {
   apply,
   comp,
   count,
+  countTo,
   divide,
   flat,
   focusMonadic,

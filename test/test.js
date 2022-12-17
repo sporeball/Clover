@@ -69,6 +69,7 @@ tentamen.add(
   count 'a'`,
   5
 );
+tentamen.add('countTo', 'count to 10', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 tentamen.add('divide', 'focus 5\ndivide by 5', 1);
 tentamen.add(
   'flat',
