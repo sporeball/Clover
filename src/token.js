@@ -92,8 +92,8 @@ export function cast (v) {
       return value;
     }
     return value.slice(1, -1)
-      .split(' ')
-      .map(x => cast(x));
+      .match(/\[.*?\]|'.*'|[^\[\]' ]+/g)
+      .map(match => cast(match));
   }
   if (T === 'number') {
     return Number(value);
