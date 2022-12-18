@@ -189,11 +189,17 @@ const apply = new Command('apply %c', (value, args) => {
 const comp = new Command('comp %l', (value, args) => {
   const [list] = args;
   assert.type(value, 'array');
-  const unique = list.filter((x, i, r) => r.indexOf(x) === i);
+  const unique = list.flat(Infinity)
+    .filter((x, i, r) => r.indexOf(x) === i);
   const obj = Object.fromEntries(
     unique.map((x, i) => [x, value[i]])
   );
-  return list.map(item => obj[item]);
+  return list.map(function cb (item) {
+    if (Array.isArray(item)) {
+      return item.map(subItem => cb(subItem));
+    }
+    return obj[item];
+  });
 });
 
 const count = new Command('count %a', (value, args) => {
