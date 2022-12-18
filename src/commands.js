@@ -342,6 +342,11 @@ const split = new Command('split %a %a', (value, args) => {
   }
 });
 
+const stop = new Command('stop', (value) => {
+  Clover.stop = true;
+  return value;
+});
+
 const subtract = new Command('subtract %a', (value, args) => {
   const [subtrahend] = args;
   assert.type(value, 'number');
@@ -387,6 +392,7 @@ export const commands = {
   show,
   showMonadic,
   split,
+  stop,
   subtract,
   sum,
   unitemize,

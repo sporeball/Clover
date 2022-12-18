@@ -58,6 +58,9 @@ export default function parse (code, options = {}) {
     // each line of code holds a single command
     // tokenize and evaluate
     Command.evaluate(line);
+    if (Clover.stop) {
+      break;
+    }
   }
 
   // implicit output
