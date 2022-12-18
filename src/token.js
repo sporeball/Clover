@@ -113,13 +113,6 @@ export function cast (v) {
 
 /**
  * return the format specifier that matches a token value
- * supported specifiers include:
- *   %n  number
- *   %s  string
- *   %r  reserved word
- *   %m  mutable
- *       (understood to be some other unqualified word)
- *   %a  any
  * @param {*} value
  */
 function specifier (value) {

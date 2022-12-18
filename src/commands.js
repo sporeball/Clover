@@ -8,12 +8,11 @@ import { output, escape } from './util.js';
  * if this list begins with a valid token, the interpreter will call a
  * corresponding function, which runs code for that command if the list
  * follows a valid pattern.
- * all such functions take the entire list, and consume it one token at a time
- * through callbacks.
  */
 
 /**
- * regular commands access the working value of all items
+ * command superclass
+ * regular commands access the working value of every item in the focus list
  */
 class Command {
   /**
@@ -31,17 +30,17 @@ class Command {
 }
 
 /**
- * item commands can access all properties of an item
+ * item commands access every item in the focus list
  */
 class ItemCommand extends Command { }
 
 /**
- * list commands access and replace the entire list of items
+ * list commands return an entirely different focus list
  */
 class ListCommand extends Command { }
 
 /**
- * sugar commands are one-liners which alias to another command
+ * sugar commands are aliases of other commands
  */
 class Sugar extends Command {
   constructor (pattern, cmd) {
@@ -50,6 +49,11 @@ class Sugar extends Command {
   }
 }
 
+/**
+ * convert a line of code into a stream of tokens
+ * @param {string} line
+ * @returns {Token[]}
+ */
 function tokenize (line) {
   return line.match(
     /'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
@@ -57,6 +61,11 @@ function tokenize (line) {
     .map(token => new Token(token));
 }
 
+/**
+ * determine what command is matched by a stream of tokens
+ * @param {Token[]} tokens
+ * @returns {Command}
+ */
 function getCommand (tokens) {
   let possible = Object.entries(commands);
   // for each token...
@@ -84,6 +93,12 @@ function getCommand (tokens) {
   return command;
 }
 
+/**
+ * get the arguments being passed to a command,
+ * given that command and the tokens that match its pattern
+ * @param {Command} command
+ * @param {Token[]} tokens
+ */
 function getArgs (command, tokens) {
   const patternTokens = command.pattern.split(' ');
   // make sure that there is the correct amount of tokens first
@@ -134,13 +149,16 @@ export function evaluate (line) {
   // at this point there is just one option left
   const command = getCommand(tokens);
 
+  // list commands return an entirely different focus list
   if (command instanceof ListCommand) {
     Clover.focus = command.run(Clover.focus, getArgs(command, tokens));
+  // item commands access every item in the focus list
   } else if (command instanceof ItemCommand) {
     Clover.focus = Clover.focus.map(item => {
       Clover.evItem = item;
       return command.run(item, getArgs(command, tokens));
     });
+  // regular commands access the working value of every item in the focus list
   } else {
     Clover.focus.forEach(item => {
       Clover.evItem = item;
@@ -394,7 +412,6 @@ export const commands = {
   minimum,
   multiply,
   product,
-  // set,
   show,
   showMonadic,
   split,

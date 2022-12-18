@@ -31,8 +31,10 @@ export default function parse (code, options = {}) {
   Clover.outputs = [];
   Clover.options = options;
 
-  // commands act on the focus value
-  // this is equivalent to the original input at first
+  // commands act on the focus list.
+  // this is a list of items, each with their own "working value",
+  // as well as their own mutable storage.
+  // at first, there is just one item, which works with the input
   Clover.focus = [{
     input,
     working: input
@@ -58,6 +60,7 @@ export default function parse (code, options = {}) {
     // each line of code holds a single command
     // tokenize and evaluate
     Command.evaluate(line);
+    // the `stop` command will set this value to true for an early break
     if (Clover.stop) {
       break;
     }
