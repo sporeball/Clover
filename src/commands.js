@@ -250,6 +250,25 @@ const divide = new Command('divide by %a', (value, args) => {
   return value / divisor;
 });
 
+const eachOf = new Command('each of %l %c', (value, args) => {
+  let [list, cstr] = args;
+  let arr = [];
+  for (const item of list) {
+    const tokens = tokenize(cstr.replace('::', item));
+    const command = getCommand(tokens);
+    const commandArgs = getArgs(command, tokens);
+    arr.push(command.run(value, commandArgs));
+  }
+  return arr;
+});
+
+// TODO: best way to make list and regular commands that both do this
+const filterOut = new ListCommand('filter out %a', (value, args) => {
+  const [filterValue] = args;
+  assert.type(value, 'array');
+  return value.filter(x => x.working !== filterValue);
+});
+
 const flat = new Command('flatten', (value) => {
   assert.type(value, 'array');
   return value.flat();
@@ -286,7 +305,7 @@ const itemize = new ListCommand('itemize %s', (value, args) => {
     throw new CloverError('itemize list should be a plural word');
   }
   const src = value[0];
-  const prop = dest.slice(0, -1);
+  const prop = ':' + dest.slice(0, -1);
   const srcWorking = src.working;
   const srcItemCount = src.working.length;
   return Array(srcItemCount)
@@ -317,6 +336,13 @@ const maximum = new Command('maximum', (value) => {
 const minimum = new Command('minimum', (value) => {
   assert.type(value, 'array');
   return Math.min(...value.filter(Number));
+});
+
+const mod = new Command('mod %a', (value, args) => {
+  const [argument] = args;
+  assert.type(value, 'number');
+  assert.any(typeOf(argument), ['number', 'mutable']);
+  return value % argument;
 });
 
 const multiply = new Command('multiply by %a', (value, args) => {
@@ -403,6 +429,8 @@ export const commands = {
   count,
   countTo,
   divide,
+  eachOf,
+  filterOut,
   flat,
   focusMonadic,
   group,
@@ -410,6 +438,7 @@ export const commands = {
   last,
   maximum,
   minimum,
+  mod,
   multiply,
   product,
   show,
