@@ -43,8 +43,17 @@ export function matches (value, regexp) {
  * @returns {string}
  */
 export function pretty (value) {
+  if (value instanceof Plant) {
+    return `${value.leaves.map(leaf => pretty(leaf)).join(',\n')}`;
+  } else if (value instanceof Leaf) {
+    const entries = Object.entries(value)
+      .map(e => {
+        const [k, v] = e;
+        return `  ${k} = ${pretty(v)}`;
+      }).join(',\n');
+    return `${colors.green('{')}\n${entries}\n${colors.green('}')}`;
   // undefined
-  if (value === undefined) {
+  } else if (value === undefined) {
     return colors.yellow('(undefined!)');
   // number
   } else if (!isNaN(Number(value))) {
@@ -57,18 +66,9 @@ export function pretty (value) {
     return colors.cyan(`'${value.replace(/\n/g, colors.yellow('\\n'))}'`);
   // array
   } else if (Array.isArray(value)) {
-    return `[${colors.cyan(value.map(i => {
+    return `[${value.map(i => {
       return pretty(i);
-    }).join(colors.white(', ')))}]`;
-  } else if (value instanceof Plant) {
-    return `${value.leaves.map(leaf => pretty(leaf))}`;
-  } else if (value instanceof Leaf) {
-    return '{\n  ' +
-      Object.entries(value).map(e => {
-        const [k, v] = e;
-        return `${k} = ${pretty(v)}`;
-      }) +
-      '\n}';
+    }).join(colors.white(', '))}]`;
   // CloverError
   } else if (value.constructor?.name === 'CloverError') {
     return `${colors.red('e:')} ${value.message}

@@ -1,4 +1,5 @@
 import assert from './assert.js';
+import { Leaf } from './leaf.js';
 import { Token, typeOf, cast } from './token.js';
 import { output, escape } from './util.js';
 
@@ -29,14 +30,13 @@ class Command {
 }
 
 /**
- * item commands access every item in the focus list
  */
-class ItemCommand extends Command { }
+class LeafCommand extends Command { }
 
 /**
  * list commands return an entirely different focus list
  */
-class ListCommand extends Command { }
+class PlantCommand extends Command { }
 
 /**
  * sugar commands are aliases of other commands
@@ -149,10 +149,10 @@ export function evaluate (line) {
   const command = getCommand(tokens);
 
   // list commands return an entirely different focus list
-  if (command instanceof ListCommand) {
+  if (command instanceof PlantCommand) {
     Clover.plant = command.run(Clover.plant, getArgs(command, tokens));
   // item commands access every item in the focus list
-  } else if (command instanceof ItemCommand) {
+  } else if (command instanceof LeafCommand) {
     Clover.plant = Clover.plant.map(item => {
       Clover.evItem = item;
       return command.run(item, getArgs(command, tokens));
@@ -261,7 +261,7 @@ const eachOf = new Command('each of %l %c', (value, args) => {
 });
 
 // TODO: best way to make list and regular commands that both do this
-const filterOut = new ListCommand('filter out %a', (value, args) => {
+const filterOut = new PlantCommand('filter out %a', (value, args) => {
   const [filterValue] = args;
   assert.type(value, 'array');
   return value.filter(x => x.working !== filterValue);
@@ -291,32 +291,25 @@ const group = new Command('groups of %n', (value, args) => {
   return [...newArray];
 });
 
-const itemize = new ListCommand('itemize %s', (value, args) => {
+const itemize = new PlantCommand('itemize %s', (plant, args) => {
   const [dest] = args;
+  const leaves = plant.leaves;
   // assert.type(value, 'array');
-  if (value.length > 1) {
+  if (leaves.length > 1) {
     throw new CloverError(
-      'ensure focus contains only one item object before itemizing'
+      'ensure plant has only one leaf before itemizing'
     );
   }
   if (!dest.endsWith('s')) {
     throw new CloverError('itemize list should be a plural word');
   }
-  const src = value[0];
-  const prop = ':' + dest.slice(0, -1);
-  const srcWorking = src.working;
-  const srcItemCount = src.working.length;
-  return Array(srcItemCount)
-    .fill(undefined) // dummy value
-    .map((item, index) => {
-      item = { ...src };
-      item[prop] = srcWorking[index];
-      // move the working value to the end
-      delete item.working;
-      item.working = srcWorking[index];
-      // done
-      return item;
-    });
+  const working = leaves[0].working;
+  plant.kill();
+  working.forEach((item, index) => {
+    plant.addLeaf(item);
+    plant.leaves[index][dest.slice(0, -1)] = item;
+  });
+  return plant;
 });
 
 const last = new Command('last', (value) => {
@@ -357,12 +350,12 @@ const product = new Command('product', (value) => {
     .reduce((a, c) => a * c, 1);
 });
 
-const show = new ListCommand('show', (value) => {
+const show = new PlantCommand('show', (value) => {
   output(Clover.focus);
   return value;
 });
 
-const showMonadic = new ListCommand('show %a', (value, args) => {
+const showMonadic = new PlantCommand('show %a', (value, args) => {
   const [showValue] = args;
   output(showValue);
   return value;
@@ -409,7 +402,7 @@ const sum = new Command('sum', (value) => {
     .reduce((a, c) => a + c, 0);
 });
 
-const unitemize = new ListCommand('unitemize', (value) => {
+const unitemize = new PlantCommand('unitemize', (value) => {
   return [{
     input: value[0].input, // same everywhere
     working: value.map(item => item.working)

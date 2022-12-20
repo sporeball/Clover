@@ -18,4 +18,9 @@ export class Plant {
     this.leaves.splice(index, 1);
     return this;
   }
+
+  kill () {
+    this.leaves = [];
+    return this;
+  }
 }
