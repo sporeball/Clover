@@ -91,6 +91,9 @@ export function cast (v) {
     if (Array.isArray(value)) {
       return value;
     }
+    if (value === '[]') {
+      return [];
+    }
     return value.slice(1, -1)
       .match(/\[.*?\]|'.*'|[^[\]' ]+/g)
       .map(match => cast(match));
