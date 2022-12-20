@@ -1,6 +1,5 @@
 import assert from './assert.js';
 import { Token, typeOf, cast } from './token.js';
-// import { accesses } from './mutable.js';
 import { output, escape } from './util.js';
 
 /**
