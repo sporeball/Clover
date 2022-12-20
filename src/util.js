@@ -45,7 +45,7 @@ export function pretty (value) {
   if (value === undefined) {
     return colors.yellow('(undefined!)');
   // number
-  } else if (Number.isInteger(value)) {
+  } else if (!isNaN(Number(value))) {
     return colors.cyan(value);
   // string
   } else if (typeof value === 'string') {

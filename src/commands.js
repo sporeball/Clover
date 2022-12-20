@@ -251,8 +251,8 @@ const divide = new Command('divide by %a', (value, args) => {
 });
 
 const eachOf = new Command('each of %l %c', (value, args) => {
-  let [list, cstr] = args;
-  let arr = [];
+  const [list, cstr] = args;
+  const arr = [];
   for (const item of list) {
     const tokens = tokenize(cstr.replace('::', item));
     const command = getCommand(tokens);
