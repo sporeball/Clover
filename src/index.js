@@ -1,3 +1,4 @@
+import { Plant } from './plant.js';
 import * as Command from './commands.js';
 import { cast } from './token.js';
 import { format, output } from './util.js';
@@ -31,14 +32,11 @@ export default function parse (code, options = {}) {
   Clover.outputs = [];
   Clover.options = options;
 
-  // commands act on the focus list.
-  // this is a list of items, each with their own "working value",
-  // as well as their own mutable storage.
-  // at first, there is just one item, which works with the input
-  Clover.focus = [{
-    input,
-    working: input
-  }];
+  // commands act on the "plant".
+  // the items in the plant are called the "leaves".
+  // each leaf has its own "working value", as well as its own mutable storage.
+  // at first, there is just one leaf, which works with the input.
+  Clover.plant = new Plant().addLeaf(input);
 
   Clover.line = 0;
 
@@ -67,7 +65,7 @@ export default function parse (code, options = {}) {
   }
 
   // implicit output
-  output(Clover.focus);
+  output(Clover.plant);
 
   // collapse
   let collapsed = Clover.outputs.flat(Infinity)

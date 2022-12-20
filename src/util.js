@@ -1,3 +1,5 @@
+import { Plant } from './plant.js';
+import { Leaf } from './leaf.js';
 import colors from 'picocolors';
 
 /**
@@ -55,26 +57,17 @@ export function pretty (value) {
     return colors.cyan(`'${value.replace(/\n/g, colors.yellow('\\n'))}'`);
   // array
   } else if (Array.isArray(value)) {
-    if (value[0].working !== undefined) {
-      return pretty(value[0]) +
-        (value.length > 1
-          ? `,\n${colors.cyan(`... (${value.length - 1} more)`)}`
-          : ''
-        );
-    } else {
-      return `[${colors.cyan(value.map(i => {
-        return pretty(i);
-      }).join(colors.white(', ')))}]`;
-    }
-  } else if (value.working !== undefined) {
+    return `[${colors.cyan(value.map(i => {
+      return pretty(i);
+    }).join(colors.white(', ')))}]`;
+  } else if (value instanceof Plant) {
+    return `${value.leaves.map(leaf => pretty(leaf))}`;
+  } else if (value instanceof Leaf) {
     return '{\n  ' +
-      Object.entries(value).map(entry => {
-        const [k, v] = entry;
-        if (k === 'input') {
-          return undefined;
-        }
-        return `${k.startsWith(':') ? colors.yellow(k) : k} = ${pretty(v)}`;
-      }).filter(v => v).join(',\n  ') +
+      Object.entries(value).map(e => {
+        const [k, v] = e;
+        return `${k} = ${pretty(v)}`;
+      }) +
       '\n}';
   // CloverError
   } else if (value.constructor?.name === 'CloverError') {

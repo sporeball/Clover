@@ -150,20 +150,19 @@ export function evaluate (line) {
 
   // list commands return an entirely different focus list
   if (command instanceof ListCommand) {
-    Clover.focus = command.run(Clover.focus, getArgs(command, tokens));
+    Clover.plant = command.run(Clover.plant, getArgs(command, tokens));
   // item commands access every item in the focus list
   } else if (command instanceof ItemCommand) {
-    Clover.focus = Clover.focus.map(item => {
+    Clover.plant = Clover.plant.map(item => {
       Clover.evItem = item;
       return command.run(item, getArgs(command, tokens));
     });
   // regular commands access the working value of every item in the focus list
   } else {
-    Clover.focus.forEach(item => {
-      Clover.evItem = item;
-      item.working = command.run(item.working, getArgs(command, tokens));
-      return item;
-    });
+    for (const leaf of Clover.plant.leaves) {
+      Clover.evItem = leaf;
+      leaf.working = command.run(leaf.working, getArgs(command, tokens));
+    }
   }
 
   // if the command had a right-hand side...
@@ -191,7 +190,7 @@ export function evaluate (line) {
 const add = new Command('add %a', (value, args) => {
   const [addend] = args;
   assert.type(value, 'number');
-  assert.any(typeOf(addend), ['number', 'mutable']);
+  assert.type(addend, 'number');
   return value + addend;
 });
 
