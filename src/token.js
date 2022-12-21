@@ -94,11 +94,15 @@ export function cast (v) {
     if (Array.isArray(value)) {
       return value;
     }
-    if (value === '[]') {
+    value = value.slice(1, -1);
+    if (value.includes('[') || value.includes(']')) {
+      throw new CloverError('cannot cast nested array - build it yourself');
+    }
+    if (value === '') {
       return [];
     }
-    return value.slice(1, -1)
-      .match(/\[.*?\]|'.*'|[^[\]' ]+/g)
+    return value
+      .match(/\[.*\]|'.*?'|[^[\]' ]+/g)
       .map(match => cast(match));
   }
   if (T === 'leaf') {
