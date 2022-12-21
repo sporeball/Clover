@@ -30,7 +30,7 @@ export function typeOf (v) {
   if (reserved.includes(value)) {
     return 'reserved';
   }
-  if (matches(value, /<\d+/)) {
+  if (matches(value, /^<-?\d+/)) {
     return 'leaf';
   }
   if (matches(value, /^\(.*\)/)) {

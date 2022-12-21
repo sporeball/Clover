@@ -58,7 +58,7 @@ class Sugar extends Command {
  */
 export function tokenize (line) {
   return line.match(
-    /'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
+    /'.*'|\[.*?\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
   )
     .map(token => new Token(token));
 }
@@ -272,7 +272,7 @@ const flat = new Command('flatten', (value) => {
   return value.flat();
 });
 
-const focusMonadic = new SpecialCommand('focus %a', (value, args) => {
+const focusMonadic = new Command('focus %a', (value, args) => {
   const [focusValue] = args;
   return focusValue;
 });
@@ -417,13 +417,21 @@ const sum = new Command('sum', (value) => {
     .reduce((a, c) => a + c, 0);
 });
 
+const sumMonadic = new Command('sum %l', (value, args) => {
+  const [list] = args;
+  return list.filter(v => typeOf(v) === 'number')
+    .reduce((a, c) => a + c, 0);
+});
+
 const take = new PlantCommand('take %n', (plant, args) => {
   const [n] = args;
   if (!(plant instanceof LazyPlant)) {
     throw new CloverError("'take' command run on non-lazy plant");
   }
-  plant.leaves = plant.leaves.slice(0, 1);
   for (let i = 1; i <= n; i++) {
+    if (plant.getLeaf(i - 1) !== undefined) {
+      continue;
+    }
     const tokens = tokenize(plant.cstr.replace('::', i))
     const command = getCommand(tokens);
     const commandArgs = getArgs(command, tokens);
@@ -470,6 +478,7 @@ export const commands = {
   stop,
   subtract,
   sum,
+  sumMonadic,
   take,
   unitemize,
   // syntactic sugar

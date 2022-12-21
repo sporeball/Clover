@@ -20,7 +20,7 @@ export class Plant {
   }
 
   getLeaf (index) {
-    return this.leaves[index];
+    return this.leaves.at(index);
   }
 
   kill () {
@@ -35,9 +35,5 @@ export class LazyPlant extends Plant {
     this.leaves = plant.leaves;
     this.cstr = cstr;
     return this;
-  }
-
-  getLeaf (index) {
-    return this.leaves[index - 1];
   }
 }
