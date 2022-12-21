@@ -19,7 +19,10 @@ function cli () {
     throw new Error('file not found');
   }
   // parse
+  // const t0 = performance.now();
   parse(code);
+  // const t1 = performance.now();
+  // console.log(`(${(t1 - t0).toFixed(2)}ms)`);
 }
 
 try {

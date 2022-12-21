@@ -151,13 +151,6 @@ export function evaluate (line) {
   // at this point there is just one option left
   const command = getCommand(tokens);
 
-  if (
-    command.constructor.name === 'Command' &&
-    Clover.plant instanceof LazyPlant
-  ) {
-    Clover.plant.cstrs.push(line);
-  }
-
   // plant commands return an entirely new plant
   if (command instanceof PlantCommand) {
     Clover.plant = command.run(Clover.plant, getArgs(command, tokens));
@@ -424,6 +417,21 @@ const sum = new Command('sum', (value) => {
     .reduce((a, c) => a + c, 0);
 });
 
+const take = new PlantCommand('take %n', (plant, args) => {
+  const [n] = args;
+  if (!(plant instanceof LazyPlant)) {
+    throw new CloverError("'take' command run on non-lazy plant");
+  }
+  plant.leaves = plant.leaves.slice(0, 1);
+  for (let i = 1; i <= n; i++) {
+    const tokens = tokenize(plant.cstr.replace('::', i))
+    const command = getCommand(tokens);
+    const commandArgs = getArgs(command, tokens);
+    plant.leaves[i - 1] = new Leaf(command.run(i, commandArgs));
+  }
+  return plant;
+});
+
 const unitemize = new PlantCommand('unitemize', (value) => {
   return [{
     input: value[0].input, // same everywhere
@@ -462,6 +470,7 @@ export const commands = {
   stop,
   subtract,
   sum,
+  take,
   unitemize,
   // syntactic sugar
   max,
