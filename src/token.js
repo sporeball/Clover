@@ -30,6 +30,9 @@ export function typeOf (v) {
   if (reserved.includes(value)) {
     return 'reserved';
   }
+  if (matches(value, /<\d+/)) {
+    return 'leaf';
+  }
   if (matches(value, /^\(.*\)/)) {
     return 'command';
   }
@@ -98,6 +101,10 @@ export function cast (v) {
       .match(/\[.*?\]|'.*'|[^[\]' ]+/g)
       .map(match => cast(match));
   }
+  if (T === 'leaf') {
+    const index = Number(value.slice(1));
+    return Clover.plant.getLeaf(index).working;
+  }
   if (T === 'number') {
     return Number(value);
   }
@@ -126,6 +133,9 @@ function specifier (value) {
   }
   if (T === 'command') {
     return '%c';
+  }
+  if (T === 'leaf') {
+    return '%L';
   }
   if (T === 'array') {
     return '%l'; // for "list"

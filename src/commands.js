@@ -1,5 +1,6 @@
 import assert from './assert.js';
 import { Leaf } from './leaf.js';
+import { LazyPlant } from './plant.js';
 import { Token, typeOf, cast } from './token.js';
 import { output, escape } from './util.js';
 
@@ -38,6 +39,8 @@ class LeafCommand extends Command { }
  */
 class PlantCommand extends Command { }
 
+class SpecialCommand extends Command { }
+
 /**
  * sugar commands are aliases of other commands
  */
@@ -53,7 +56,7 @@ class Sugar extends Command {
  * @param {string} line
  * @returns {Token[]}
  */
-function tokenize (line) {
+export function tokenize (line) {
   return line.match(
     /'.*'|\[.*\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
   )
@@ -65,7 +68,7 @@ function tokenize (line) {
  * @param {Token[]} tokens
  * @returns {Command}
  */
-function getCommand (tokens) {
+export function getCommand (tokens) {
   let possible = Object.entries(commands);
   // for each token...
   for (let i = 0; i < tokens.length; i++) {
@@ -98,7 +101,7 @@ function getCommand (tokens) {
  * @param {Command} command
  * @param {Token[]} tokens
  */
-function getArgs (command, tokens) {
+export function getArgs (command, tokens) {
   const patternTokens = command.pattern.split(' ');
   // make sure that there is the correct amount of tokens first
   if (tokens.length < patternTokens.length) {
@@ -148,18 +151,22 @@ export function evaluate (line) {
   // at this point there is just one option left
   const command = getCommand(tokens);
 
-  // list commands return an entirely different focus list
+  if (
+    command.constructor.name === 'Command' &&
+    Clover.plant instanceof LazyPlant
+  ) {
+    Clover.plant.cstrs.push(line);
+  }
+
+  // plant commands return an entirely new plant
   if (command instanceof PlantCommand) {
     Clover.plant = command.run(Clover.plant, getArgs(command, tokens));
-  // item commands access every item in the focus list
-  } else if (command instanceof LeafCommand) {
-    Clover.plant = Clover.plant.map(item => {
-      Clover.evItem = item;
-      return command.run(item, getArgs(command, tokens));
-    });
-  // regular commands access the working value of every item in the focus list
+  // regular commands change the working value of every leaf in the plant
   } else {
     for (const leaf of Clover.plant.leaves) {
+      if (leaf === undefined) {
+        continue;
+      }
       Clover.evItem = leaf;
       leaf.working = command.run(leaf.working, getArgs(command, tokens));
     }
@@ -272,7 +279,7 @@ const flat = new Command('flatten', (value) => {
   return value.flat();
 });
 
-const focusMonadic = new Command('focus %a', (value, args) => {
+const focusMonadic = new SpecialCommand('focus %a', (value, args) => {
   const [focusValue] = args;
   return focusValue;
 });
@@ -289,6 +296,10 @@ const group = new Command('groups of %n', (value, args) => {
     newArray.push(value.slice(i, i + size));
   }
   return [...newArray];
+});
+
+const id = new Command('id %a', (value, args) => {
+  return args[0];
 });
 
 const itemize = new PlantCommand('itemize %s', (plant, args) => {
@@ -317,6 +328,17 @@ const last = new Command('last', (value) => {
     return value[value.length - 1];
   }
   return value;
+});
+
+const lazy = new PlantCommand('lazy %l %c', (plant, args) => {
+  const [knownTerms, cstr] = args;
+  plant.kill();
+  // TODO: this taught us that nothing is logged if the plant is empty
+  for (const term of knownTerms) {
+    plant.addLeaf(term);
+  }
+  const lazyPlant = new LazyPlant(plant, cstr);
+  return lazyPlant;
 });
 
 const maximum = new Command('maximum', (value) => {
@@ -425,8 +447,10 @@ export const commands = {
   flat,
   focusMonadic,
   group,
+  id,
   itemize,
   last,
+  lazy,
   maximum,
   minimum,
   mod,
