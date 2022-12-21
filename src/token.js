@@ -116,7 +116,7 @@ export function cast (v) {
     return value;
   }
   if (T === 'mutable') {
-    return Clover.evItem[value];
+    return Clover.evItem[value.slice(1)];
   }
   return value;
 }
