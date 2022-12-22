@@ -3,6 +3,6 @@
  */
 export class Leaf {
   constructor (value) {
-    this.working = value;
+    this.flower = value;
   }
 }

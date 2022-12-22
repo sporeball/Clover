@@ -13,7 +13,7 @@ import { output, escape } from './util.js';
 
 /**
  * command superclass
- * regular commands access the working value of every item in the focus list
+ * regular commands change the flower value of every leaf in the plant
  */
 class Command {
   /**
@@ -35,7 +35,7 @@ class Command {
 class LeafCommand extends Command { }
 
 /**
- * list commands return an entirely different focus list
+ * plant commands return an entirely new plant
  */
 class PlantCommand extends Command { }
 
@@ -154,33 +154,18 @@ export function evaluate (line) {
   // plant commands return an entirely new plant
   if (command instanceof PlantCommand) {
     Clover.plant = command.run(Clover.plant, getArgs(command, tokens));
-  // regular commands change the working value of every leaf in the plant
+  // regular commands change the flower value of every leaf in the plant
   } else {
     for (const leaf of Clover.plant.leaves) {
       if (leaf === undefined) {
         continue;
       }
       Clover.evItem = leaf;
-      leaf.working = command.run(leaf.working, getArgs(command, tokens));
+      leaf.flower = command.run(leaf.flower, getArgs(command, tokens));
     }
   }
 
-  // if the command had a right-hand side...
-  if (rhs) {
-    // ensure it consisted of a mutable
-    const v = rhs[0].value;
-    const specifier = rhs[0].specifier;
-    if (specifier !== '%m') {
-      throw new CloverError('invalid right-hand side value %t', v);
-    }
-    // add that mutable to the item
-    Clover.focus.forEach(item => {
-      item[v] = item.working;
-      // move the working value to the end
-      delete item.working;
-      item.working = item[v];
-    });
-  }
+  // TODO: fix rhs code
 }
 
 /**
@@ -264,7 +249,7 @@ const eachOf = new Command('each of %l %c', (value, args) => {
 const filterOut = new PlantCommand('filter out %a', (value, args) => {
   const [filterValue] = args;
   assert.type(value, 'array');
-  return value.filter(x => x.working !== filterValue);
+  return value.filter(x => x.flower !== filterValue);
 });
 
 const flat = new Command('flatten', (value) => {
@@ -307,9 +292,9 @@ const itemize = new PlantCommand('itemize %s', (plant, args) => {
   if (!dest.endsWith('s')) {
     throw new CloverError('itemize list should be a plural word');
   }
-  const working = leaves[0].working;
+  const flower = leaves[0].flower;
   plant.kill();
-  working.forEach((item, index) => {
+  flower.forEach((item, index) => {
     plant.addLeaf(item);
     plant.leaves[index][dest.slice(0, -1)] = item;
   });
@@ -443,7 +428,7 @@ const take = new PlantCommand('take %n', (plant, args) => {
 const unitemize = new PlantCommand('unitemize', (value) => {
   return [{
     input: value[0].input, // same everywhere
-    working: value.map(item => item.working)
+    flower: value.map(item => item.flower)
   }];
 });
 

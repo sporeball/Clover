@@ -34,8 +34,9 @@ export default function parse (code, options = {}) {
 
   // commands act on the "plant".
   // the items in the plant are called the "leaves".
-  // each leaf has its own "working value", as well as its own mutable storage.
-  // at first, there is just one leaf, which works with the input.
+  // each leaf has its own "flower" (the important value it's working with),
+  // as well as its own mutable storage.
+  // at first, there is just one leaf, whose flower is the input.
   Clover.plant = new Plant().addLeaf(input);
 
   Clover.line = 0;
