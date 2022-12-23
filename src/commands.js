@@ -149,7 +149,6 @@ export function evaluate (line) {
     tokens = tokens.slice(0, rhsIndex);
   }
 
-  // at this point there is just one option left
   const command = getCommand(tokens);
 
   // plant commands return an entirely new plant
@@ -166,7 +165,27 @@ export function evaluate (line) {
     }
   }
 
-  // TODO: fix rhs code
+  // if there was a right-hand side...
+  if (rhs !== undefined) {
+    const rhsValue = rhs[0].value.slice(1);
+    const rhsSpecifier = rhs[0].specifier;
+    switch (rhsSpecifier) {
+      // for plants,
+      case '%P':
+        // store a clone of the plant
+        Clover.plants[rhsValue] = Clover.plant.clone();
+        break;
+      // for mutables,
+      case '%m':
+        // update every flower
+        Clover.plant.leaves.forEach(leaf => {
+          leaf[rhsValue] = leaf.flower;
+        });
+        break;
+      default:
+        throw new CloverError('invalid right-hand side value %t', rhsValue);
+    }
+  }
 }
 
 /**
@@ -258,9 +277,14 @@ const flat = new Command('flatten', (value) => {
   return value.flat();
 });
 
-const focusMonadic = new Command('focus %a', (value, args) => {
+const focusMutable = new Command('focus %m', (value, args) => {
   const [focusValue] = args;
   return focusValue;
+});
+
+const focusPlant = new PlantCommand('focus %P', (plant, args) => {
+  const [focusValue] = args;
+  return focusValue.clone();
 });
 
 const group = new Command('groups of %n', (value, args) => {
@@ -316,7 +340,7 @@ const lazy = new PlantCommand('lazy %l %c', (plant, args) => {
   for (const term of knownTerms) {
     plant.addLeaf(term);
   }
-  const lazyPlant = new LazyPlant(plant, cstr);
+  const lazyPlant = new LazyPlant(plant.leaves, cstr);
   return lazyPlant;
 });
 
@@ -447,7 +471,8 @@ export const commands = {
   eachOf,
   filterOut,
   flat,
-  focusMonadic,
+  focusMutable,
+  focusPlant,
   group,
   id,
   itemize,

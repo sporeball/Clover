@@ -55,6 +55,9 @@ export function typeOf (v) {
     return 'string';
   }
   if (typeof value === 'string') {
+    if (value.startsWith('@')) {
+      return 'plant';
+    }
     if (value.startsWith(':')) {
       return 'mutable';
     }
@@ -105,6 +108,9 @@ export function cast (v) {
       .match(/\[.*\]|'.*?'|[^[\]' ]+/g)
       .map(match => cast(match));
   }
+  if (T === 'plant') {
+    return Clover.plants[value.slice(1)];
+  }
   if (T === 'leaf') {
     const index = Number(value.slice(1));
     return Clover.plant.getLeaf(index).flower;
@@ -137,6 +143,9 @@ function specifier (value) {
   }
   if (T === 'command') {
     return '%c';
+  }
+  if (T === 'plant') {
+    return '%P';
   }
   if (T === 'leaf') {
     return '%L';

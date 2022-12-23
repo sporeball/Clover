@@ -4,8 +4,8 @@ import { Leaf } from './leaf.js';
  * class representing the plant
  */
 export class Plant {
-  constructor () {
-    this.leaves = [];
+  constructor (leaves) {
+    this.leaves = leaves.map(leaf => new Leaf(leaf));
     return this;
   }
 
@@ -27,13 +27,20 @@ export class Plant {
     this.leaves = [];
     return this;
   }
+
+  clone () {
+    return new Plant([...this.leaves]);
+  }
 }
 
 export class LazyPlant extends Plant {
-  constructor (plant, cstr) {
-    super();
-    this.leaves = plant.leaves;
+  constructor (leaves, cstr) {
+    super([...leaves]);
     this.cstr = cstr;
     return this;
+  }
+
+  clone () {
+    return new LazyPlant(this.leaves, this.cstr);
   }
 }
