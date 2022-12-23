@@ -43,7 +43,7 @@ export default function parse (code, options = {}) {
   Clover.line = 0;
 
   code = code.split('\n')
-    .map(line => line.replace(/;.*/gm, '').trim()); // clean
+    .map(line => line.replace(/--.*/gm, '').trim()); // clean
 
   // remove trailing blank line
   // (formed by trailing newline in the original code)
