@@ -1,3 +1,5 @@
+import { Plant } from './plant.js';
+import { Leaf } from './leaf.js';
 import { matches } from './util.js';
 import reserved from '../util/reserved.js';
 
@@ -24,26 +26,11 @@ export function typeOf (v) {
   if (v instanceof Token) {
     value = value.value; // haha...
   }
+  /**
+   * basic types
+   */
   if (value === undefined) {
     return 'none';
-  }
-  if (reserved.includes(value)) {
-    return 'reserved';
-  }
-  if (matches(value, /^<-?\d+/)) {
-    return 'leaf';
-  }
-  if (matches(value, /^\(.*\)/)) {
-    return 'command';
-  }
-  if (matches(value, /:(0|[1-9]\d*)$/)) {
-    return 'index';
-  }
-  if (
-    Array.isArray(value) ||
-    matches(value, /^\[.*\]$/)
-  ) {
-    return 'array';
   }
   if (
     typeof value === 'number' ||
@@ -54,15 +41,49 @@ export function typeOf (v) {
   if (matches(value, /^'.*'$/)) {
     return 'string';
   }
+  if (
+    Array.isArray(value) ||
+    matches(value, /^\[.*\]$/)
+  ) {
+    return 'array';
+  }
+  if (value.constructor?.name === 'CloverError') {
+    return 'error';
+  }
+  if (value instanceof Error) {
+    return 'uncaughtError';
+  }
+  if (
+    value instanceof Plant ||
+    matches(value, /^@/)
+  ) {
+    return 'plant';
+  }
+  if (
+    value instanceof Leaf ||
+    matches(value, /^<-?\d+/)
+  ) {
+    return 'leaf';
+  }
+  /**
+   * other types below
+   */
+  if (matches(value, /^:/)) {
+    return 'mutable';
+  }
+  if (matches(value, /^\(.*\)/)) {
+    return 'command';
+  }
+  if (matches(value, /:(0|[1-9]\d*)$/)) {
+    return 'index';
+  }
+  /**
+   * string default
+   */
   if (typeof value === 'string') {
-    if (value.startsWith('@')) {
-      return 'plant';
-    }
-    if (value.startsWith(':')) {
-      return 'mutable';
-    }
     return 'string';
   }
+  // other
   return 'other';
 }
 

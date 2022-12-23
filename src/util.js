@@ -1,5 +1,6 @@
 import { Plant } from './plant.js';
 import { Leaf } from './leaf.js';
+import pretty from '../util/pretty.js';
 import colors from 'picocolors';
 
 /**
@@ -34,50 +35,6 @@ export function equal (v1, v2) {
  */
 export function matches (value, regexp) {
   return typeof value === 'string' && value.match(regexp) !== null;
-}
-
-/**
- * manipulate a value, and return it for pretty printing
- * this mostly means giving it a bit of color
- * @param {*} value
- * @returns {string}
- */
-export function pretty (value) {
-  if (value instanceof Plant) {
-    return `${value.leaves.map(leaf => pretty(leaf)).join(',\n')}`;
-  } else if (value instanceof Leaf) {
-    const entries = Object.entries(value)
-      .map(e => {
-        const [k, v] = e;
-        return `  ${k} = ${pretty(v)}`;
-      }).join(',\n');
-    return `${colors.green('{')}\n${entries}\n${colors.green('}')}`;
-  // undefined
-  } else if (value === undefined) {
-    return colors.yellow('(undefined!)');
-  // number
-  } else if (!isNaN(Number(value))) {
-    return colors.cyan(value);
-  // string
-  } else if (typeof value === 'string') {
-    if (value.length === 0) {
-      return colors.gray("''");
-    }
-    return colors.cyan(`'${value.replace(/\n/g, colors.yellow('\\n'))}'`);
-  // array
-  } else if (Array.isArray(value)) {
-    return `[${value.map(i => {
-      return pretty(i);
-    }).join(colors.white(', '))}]`;
-  // CloverError
-  } else if (value.constructor?.name === 'CloverError') {
-    return `${colors.red('e:')} ${value.message}
-${colors.cyan(`   (line ${Clover.line})`)}`;
-  // uncaught error
-  } else if (value instanceof Error) {
-    return `${colors.red('e:')} ${value.message} ${colors.red('(uncaught!)')}
-${colors.gray(value.stack.split('\n').slice(1).join('\n'))}`;
-  }
 }
 
 /**
