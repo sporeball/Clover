@@ -5,7 +5,12 @@ import { Leaf } from './leaf.js';
  */
 export class Plant {
   constructor (leaves) {
-    this.leaves = leaves.map(leaf => new Leaf(leaf));
+    this.leaves = leaves.map(leaf => {
+      if (leaf instanceof Leaf) {
+        return leaf;
+      }
+      return new Leaf(leaf);
+    });
     return this;
   }
 
@@ -35,7 +40,7 @@ export class Plant {
 
 export class LazyPlant extends Plant {
   constructor (leaves, cstr) {
-    super([...leaves]);
+    super(leaves);
     this.cstr = cstr;
     return this;
   }

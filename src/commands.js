@@ -1,6 +1,6 @@
 import assert from './assert.js';
 import { Leaf } from './leaf.js';
-import { LazyPlant } from './plant.js';
+import { Plant, LazyPlant } from './plant.js';
 import { Token, typeOf, cast } from './token.js';
 import { output, escape } from './util.js';
 
@@ -246,6 +246,17 @@ const countTo = new Command('count to %n', (value, args) => {
     .map((x, i) => i + 1);
 });
 
+const crush = new PlantCommand('crush %c', (plant, args) => {
+  const tokens = tokenize(args[0]);
+  const command = getCommand(tokens);
+  const commandArgs = getArgs(command, tokens);
+  const result = command.run(
+    Clover.plant.leaves.map(leaf => leaf.flower),
+    commandArgs
+  );
+  return new Plant([result]);
+});
+
 const divide = new Command('divide by %a', (value, args) => {
   const [divisor] = args;
   assert.type(value, 'number');
@@ -467,6 +478,7 @@ export const commands = {
   comp,
   count,
   countTo,
+  crush,
   divide,
   eachOf,
   filterOut,
