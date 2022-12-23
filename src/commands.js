@@ -128,6 +128,7 @@ export function getArgs (command, tokens) {
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i))
     .map(token => cast(token));
+  // console.log(args);
   return args;
 }
 
@@ -383,9 +384,9 @@ const split = new Command('split %a %a', (value, args) => {
   }
 });
 
-const stop = new Command('stop', (value) => {
+const stop = new PlantCommand('stop', (plant) => {
   Clover.stop = true;
-  return value;
+  return plant;
 });
 
 const subtract = new Command('subtract %a', (value, args) => {
