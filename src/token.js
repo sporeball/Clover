@@ -41,6 +41,9 @@ export function typeOf (v) {
   if (matches(value, /^'.*'$/)) {
     return 'string';
   }
+  if (value === true || value === false) {
+    return 'boolean';
+  }
   if (
     Array.isArray(value) ||
     matches(value, /^\[.*\]$/)
@@ -179,6 +182,9 @@ function specifier (value) {
   }
   if (T === 'string') {
     return '%s';
+  }
+  if (T === 'boolean') {
+    return '%b';
   }
   if (T === 'mutable') {
     return '%m';

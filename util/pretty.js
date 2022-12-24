@@ -26,6 +26,16 @@ function string (s) {
 }
 
 /**
+ * @param {boolean} b
+ */
+function boolean (b) {
+  if (b === true) {
+    return colors.green('true');
+  }
+  return colors.red('false');
+}
+
+/**
  * @param {[]*} l
  */
 function array (l) {
@@ -88,11 +98,13 @@ const functions = {
   none,
   number,
   string,
+  boolean,
   array,
   error,
   uncaughtError,
   plant,
-  leaf
+  leaf,
+  other
 };
 
 /**
@@ -100,5 +112,5 @@ const functions = {
  */
 export default function pretty (value) {
   const T = typeOf(value);
-  return functions[T](value);
+  return (functions[T] || functions.other)(value);
 }

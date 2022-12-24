@@ -276,8 +276,11 @@ const eachOf = new Command('each of %l %c', (value, args) => {
   return arr;
 });
 
-// TODO: best way to make list and regular commands that both do this
-const filterOut = new PlantCommand('filter out %a', (value, args) => {
+const even = new Command('even', (value) => {
+  return value % 2 === 0;
+});
+
+const filt = new Command('filter %a', (value, args) => {
   const [filterValue] = args;
   assert.type(value, 'array');
   return value.filter(x => x.flower !== filterValue);
@@ -377,6 +380,19 @@ const multiply = new Command('multiply by %a', (value, args) => {
   assert.type(value, 'number');
   assert.any(typeOf(multiplier), ['number', 'mutable']);
   return value * multiplier;
+});
+
+const odd = new Command('odd', (value) => {
+  return value % 2 === 1;
+});
+
+const pluck = new PlantCommand('pluck %c', (plant, args) => {
+  const tokens = tokenize(args[0]);
+  const command = getCommand(tokens);
+  const commandArgs = getArgs(command, tokens);
+  return new Plant(Clover.plant.leaves.filter(leaf => {
+    return command.run(leaf.flower, commandArgs) === false;
+  }));
 });
 
 const product = new Command('product', (value) => {
@@ -481,7 +497,8 @@ export const commands = {
   crush,
   divide,
   eachOf,
-  filterOut,
+  even,
+  filt,
   flat,
   focusMutable,
   focusPlant,
@@ -494,6 +511,8 @@ export const commands = {
   minimum,
   mod,
   multiply,
+  odd,
+  pluck,
   product,
   show,
   showMonadic,
