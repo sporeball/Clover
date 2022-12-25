@@ -1,7 +1,4 @@
-import { Plant } from './plant.js';
-import { Leaf } from './leaf.js';
 import pretty from '../util/pretty.js';
-import colors from 'picocolors';
 
 /**
  * return whether a value is equal to one of multiple passed values
@@ -73,7 +70,7 @@ export function format (str, ...subs) {
  */
 export function output (value) {
   Clover.outputs.push(value);
-  if (!Clover.options.silent) {
+  if (!Clover.options.test) {
     pprint(value);
   }
 }

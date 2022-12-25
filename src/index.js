@@ -9,7 +9,7 @@ import fs from 'fs';
  * parse a Clover program
  * @param {string} code
  * @param {Object} [options]
- * @param {boolean} options.silent whether to silence output. good for tests
+ * @param {boolean} options.test
  */
 export default function parse (code, options = {}) {
   global.Clover = {};
@@ -68,4 +68,18 @@ export default function parse (code, options = {}) {
 
   // implicit output
   output(Clover.plant);
+
+  // if tests are being run, they need a reasonable return value
+  if (options.test) {
+    // yield an array of all flowers
+    const flowers = Clover.plant.leaves.map(leaf => leaf.flower);
+    // if there is just 1 flower, return it only
+    if (flowers.length === 1) {
+      return flowers[0];
+    }
+    // otherwise return the array
+    return flowers;
+  }
+
+  return Clover.plant;
 }

@@ -4,7 +4,7 @@ import colors from 'picocolors';
 import Tentamen from 'tentamen';
 
 const tentamen = new Tentamen({});
-tentamen.fn = () => parse(tentamen.input, { silent: true });
+tentamen.fn = () => parse(tentamen.input, { test: true });
 
 const uncovered = Object.keys(commands)
   .filter(key => commands[key].constructor.name !== 'Sugar');
@@ -107,18 +107,6 @@ tentamen.add(
   `focus [1 2 3 4 5 6 7 8 9 10]
   product`,
   3628800
-);
-tentamen.add(
-  'show',
-  `focus 5
-  show`,
-  [5, 5] // implicit
-);
-tentamen.add(
-  'showMonadic',
-  `focus 5
-  show 'a'`,
-  ['a', 5] // implicit
 );
 tentamen.add(
   'split',

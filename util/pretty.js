@@ -1,6 +1,6 @@
 import { typeOf } from '../src/token.js';
-import { Plant, LazyPlant } from '../src/plant.js';
-import { Leaf } from '../src/leaf.js';
+// import { Plant, LazyPlant } from '../src/plant.js';
+// import { Leaf } from '../src/leaf.js';
 import colors from 'picocolors';
 
 function none () {

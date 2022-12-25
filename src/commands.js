@@ -2,7 +2,7 @@ import assert from './assert.js';
 import { Leaf } from './leaf.js';
 import { Plant, LazyPlant } from './plant.js';
 import { Token, typeOf, cast } from './token.js';
-import { output, escape } from './util.js';
+import { escape } from './util.js';
 
 /**
  * each command written in a Clover program consists of a list of tokens.
@@ -31,15 +31,9 @@ class Command {
 }
 
 /**
- */
-class LeafCommand extends Command { }
-
-/**
  * plant commands return an entirely new plant
  */
 class PlantCommand extends Command { }
-
-class SpecialCommand extends Command { }
 
 /**
  * sugar commands are aliases of other commands
@@ -201,7 +195,9 @@ const add = new Command('add %a', (value, args) => {
 
 const apply = new Command('apply %c', (value, args) => {
   const tokens = tokenize(args[0]);
+  // console.log(tokens);
   const command = getCommand(tokens);
+  // console.log(command);
   const commandArgs = getArgs(command, tokens);
   assert.type(value, 'array');
   return value.map((x, i, r) => command.run(x, commandArgs));
@@ -291,7 +287,7 @@ const flat = new Command('flatten', (value) => {
   return value.flat();
 });
 
-const focusMutable = new Command('focus %m', (value, args) => {
+const focus = new Command('focus %a', (value, args) => {
   const [focusValue] = args;
   return focusValue;
 });
@@ -402,16 +398,16 @@ const product = new Command('product', (value) => {
     .reduce((a, c) => a * c, 1);
 });
 
-const show = new PlantCommand('show', (value) => {
-  output(Clover.focus);
-  return value;
-});
+// const show = new PlantCommand('show', (value) => {
+//   output(Clover.focus);
+//   return value;
+// });
 
-const showMonadic = new PlantCommand('show %a', (value, args) => {
-  const [showValue] = args;
-  output(showValue);
-  return value;
-});
+// const showMonadic = new PlantCommand('show %a', (value, args) => {
+//   const [showValue] = args;
+//   output(showValue);
+//   return value;
+// });
 
 const split = new Command('split %a %a', (value, args) => {
   const [connector, splitter] = args;
@@ -469,7 +465,7 @@ const take = new PlantCommand('take %n', (plant, args) => {
     if (plant.getLeaf(i - 1) !== undefined) {
       continue;
     }
-    const tokens = tokenize(plant.cstr.replace('::', i))
+    const tokens = tokenize(plant.cstr.replace('::', i));
     const command = getCommand(tokens);
     const commandArgs = getArgs(command, tokens);
     plant.leaves[i - 1] = new Leaf(command.run(i, commandArgs));
@@ -500,7 +496,7 @@ export const commands = {
   even,
   filt,
   flat,
-  focusMutable,
+  focus,
   focusPlant,
   group,
   id,
@@ -514,8 +510,8 @@ export const commands = {
   odd,
   pluck,
   product,
-  show,
-  showMonadic,
+  // show,
+  // showMonadic,
   split,
   stop,
   subtract,
