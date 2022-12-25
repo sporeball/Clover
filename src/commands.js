@@ -473,13 +473,6 @@ const take = new PlantCommand('take %n', (plant, args) => {
   return plant;
 });
 
-const unitemize = new PlantCommand('unitemize', (value) => {
-  return [{
-    input: value[0].input, // same everywhere
-    flower: value.map(item => item.flower)
-  }];
-});
-
 const max = new Sugar('max', maximum);
 const min = new Sugar('min', minimum);
 
@@ -518,7 +511,6 @@ export const commands = {
   sum,
   sumMonadic,
   take,
-  unitemize,
   // syntactic sugar
   max,
   min
