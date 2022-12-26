@@ -52,7 +52,7 @@ export class CommandInstance {
       this.rhs = tokens.slice(rhsIndex + 1)[0];
     }
     this.pattern = getPattern(this.lhs);
-    this.calculateArgs();
+    // this.calculateArgs();
   }
 
   run (value, args) {
@@ -131,24 +131,7 @@ export function getArgs (pattern, tokens) {
       'no matching command pattern was found (ran out of tokens)'
     );
   }
-  // some tokens simply help to form the pattern, and can be dropped.
-  // to find the indices of any arguments...
-  const argIndices = patternTokens
-    // for each segment of the pattern...
-    .map((seg, i, arr) => {
-      // replace with its index if it is given by a format specifier,
-      if (arr[i].startsWith('%')) {
-        return i;
-      }
-      // or with null otherwise,
-      return null;
-    })
-    // and remove null values
-    .filter(x => x !== null);
-  // filter the token stream to the values...
-  const args = tokens.map(token => token.value)
-    // of the tokens with those indices
-    .filter((token, i) => argIndices.includes(i))
+  const args = tokens.filter(token => token.specifier !== '%r')
     .map(token => cast(token));
   return args;
 }
@@ -159,10 +142,10 @@ export function getArgs (pattern, tokens) {
  */
 export function evaluate (line) {
   const command = new CommandInstance(line);
-  console.dir(command, { depth: 4 });
 
   // plant commands return an entirely new plant
   if (command.pattern instanceof PlantPattern) {
+    command.calculateArgs();
     Clover.plant = command.run(Clover.plant, command.args);
   // regular commands change the flower value of every leaf in the plant
   } else {
@@ -171,9 +154,12 @@ export function evaluate (line) {
         continue;
       }
       Clover.evItem = leaf;
+      command.calculateArgs();
       leaf.flower = command.run(leaf.flower, command.args);
     }
   }
+
+  console.dir(command, { depth: 4 });
 
   // if there was a right-hand side...
   if (command.rhs) {
@@ -527,3 +513,10 @@ export const patterns = {
   max,
   min
 };
+
+export const reservedWords = Object.values(patterns)
+  .map(pattern => pattern.str)
+  .flatMap(str => str.split(' '))
+  .filter(word => !word.startsWith('%'))
+  .filter((word, index, arr) => arr.indexOf(word) === index)
+  .sort();

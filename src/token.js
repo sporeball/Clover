@@ -1,6 +1,6 @@
 import { Plant } from './plant.js';
 import { Leaf } from './leaf.js';
-import { CommandInstance } from './commands.js';
+import { CommandInstance, reservedWords } from './commands.js';
 import { matches } from './util.js';
 // import reserved from '../util/reserved.js';
 
@@ -72,6 +72,9 @@ export function typeOf (v) {
   /**
    * other types below
    */
+  if (reservedWords.includes(value)) {
+    return 'reserved';
+  }
   if (matches(value, /^:/)) {
     return 'mutable';
   }
