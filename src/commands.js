@@ -164,7 +164,7 @@ export function evaluate (line) {
   }
 
   const command = new CommandInstance(line);
-  // console.dir(command, { depth: 3 });
+  // console.dir(command, { depth: 4 });
 
   // plant commands return an entirely new plant
   if (command.pattern instanceof PlantPattern) {
@@ -271,7 +271,10 @@ const crush = new PlantPattern('crush %c', (plant, args) => {
 const divide = new Pattern('divide by %a', (value, args) => {
   const [divisor] = args;
   assert.type(value, 'number');
-  assert.any(typeOf(divisor), ['number', 'mutable']);
+  assert.type(divisor, 'number');
+  if (divisor === 0) {
+    throw new CloverError('cannot divide by 0');
+  }
   return value / divisor;
 });
 
@@ -379,7 +382,10 @@ const minimum = new Pattern('minimum', (value) => {
 const mod = new Pattern('mod %a', (value, args) => {
   const [argument] = args;
   assert.type(value, 'number');
-  assert.any(typeOf(argument), ['number', 'mutable']);
+  assert.type(argument, 'number');
+  if (argument === 0) {
+    throw new CloverError('cannot divide by 0');
+  }
   return value % argument;
 });
 
