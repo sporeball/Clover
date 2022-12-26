@@ -138,6 +138,7 @@ export function cast (v) {
   }
   if (T === 'leaf') {
     const index = Number(value.slice(1));
+    console.log(Clover.plant.getLeaf(index));
     return Clover.plant.getLeaf(index).flower;
   }
   if (T === 'number') {

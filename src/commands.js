@@ -1,5 +1,5 @@
 import assert from './assert.js';
-// import { Leaf } from './leaf.js';
+import { Leaf } from './leaf.js';
 import { Plant, LazyPlant } from './plant.js';
 import { Token, typeOf, cast } from './token.js';
 import { escape } from './util.js';
@@ -49,6 +49,15 @@ export class CommandInstance {
 
   run (value, args) {
     return this.pattern.body(value, args);
+  }
+
+  substituteArg (sub) {
+    return this.args.map(arg => {
+      if (arg === '*') {
+        return sub;
+      }
+      return arg;
+    });
   }
 }
 
@@ -129,7 +138,6 @@ export function getArgs (pattern, tokens) {
     // of the tokens with those indices
     .filter((token, i) => argIndices.includes(i))
     .map(token => cast(token));
-  // console.log(args);
   return args;
 }
 
@@ -151,6 +159,7 @@ export function evaluate (line) {
   }
 
   const command = new CommandInstance(line);
+  // console.dir(command, { depth: 3 });
 
   // plant commands return an entirely new plant
   if (command.pattern instanceof PlantPattern) {
@@ -261,17 +270,14 @@ const divide = new Pattern('divide by %a', (value, args) => {
   return value / divisor;
 });
 
-// const eachOf = new Pattern('each of %l %c', (value, args) => {
-//   const [list, cstr] = args;
-//   const arr = [];
-//   for (const item of list) {
-//     const tokens = tokenize(cstr.replace('::', item));
-//     const command = getCommand(tokens);
-//     const commandArgs = getArgs(command, tokens);
-//     arr.push(command.run(value, commandArgs));
-//   }
-//   return arr;
-// });
+const eachOf = new Pattern('each of %l %c', (value, args) => {
+  const [list, command] = args;
+  const arr = [];
+  for (const item of list) {
+    arr.push(command.run(value, command.substituteArg(item)));
+  }
+  return arr;
+});
 
 const even = new Pattern('even', (value) => {
   return value % 2 === 0;
@@ -345,13 +351,13 @@ const last = new Pattern('last', (value) => {
 });
 
 const lazy = new PlantPattern('lazy %l %c', (plant, args) => {
-  const [knownTerms, cstr] = args;
+  const [knownTerms, command] = args;
   plant.kill();
   // TODO: this taught us that nothing is logged if the plant is empty
   for (const term of knownTerms) {
     plant.addLeaf(term);
   }
-  const lazyPlant = new LazyPlant(plant.leaves, cstr);
+  const lazyPlant = new LazyPlant(plant.leaves, command);
   return lazyPlant;
 });
 
@@ -455,22 +461,21 @@ const sumMonadic = new Pattern('sum %l', (value, args) => {
     .reduce((a, c) => a + c, 0);
 });
 
-// const take = new PlantPattern('take %n', (plant, args) => {
-//   const [n] = args;
-//   if (!(plant instanceof LazyPlant)) {
-//     throw new CloverError("'take' command run on non-lazy plant");
-//   }
-//   for (let i = 1; i <= n; i++) {
-//     if (plant.getLeaf(i - 1) !== undefined) {
-//       continue;
-//     }
-//     const tokens = tokenize(plant.cstr.replace('::', i));
-//     const command = getCommand(tokens);
-//     const commandArgs = getArgs(command, tokens);
-//     plant.leaves[i - 1] = new Leaf(command.run(i, commandArgs));
-//   }
-//   return plant;
-// });
+const take = new PlantPattern('take %n', (plant, args) => {
+  const [n] = args;
+  if (!(plant instanceof LazyPlant)) {
+    throw new CloverError("'take' command run on non-lazy plant");
+  }
+  for (let i = 1; i <= n; i++) {
+    if (plant.getLeaf(i - 1) !== undefined) {
+      continue;
+    }
+    plant.leaves[i - 1] = new Leaf(
+      plant.command.run(i, plant.command.substituteArg(i))
+    );
+  }
+  return plant;
+});
 
 const max = new SugarPattern('max', maximum);
 const min = new SugarPattern('min', minimum);
@@ -484,7 +489,7 @@ export const patterns = {
   countTo,
   crush,
   divide,
-  // eachOf,
+  eachOf,
   even,
   filt,
   flat,
@@ -509,7 +514,7 @@ export const patterns = {
   subtract,
   sum,
   sumMonadic,
-  // take,
+  take,
   // syntactic sugar
   max,
   min

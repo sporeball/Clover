@@ -39,9 +39,9 @@ export class Plant {
 }
 
 export class LazyPlant extends Plant {
-  constructor (leaves, cstr) {
+  constructor (leaves, command) {
     super(leaves);
-    this.cstr = cstr;
+    this.command = command;
     return this;
   }
 
