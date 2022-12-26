@@ -43,8 +43,9 @@ class SugarPattern extends Pattern {
 
 export class CommandInstance {
   constructor (line) {
-    this.pattern = getPattern(tokenize(line));
-    this.args = getArgs(this.pattern, tokenize(line));
+    this.tokens = tokenize(line);
+    this.pattern = getPattern(this.tokens);
+    this.calculateArgs();
   }
 
   run (value, args) {
@@ -58,6 +59,10 @@ export class CommandInstance {
       }
       return arg;
     });
+  }
+
+  calculateArgs () {
+    this.args = getArgs(this.pattern, this.tokens);
   }
 }
 
@@ -294,6 +299,11 @@ const flat = new Pattern('flatten', (value) => {
   return value.flat();
 });
 
+const flowers = new PlantPattern('flowers %l', (plant, args) => {
+  const [list] = args;
+  return new Plant(list);
+});
+
 const focus = new Pattern('focus %a', (value, args) => {
   const [focusValue] = args;
   return focusValue;
@@ -350,13 +360,8 @@ const last = new Pattern('last', (value) => {
   return value;
 });
 
-const lazy = new PlantPattern('lazy %l %c', (plant, args) => {
-  const [knownTerms, command] = args;
-  plant.kill();
-  // TODO: this taught us that nothing is logged if the plant is empty
-  for (const term of knownTerms) {
-    plant.addLeaf(term);
-  }
+const lazy = new PlantPattern('lazy %c', (plant, args) => {
+  const [command] = args;
   const lazyPlant = new LazyPlant(plant.leaves, command);
   return lazyPlant;
 });
@@ -470,7 +475,8 @@ const take = new PlantPattern('take %n', (plant, args) => {
     if (plant.getLeaf(i - 1) !== undefined) {
       continue;
     }
-    plant.leaves[i - 1] = new Leaf(
+    plant.command.calculateArgs();
+    plant.addLeaf(
       plant.command.run(i, plant.command.substituteArg(i))
     );
   }
@@ -493,6 +499,7 @@ export const patterns = {
   even,
   filt,
   flat,
+  flowers,
   focus,
   focusPlant,
   group,
