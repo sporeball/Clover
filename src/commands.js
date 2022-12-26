@@ -43,8 +43,15 @@ class SugarPattern extends Pattern {
 
 export class CommandInstance {
   constructor (line) {
-    this.tokens = tokenize(line);
-    this.pattern = getPattern(this.tokens);
+    const tokens = tokenize(line);
+    const rhsIndex = tokens.findIndex(token => token.value === '=');
+    if (rhsIndex === -1) {
+      this.lhs = tokens;
+    } else {
+      this.lhs = tokens.slice(0, rhsIndex);
+      this.rhs = tokens.slice(rhsIndex + 1)[0];
+    }
+    this.pattern = getPattern(this.lhs);
     this.calculateArgs();
   }
 
@@ -62,7 +69,7 @@ export class CommandInstance {
   }
 
   calculateArgs () {
-    this.args = getArgs(this.pattern, this.tokens);
+    this.args = getArgs(this.pattern, this.lhs);
   }
 }
 
@@ -151,20 +158,8 @@ export function getArgs (pattern, tokens) {
  * @param {string} line
  */
 export function evaluate (line) {
-  let tokens = tokenize(line);
-  let rhs;
-
-  // if the command has a right-hand side...
-  const rhsIndex = tokens.findIndex(token => token.value === '=');
-  if (rhsIndex > -1) {
-    // store it for later
-    rhs = tokens.slice(rhsIndex + 1);
-    // and remove it from the list of tokens
-    tokens = tokens.slice(0, rhsIndex);
-  }
-
   const command = new CommandInstance(line);
-  // console.dir(command, { depth: 4 });
+  console.dir(command, { depth: 4 });
 
   // plant commands return an entirely new plant
   if (command.pattern instanceof PlantPattern) {
@@ -181,9 +176,9 @@ export function evaluate (line) {
   }
 
   // if there was a right-hand side...
-  if (rhs !== undefined) {
-    const rhsValue = rhs[0].value.slice(1);
-    const rhsSpecifier = rhs[0].specifier;
+  if (command.rhs) {
+    const rhsValue = command.rhs.value.slice(1);
+    const rhsSpecifier = command.rhs.specifier;
     switch (rhsSpecifier) {
       // for plants,
       case '%P':
