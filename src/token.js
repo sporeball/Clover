@@ -1,5 +1,6 @@
 import { Plant } from './plant.js';
 import { Leaf } from './leaf.js';
+import { CommandInstance } from './commands.js';
 import { matches } from './util.js';
 // import reserved from '../util/reserved.js';
 
@@ -104,7 +105,7 @@ export function cast (v) {
   }
   const T = typeOf(value);
   if (T === 'command') {
-    return value.slice(1, -1);
+    return new CommandInstance(value.slice(1, -1));
   }
   if (T === 'index') {
     const index = Number(value.slice(value.lastIndexOf(':') + 1));

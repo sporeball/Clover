@@ -1,13 +1,13 @@
 import parse from '../src/index.js';
-import { commands } from '../src/commands.js';
+import { patterns } from '../src/commands.js';
 import colors from 'picocolors';
 import Tentamen from 'tentamen';
 
 const tentamen = new Tentamen({});
 tentamen.fn = () => parse(tentamen.input, { test: true });
 
-const uncovered = Object.keys(commands)
-  .filter(key => commands[key].constructor.name !== 'Sugar');
+const uncovered = Object.keys(patterns)
+  .filter(key => patterns[key].constructor.name !== 'Sugar');
 
 // hijack tentamen's methods to add coverage information
 tentamen.add = (function () {
@@ -29,7 +29,7 @@ tentamen.done = (function () {
   const cached = tentamen.done;
   return function () {
     cached.apply(this, arguments); // output pass/fail count
-    const numCommands = Object.keys(commands).length;
+    const numCommands = Object.keys(patterns).length;
     // percentage of commands which were found to be covered
     const p = (100 * ((numCommands - uncovered.length) / numCommands))
       .toFixed(2);
