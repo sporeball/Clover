@@ -138,7 +138,9 @@ export function cast (v) {
   }
   if (T === 'leaf') {
     const index = Number(value.slice(1));
-    console.log(Clover.plant.getLeaf(index));
+    if (Clover.plant.getLeaf(index) === undefined) {
+      throw new CloverError('cannot cast leaf at index %t (undefined!)', index);
+    }
     return Clover.plant.getLeaf(index).flower;
   }
   if (T === 'number') {
