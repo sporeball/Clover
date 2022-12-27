@@ -58,18 +58,11 @@ tentamen.add(
   [2, 4, 6, 8, 10]
 );
 tentamen.add(
-  'comp',
-  `focus [1 2 3]
-  comp [one one one two two three]`,
-  [1, 1, 1, 2, 2, 3]
-);
-tentamen.add(
   'count',
   `focus 'aaaaa'
   count 'a'`,
   5
 );
-tentamen.add('countTo', 'count to 10', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 tentamen.add('divide', 'focus 5\ndivide by 5', 1);
 tentamen.add(
   'flat',

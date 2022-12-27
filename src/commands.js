@@ -1,5 +1,5 @@
 import assert from './assert.js';
-import { Leaf } from './leaf.js';
+// import { Leaf } from './leaf.js';
 import { Plant, LazyPlant } from './plant.js';
 import { Token, typeOf, cast } from './token.js';
 import { escape } from './util.js';
@@ -52,7 +52,7 @@ export class CommandInstance {
       this.rhs = tokens.slice(rhsIndex + 1)[0];
     }
     this.pattern = getPattern(this.lhs);
-    // this.calculateArgs();
+    this.calculateArgs();
   }
 
   run (value, args) {
@@ -159,7 +159,7 @@ export function evaluate (line) {
     }
   }
 
-  console.dir(command, { depth: 4 });
+  // console.dir(command, { depth: 4 });
 
   // if there was a right-hand side...
   if (command.rhs) {
