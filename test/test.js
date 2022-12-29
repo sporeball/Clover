@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import parse from '../src/index.js';
 import { patterns } from '../src/commands.js';
 import colors from 'picocolors';
@@ -7,7 +9,32 @@ const tentamen = new Tentamen({});
 tentamen.fn = () => parse(tentamen.input, { test: true });
 
 const uncovered = Object.keys(patterns)
-  .filter(key => patterns[key].constructor.name !== 'Sugar');
+  .filter(key => patterns[key].constructor.name !== 'SugarPattern');
+
+// assert that the patterns in the source code are in alphabetical order
+const names = fs.readFileSync(
+  path.resolve('src/commands.js'),
+  { encoding: 'utf-8' }
+)
+  .split('\n')
+  .filter(line => line.match(/^const .+ = new (Pattern|PlantPattern)/))
+  .map(line => line.slice(6, line.indexOf('=') - 1));
+const sortedNames = [...names].sort();
+const unsortedIndex = names.findIndex((x, i) => names[i] !== sortedNames[i]);
+if (unsortedIndex === -1) {
+  console.log(
+    colors.green('  o  ') +
+    'source patterns in alphabetical order\n'
+  );
+} else {
+  console.log(
+    colors.red('  X  ') +
+    colors.yellow('source patterns not in alphabetical order\n') +
+    `     (see '${names[unsortedIndex]}')\n`
+  );
+}
+
+// TODO: check order of sugar patterns independently
 
 // hijack tentamen's methods to add coverage information
 tentamen.add = (function () {
