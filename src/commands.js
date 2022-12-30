@@ -20,8 +20,9 @@ class Pattern {
    * @param {string} str format string for the pattern
    * @param {Function} body underlying command code
    */
-  constructor (str, body) {
-    this.str = str;
+  constructor (head, args, body) {
+    this.head = head;
+    this.args = args;
     this.body = body;
   }
 }
@@ -35,8 +36,8 @@ class PlantPattern extends Pattern { }
  * sugar commands are aliases of other commands
  */
 class SugarPattern extends Pattern {
-  constructor (str, pattern) {
-    super(str);
+  constructor (head, pattern) {
+    super(head);
     this.body = pattern.body;
   }
 }
@@ -69,7 +70,9 @@ export class CommandInstance {
   }
 
   calculateArgs () {
-    this.args = getArgs(this.pattern, this.lhs);
+    const [args, dest] = getArgs(this.pattern, this.lhs);
+    this.args = args;
+    this.dest = dest || 'flower';
   }
 }
 
@@ -91,30 +94,16 @@ export function tokenize (line) {
  * @returns {Command}
  */
 export function getPattern (tokens) {
-  let possible = Object.entries(patterns);
-  // for each token...
-  for (let i = 0; i < tokens.length; i++) {
-    // filter to those commands where...
-    possible = possible.filter(item => {
-      const pattern = item[1];
-      // the next part of the command pattern...
-      const next = pattern.str.split(' ')[i];
-      return tokens[i].value === next || // equals the token,
-        tokens[i].specifier === next || // the token's format specifier,
-        next === '%a'; // or the "any" specifier
-    });
-    // throw if there are no possible options
-    if (possible.length === 0) {
-      // TODO: this could be made slightly clearer for invalid streams such as
-      // (at the time of writing) `add f`
-      throw new CloverError(
-        'no matching command pattern was found (offending token: %t)',
-        tokens[i].value
-      );
-    }
+  const head = tokens[0].value;
+  const pattern = Object.values(patterns)
+    .find(pattern => pattern.head === head);
+  if (pattern === undefined) {
+    throw new CloverError(
+      'no pattern found for head token %t',
+      head
+    );
   }
-  const [, command] = possible[0];
-  return command;
+  return pattern;
 }
 
 /**
@@ -124,16 +113,31 @@ export function getPattern (tokens) {
  * @param {Token[]} tokens
  */
 export function getArgs (pattern, tokens) {
-  const patternTokens = pattern.str.split(' ');
-  // make sure that there is the correct amount of tokens first
-  if (tokens.length < patternTokens.length) {
+  tokens = [...tokens].slice(1);
+  const minArgs = pattern.args;
+  const maxArgs = pattern.args + 1;
+  // there must be at least as many arguments as the pattern requires...
+  if (tokens.length < minArgs) {
     throw new CloverError(
-      'no matching command pattern was found (ran out of tokens)'
+      'expected at least %s args, got %s',
+      pattern.args,
+      tokens.length
     );
   }
-  const args = tokens.filter(token => token.specifier !== '%r')
-    .map(token => cast(token));
-  return args;
+  // and at most one more (the destination argument).
+  if (tokens.length > maxArgs) {
+    throw new CloverError(
+      'expected at most %s args, got %s',
+      pattern.args + 1,
+      tokens.length
+    );
+  }
+  // fill the destination argument if it was given
+  let dest;
+  if (tokens.length === maxArgs) {
+    dest = tokens.pop().value.slice(1);
+  }
+  return [tokens.map(token => cast(token)), dest];
 }
 
 /**
@@ -155,7 +159,10 @@ export function evaluate (line) {
       }
       Clover.evItem = leaf;
       command.calculateArgs();
-      leaf.flower = command.run(leaf.flower, command.args);
+      if (leaf[command.dest] === undefined) {
+        throw new CloverError('destination argument is undefined');
+      }
+      leaf[command.dest] = command.run(leaf[command.dest], command.args);
     }
   }
 
@@ -188,19 +195,9 @@ export function evaluate (line) {
  * commands below
  */
 
-/**
- * add to a flower (+)
- * mutables accepted
- * @flower {number}
- * @param {number} addend
- * @returns {number}
- */
-const add = new Pattern('add %a', (value, args) => {
-  const [addend] = args;
-  assert.type(value, 'number');
-  assert.type(addend, 'number');
-  return value + addend;
-});
+// TODO: all commands just lost all argument type checks.
+// that's really serious.
+// figure something out
 
 /**
  * run a command on each element of a flower
@@ -208,7 +205,7 @@ const add = new Pattern('add %a', (value, args) => {
  * @param {command} command
  * @returns {*[]}
  */
-const apply = new Pattern('apply %c', (value, args) => {
+const apply = new Pattern('apply', 1, (value, args) => {
   const [command] = args;
   assert.type(value, 'array');
   return value.map((x, i, r) => command.run(x, command.args));
@@ -222,7 +219,7 @@ const apply = new Pattern('apply %c', (value, args) => {
  * @param {*} searchValue
  * @returns {number}
  */
-const count = new Pattern('count %a', (value, args) => {
+const count = new Pattern('count', 1, (value, args) => {
   const [searchValue] = args;
   assert.any(typeOf(value), ['array', 'string']);
   switch (typeOf(value)) {
@@ -246,7 +243,7 @@ const count = new Pattern('count %a', (value, args) => {
  * crush (sum) -- { flower = 15 }
  * @param {command} command
  */
-const crush = new PlantPattern('crush %c', (plant, args) => {
+const crush = new PlantPattern('crush', 1, (plant, args) => {
   const [command] = args;
   const result = command.run(
     Clover.plant.leaves.map(leaf => leaf.flower),
@@ -256,20 +253,53 @@ const crush = new PlantPattern('crush %c', (plant, args) => {
 });
 
 /**
- * divide a flower (/)
- * mutables accepted
+ * return whether a flower is even
  * @flower {number}
- * @param {number} divisor
- * @returns {number}
+ * @returns {boolean}
  */
-const divide = new Pattern('divide by %a', (value, args) => {
-  const [divisor] = args;
-  assert.type(value, 'number');
-  assert.type(divisor, 'number');
-  if (divisor === 0) {
-    throw new CloverError('cannot divide by 0');
-  }
-  return value / divisor;
+const even = new Pattern('even', 0, (value) => {
+  return value % 2 === 0;
+});
+
+/**
+ * remove occurrences of a value from a flower
+ * @flower {*[]}
+ * @param {*} filterValue
+ * @returns {*[]}
+ */
+const filter = new Pattern('filter', 1, (value, args) => {
+  const [filterValue] = args;
+  assert.type(value, 'array');
+  return value.filter(x => x.flower !== filterValue);
+});
+
+/**
+ * flatten a flower
+ * @flower {*[]}
+ * @returns {*[]}
+ */
+const flatten = new Pattern('flatten', 0, (value) => {
+  assert.type(value, 'array');
+  return value.flat();
+});
+
+/**
+ * replace a plant's flowers with the values in a given list
+ * @param {*[]} list
+ */
+const flowers = new PlantPattern('flowers', 1, (plant, args) => {
+  const [list] = args;
+  return new Plant(list);
+});
+
+/**
+ * set a flower equal to another value
+ * mutables accepted
+ * @param {*} focusValue
+ */
+const focus = new Pattern('focus', 1, (value, args) => {
+  const [focusValue] = args;
+  return focusValue;
 });
 
 /**
@@ -282,7 +312,7 @@ const divide = new Pattern('divide by %a', (value, args) => {
  * @param {*[]} list
  * @param {command} command
  */
-const eachOf = new Pattern('each of %l %c', (value, args) => {
+const foreach = new Pattern('foreach', 2, (value, args) => {
   const [list, command] = args;
   const arr = [];
   for (const item of list) {
@@ -292,64 +322,15 @@ const eachOf = new Pattern('each of %l %c', (value, args) => {
   return arr;
 });
 
-/**
- * return whether a flower is even
- * @flower {number}
- * @returns {boolean}
- */
-const even = new Pattern('even', (value) => {
-  return value % 2 === 0;
-});
-
-/**
- * remove occurrences of a value from a flower
- * @flower {*[]}
- * @param {*} filterValue
- * @returns {*[]}
- */
-const filt = new Pattern('filter %a', (value, args) => {
-  const [filterValue] = args;
-  assert.type(value, 'array');
-  return value.filter(x => x.flower !== filterValue);
-});
-
-/**
- * flatten a flower
- * @flower {*[]}
- * @returns {*[]}
- */
-const flat = new Pattern('flatten', (value) => {
-  assert.type(value, 'array');
-  return value.flat();
-});
-
-/**
- * replace a plant's flowers with the values in a given list
- * @param {*[]} list
- */
-const flowers = new PlantPattern('flowers %l', (plant, args) => {
-  const [list] = args;
-  return new Plant(list);
-});
-
-/**
- * set a flower equal to another value
- * mutables accepted
- * @param {*} focusValue
- */
-const focus = new Pattern('focus %a', (value, args) => {
-  const [focusValue] = args;
-  return focusValue;
-});
-
-/**
- * set a plant equal to a different plant
- * @param {Plant} focusValue
- */
-const focusPlant = new PlantPattern('focus %P', (plant, args) => {
-  const [focusValue] = args;
-  return focusValue.clone();
-});
+// TODO: best thing to do with this command
+// /**
+//  * set a plant equal to a different plant
+//  * @param {Plant} focusValue
+//  */
+// const focusPlant = new PlantPattern('focus %P', (plant, args) => {
+//   const [focusValue] = args;
+//   return focusValue.clone();
+// });
 
 /**
  * split a flower into groups of up to n values
@@ -360,7 +341,7 @@ const focusPlant = new PlantPattern('focus %P', (plant, args) => {
  * @param {number} size
  * @returns {*[]}
  */
-const group = new Pattern('groups of %n', (value, args) => {
+const group = new Pattern('groups', 1, (value, args) => {
   const [size] = args;
   assert.type(size, 'number');
   if (size === 0) {
@@ -383,7 +364,7 @@ const group = new Pattern('groups of %n', (value, args) => {
  * -- { flower = 1, natural = 1 }, ...
  * @param {string} dest a plural word used to determine the mutable
  */
-const itemize = new PlantPattern('itemize %s', (plant, args) => {
+const itemize = new PlantPattern('itemize', 1, (plant, args) => {
   const [dest] = args;
   const leaves = plant.leaves;
   // assert.type(value, 'array');
@@ -410,7 +391,7 @@ const itemize = new PlantPattern('itemize %s', (plant, args) => {
  * @flower {*}
  * @returns {*}
  */
-const last = new Pattern('last', (value) => {
+const last = new Pattern('last', 0, (value) => {
   if (typeOf(value) === 'array') {
     return value[value.length - 1];
   }
@@ -423,7 +404,7 @@ const last = new Pattern('last', (value) => {
  * use `take` to get more terms
  * @param {command} command
  */
-const lazy = new PlantPattern('lazy %c', (plant, args) => {
+const lazy = new PlantPattern('lazy', 1, (plant, args) => {
   const [command] = args;
   const lazyPlant = new LazyPlant(plant.leaves, command);
   return lazyPlant;
@@ -434,7 +415,7 @@ const lazy = new PlantPattern('lazy %c', (plant, args) => {
  * @flower {*[]}
  * @returns {number}
  */
-const maximum = new Pattern('maximum', (value) => {
+const maximum = new Pattern('maximum', 0, (value) => {
   assert.type(value, 'array');
   return Math.max(...value.filter(Number));
 });
@@ -444,9 +425,23 @@ const maximum = new Pattern('maximum', (value) => {
  * @flower {*[]}
  * @returns {number}
  */
-const minimum = new Pattern('minimum', (value) => {
+const minimum = new Pattern('minimum', 0, (value) => {
   assert.type(value, 'array');
   return Math.min(...value.filter(Number));
+});
+
+/**
+ * subtract from a flower (-)
+ * mutables accepted
+ * @flower {number}
+ * @param {number} subtrahend
+ * @returns {number}
+ */
+const minus = new Pattern('minus', 1, (value, args) => {
+  const [subtrahend] = args;
+  assert.type(value, 'number');
+  assert.type(subtrahend, 'number');
+  return value - subtrahend;
 });
 
 /**
@@ -456,7 +451,7 @@ const minimum = new Pattern('minimum', (value) => {
  * @param {number} argument
  * @returns {number}
  */
-const mod = new Pattern('mod %a', (value, args) => {
+const mod = new Pattern('mod', 1, (value, args) => {
   const [argument] = args;
   assert.type(value, 'number');
   assert.type(argument, 'number');
@@ -467,26 +462,29 @@ const mod = new Pattern('mod %a', (value, args) => {
 });
 
 /**
- * multiply a flower (*)
- * mutables accepted
- * @flower {number}
- * @param {number} multiplier
- * @returns {number}
- */
-const multiply = new Pattern('multiply by %a', (value, args) => {
-  const [multiplier] = args;
-  assert.type(value, 'number');
-  assert.type(multiplier, 'number');
-  return value * multiplier;
-});
-
-/**
  * return whether a flower is odd
  * @flower {number}
  * @returns {boolean}
  */
-const odd = new Pattern('odd', (value) => {
+const odd = new Pattern('odd', 0, (value) => {
   return value % 2 === 1;
+});
+
+/**
+ * divide a flower (/)
+ * mutables accepted
+ * @flower {number}
+ * @param {number} divisor
+ * @returns {number}
+ */
+const over = new Pattern('over', 1, (value, args) => {
+  const [divisor] = args;
+  assert.type(value, 'number');
+  assert.type(divisor, 'number');
+  if (divisor === 0) {
+    throw new CloverError('cannot divide by 0');
+  }
+  return value / divisor;
 });
 
 /**
@@ -496,7 +494,7 @@ const odd = new Pattern('odd', (value) => {
  * pluck (odd) -- { flower = 2 }, { flower = 4 }
  * @param {command} command
  */
-const pluck = new PlantPattern('pluck %c', (plant, args) => {
+const pluck = new PlantPattern('pluck', 1, (plant, args) => {
   const [command] = args;
   return new Plant(Clover.plant.leaves.filter(leaf => {
     return command.run(leaf.flower, command.args) === false;
@@ -504,11 +502,25 @@ const pluck = new PlantPattern('pluck %c', (plant, args) => {
 });
 
 /**
+ * add to a flower (+)
+ * mutables accepted
+ * @flower {number}
+ * @param {number} addend
+ * @returns {number}
+ */
+const plus = new Pattern('plus', 1, (value, args) => {
+  const [addend] = args;
+  assert.type(value, 'number');
+  assert.type(addend, 'number');
+  return value + addend;
+});
+
+/**
  * return the product of all numbers in a flower
  * @flower {*[]}
  * @returns {number}
  */
-const product = new Pattern('product', (value) => {
+const product = new Pattern('product', 0, (value) => {
   assert.type(value, 'array');
   // TODO: should it throw if it finds non-numbers instead?
   return value.filter(v => typeOf(v) === 'number')
@@ -522,11 +534,10 @@ const product = new Pattern('product', (value) => {
  * @param {*} splitter
  * @returns {string[]}
  */
-const split = new Pattern('split %a %a', (value, args) => {
-  const [connector, splitter] = args;
+const split = new Pattern('split', 1, (value, args) => {
+  const [splitter] = args;
 
   assert.type(value, 'string');
-  assert.any(connector, ['by', 'on']);
   // Token.assertType(splitter, 'string');
 
   // TODO: singular and plural
@@ -547,23 +558,9 @@ const split = new Pattern('split %a %a', (value, args) => {
 /**
  * stop execution early
  */
-const stop = new PlantPattern('stop', (plant) => {
+const stop = new PlantPattern('stop', 0, (plant) => {
   Clover.stop = true;
   return plant;
-});
-
-/**
- * subtract from a flower (-)
- * mutables accepted
- * @flower {number}
- * @param {number} subtrahend
- * @returns {number}
- */
-const subtract = new Pattern('subtract %a', (value, args) => {
-  const [subtrahend] = args;
-  assert.type(value, 'number');
-  assert.type(subtrahend, 'number');
-  return value - subtrahend;
 });
 
 /**
@@ -571,21 +568,10 @@ const subtract = new Pattern('subtract %a', (value, args) => {
  * @flower {*[]}
  * @returns {number}
  */
-const sum = new Pattern('sum', (value) => {
+const sum = new Pattern('sum', 0, (value) => {
   assert.type(value, 'array');
   // TODO: should it throw if it finds non-numbers instead?
   return value.filter(v => typeOf(v) === 'number')
-    .reduce((a, c) => a + c, 0);
-});
-
-/**
- * return the sum of all numbers in a list passed as an argument
- * @param {*[]} list
- * @returns {number}
- */
-const sumMonadic = new Pattern('sum %l', (value, args) => {
-  const [list] = args;
-  return list.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a + c, 0);
 });
 
@@ -595,7 +581,7 @@ const sumMonadic = new Pattern('sum %l', (value, args) => {
  * performs arg substitution
  * @param {number} n
  */
-const take = new PlantPattern('take %n', (plant, args) => {
+const take = new PlantPattern('take', 1, (plant, args) => {
   const [n] = args;
   if (!(plant instanceof LazyPlant)) {
     throw new CloverError("'take' command run on non-lazy plant");
@@ -612,50 +598,57 @@ const take = new PlantPattern('take %n', (plant, args) => {
   return plant;
 });
 
+/**
+ * multiply a flower (*)
+ * mutables accepted
+ * @flower {number}
+ * @param {number} multiplier
+ * @returns {number}
+ */
+const times = new Pattern('times', 1, (value, args) => {
+  const [multiplier] = args;
+  assert.type(value, 'number');
+  assert.type(multiplier, 'number');
+  return value * multiplier;
+});
+
 const max = new SugarPattern('max', maximum);
 const min = new SugarPattern('min', minimum);
 
 export const patterns = {
   // commands
-  add,
   apply,
   count,
   crush,
-  divide,
-  eachOf,
   even,
-  filt,
-  flat,
+  filter,
+  flatten,
   flowers,
   focus,
-  focusPlant,
+  foreach,
   group,
   itemize,
   last,
   lazy,
   maximum,
   minimum,
+  minus,
   mod,
-  multiply,
   odd,
+  over,
   pluck,
+  plus,
   product,
-  // show,
-  // showMonadic,
   split,
   stop,
-  subtract,
   sum,
-  sumMonadic,
   take,
+  times,
   // syntactic sugar
   max,
   min
 };
 
 export const reservedWords = Object.values(patterns)
-  .map(pattern => pattern.str)
-  .flatMap(str => str.split(' '))
-  .filter(word => !word.startsWith('%'))
-  .filter((word, index, arr) => arr.indexOf(word) === index)
+  .map(pattern => pattern.head)
   .sort();

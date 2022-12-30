@@ -77,11 +77,10 @@ tentamen.done = (function () {
  */
 
 tentamen.suite('tests');
-tentamen.add('add', 'focus 5\nadd 5', 10);
 tentamen.add(
   'apply',
   `focus [1 2 3 4 5]
-  apply (multiply by 2)`,
+  apply (times 2)`,
   [2, 4, 6, 8, 10]
 );
 tentamen.add(
@@ -90,19 +89,18 @@ tentamen.add(
   count 'a'`,
   5
 );
-tentamen.add('divide', 'focus 5\ndivide by 5', 1);
 tentamen.add(
-  'flat',
+  'flatten',
   `focus [1 2 3 4]
-  groups of 2
+  groups 2
   flatten`,
   [1, 2, 3, 4]
 );
-tentamen.add('focusMonadic', 'focus 5', 5);
+tentamen.add('focus', 'focus 5', 5);
 tentamen.add(
   'group',
   `focus [1 2 3 4 5 6 7]
-  groups of 2`,
+  groups 2`,
   [[1, 2], [3, 4], [5, 6], [7]]
 );
 tentamen.add(
@@ -110,7 +108,7 @@ tentamen.add(
   // in this form, we expect that an apply should not be required
   `focus [1 2 3 4 5]
   itemize numbers
-  multiply by 2`,
+  times 2`,
   [2, 4, 6, 8, 10]
 );
 tentamen.add(
@@ -121,7 +119,8 @@ tentamen.add(
 );
 tentamen.add('maximum', 'focus [1 5 6 2 3 4]\nmaximum', 6);
 tentamen.add('minimum', 'focus [6 2 1 5 4 3]\nminimum', 1);
-tentamen.add('multiply', 'focus 5\nmultiply by 5', 25);
+tentamen.add('over', 'focus 5\nover 5', 1);
+tentamen.add('plus', 'focus 5\nplus 5', 10);
 tentamen.add(
   'product',
   `focus [1 2 3 4 5 6 7 8 9 10]
@@ -131,15 +130,16 @@ tentamen.add(
 tentamen.add(
   'split',
   `focus '1\\n2\\n3\\n4'
-  split on newlines`,
+  split newlines`,
   ['1', '2', '3', '4']
 );
-tentamen.add('subtract', 'focus 5\nsubtract 5', 0);
+tentamen.add('minus', 'focus 5\nminus 5', 0);
 tentamen.add(
   'sum',
   `focus [1 2 3 4 5 6 7 8 9 10]
   sum`,
   55
 );
+tentamen.add('times', 'focus 5\ntimes 5', 25);
 
 tentamen.done();
