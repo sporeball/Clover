@@ -38,6 +38,7 @@ class PlantPattern extends Pattern { }
 class SugarPattern extends Pattern {
   constructor (head, pattern) {
     super(head);
+    this.args = pattern.args;
     this.body = pattern.body;
   }
 }
