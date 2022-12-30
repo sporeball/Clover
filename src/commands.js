@@ -528,6 +528,28 @@ const product = new Pattern('product', 0, (value) => {
 });
 
 /**
+ * array run-length decode
+ * @flower {*[][]}
+ * @returns {*[]}
+ */
+const rld = new Pattern('rld', 0, (value) => {
+  assert.type(value, 'array');
+
+  const result = [];
+  for (const run of value) {
+    assert.type(run, 'array');
+    assert.equal(run.length, 2); // TODO: make sure 'assert.equal' language doesn't talk about tokens, since this isn't a parser thing
+    const [length, item] = run;
+    assert.type(length, 'number');
+    for (let i = 0; i < length; i++) {
+      result.push(item);
+    }
+  }
+
+  return result;
+});
+
+/**
  * string split a flower
  * accepts some special keywords
  * @flower {string}
@@ -612,6 +634,26 @@ const times = new Pattern('times', 1, (value, args) => {
   return value * multiplier;
 });
 
+/**
+ * zip two arrays together
+ * mutables accepted
+ * @flower {array}
+ * @param {array} seconds
+ * @returns {array}
+ */
+const zip = new Pattern('zip', 1, (value, args) => {
+  const firsts = value;
+  const [seconds] = args;
+  assert.type(firsts, 'array');
+  assert.type(seconds, 'array');
+  const result = [];
+  const length = Math.min(firsts.length, seconds.length);
+  for (let i = 0; i < length; i++) {
+    result.push([firsts[i], seconds[i]]);
+  }
+  return result;
+});
+
 const max = new SugarPattern('max', maximum);
 const min = new SugarPattern('min', minimum);
 
@@ -639,11 +681,13 @@ export const patterns = {
   pluck,
   plus,
   product,
+  rld,
   split,
   stop,
   sum,
   take,
   times,
+  zip,
   // syntactic sugar
   max,
   min
