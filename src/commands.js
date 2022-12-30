@@ -70,9 +70,9 @@ export class CommandInstance {
   }
 
   calculateArgs () {
-    const [args, dest] = getArgs(this.pattern, this.lhs);
+    const [args, source] = getArgs(this.pattern, this.lhs);
     this.args = args;
-    this.dest = dest || 'flower';
+    this.source = source; // TODO: || ??
   }
 }
 
@@ -124,7 +124,7 @@ export function getArgs (pattern, tokens) {
       tokens.length
     );
   }
-  // and at most one more (the destination argument).
+  // and at most one more (the source argument).
   if (tokens.length > maxArgs) {
     throw new CloverError(
       'expected at most %s args, got %s',
@@ -132,12 +132,12 @@ export function getArgs (pattern, tokens) {
       tokens.length
     );
   }
-  // fill the destination argument if it was given
-  let dest;
+  // fill the source argument if it was given
+  let source;
   if (tokens.length === maxArgs) {
-    dest = tokens.pop().value.slice(1);
+    source = cast(tokens.pop());
   }
-  return [tokens.map(token => cast(token)), dest];
+  return [tokens.map(token => cast(token)), source];
 }
 
 /**
@@ -159,10 +159,7 @@ export function evaluate (line) {
       }
       Clover.evItem = leaf;
       command.calculateArgs();
-      if (leaf[command.dest] === undefined) {
-        throw new CloverError('destination argument is undefined');
-      }
-      leaf[command.dest] = command.run(leaf[command.dest], command.args);
+      leaf.flower = command.run(command.source || leaf.flower, command.args);
     }
   }
 
