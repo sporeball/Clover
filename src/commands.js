@@ -661,8 +661,12 @@ const zip = new Pattern('zip', 1, (value, args) => {
   return result;
 });
 
+const M = new SugarPattern('*', times);
+const m = new SugarPattern('-', minus);
 const max = new SugarPattern('max', maximum);
 const min = new SugarPattern('min', minimum);
+const o = new SugarPattern('/', over);
+const p = new SugarPattern('+', plus);
 
 export const patterns = {
   // commands
@@ -697,8 +701,12 @@ export const patterns = {
   times,
   zip,
   // syntactic sugar
+  M,
+  m,
   max,
-  min
+  min,
+  o,
+  p
 };
 
 export const reservedWords = Object.values(patterns)
