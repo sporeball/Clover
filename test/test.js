@@ -142,4 +142,11 @@ tentamen.add(
 );
 tentamen.add('times', 'focus 5\ntimes 5', 25);
 
+tentamen.add(
+  'zip',
+  `focus [1 2 3 4 5]
+  zip [6 7 8 9]`,
+  [[1, 6], [2, 7], [3, 8], [4, 9]]
+);
+
 tentamen.done();
