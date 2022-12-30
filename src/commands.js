@@ -634,9 +634,6 @@ const times = new Pattern('times', 1, (value, args) => {
   return value * multiplier;
 });
 
-const max = new SugarPattern('max', maximum);
-const min = new SugarPattern('min', minimum);
-
 /**
  * zip two arrays together
  * mutables accepted
@@ -656,6 +653,9 @@ const zip = new Pattern('zip', 1, (value, args) => {
   }
   return result;
 });
+
+const max = new SugarPattern('max', maximum);
+const min = new SugarPattern('min', minimum);
 
 export const patterns = {
   // commands
@@ -687,10 +687,10 @@ export const patterns = {
   sum,
   take,
   times,
+  zip,
   // syntactic sugar
   max,
-  min,
-  zip
+  min
 };
 
 export const reservedWords = Object.values(patterns)
