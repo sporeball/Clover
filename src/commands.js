@@ -547,6 +547,16 @@ const rld = new Pattern('rld', 0, (value) => {
 });
 
 /**
+ * sort a flower
+ * @flower {*[]}
+ * @returns {*[]}
+ */
+const sort = new Pattern('sort', 0, (value) => {
+  assert.type(value, 'array');
+  return [...value].sort((a, b) => a - b);
+});
+
+/**
  * string split a flower
  * accepts some special keywords
  * @flower {string}
@@ -679,6 +689,7 @@ export const patterns = {
   plus,
   product,
   rld,
+  sort,
   split,
   stop,
   sum,

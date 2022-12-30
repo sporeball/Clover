@@ -35,6 +35,7 @@ if (unsortedIndex === -1) {
 }
 
 // TODO: check order of sugar patterns independently
+// TODO: check order of the tests themselves too
 
 // hijack tentamen's methods to add coverage information
 tentamen.add = (function () {
@@ -133,6 +134,12 @@ tentamen.add(
   groups 2
   rld`,
   ['a', 'b', 'b', 'c', 'c', 'c']
+);
+tentamen.add(
+  'sort',
+  `focus [1 3 8 4 2 5 6 9 7 10]
+  sort`,
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 );
 tentamen.add(
   'split',
