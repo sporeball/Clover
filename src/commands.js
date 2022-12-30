@@ -528,6 +528,28 @@ const product = new Pattern('product', 0, (value) => {
 });
 
 /**
+ * array run-length decode
+ * @flower {*[][]}
+ * @returns {*[]}
+ */
+const rld = new Pattern('rld', 0, (value) => {
+  assert.type(value, 'array');
+
+  const result = [];
+  for (const run of value) {
+    assert.type(run, 'array');
+    assert.equal(run.length, 2); // TODO: make sure 'assert.equal' language doesn't talk about tokens, since this isn't a parser thing
+    const [length, item] = run;
+    assert.type(length, 'number');
+    for (let i = 0; i < length; i++) {
+      result.push(item);
+    }
+  }
+
+  return result;
+});
+
+/**
  * string split a flower
  * accepts some special keywords
  * @flower {string}
@@ -659,6 +681,7 @@ export const patterns = {
   pluck,
   plus,
   product,
+  rld,
   split,
   stop,
   sum,

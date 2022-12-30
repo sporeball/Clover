@@ -128,6 +128,13 @@ tentamen.add(
   3628800
 );
 tentamen.add(
+  'rld',
+  `focus [1 'a' 2 'b' 3 'c']
+  groups 2
+  rld`,
+  ['a', 'b', 'b', 'c', 'c', 'c']
+);
+tentamen.add(
   'split',
   `focus '1\\n2\\n3\\n4'
   split newlines`,
