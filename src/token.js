@@ -78,7 +78,10 @@ export function typeOf (v) {
   if (matches(value, /^:/)) {
     return 'mutable';
   }
-  if (matches(value, /^\(.*\)/)) {
+  if (
+    value instanceof CommandInstance ||
+    matches(value, /^\(.*\)/)
+  ) {
     return 'command';
   }
   if (matches(value, /:(0|[1-9]\d*)$/)) {

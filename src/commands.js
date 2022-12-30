@@ -193,10 +193,6 @@ export function evaluate (line) {
  * commands below
  */
 
-// TODO: all commands just lost all argument type checks.
-// that's really serious.
-// figure something out
-
 /**
  * run a command on each element of a flower
  * @flower {*[]}
@@ -206,7 +202,8 @@ export function evaluate (line) {
 const apply = new Pattern('apply', 1, (value, args) => {
   const [command] = args;
   assert.type(value, 'array');
-  return value.map((x, i, r) => command.run(x, command.args));
+  assert.type(command, 'command');
+  return value.map(x => command.run(x, command.args));
 });
 
 // TODO: comp used to be here - replace with destructuring bind
@@ -243,6 +240,7 @@ const count = new Pattern('count', 1, (value, args) => {
  */
 const crush = new PlantPattern('crush', 1, (plant, args) => {
   const [command] = args;
+  assert.type(command, 'command');
   const result = command.run(
     Clover.plant.leaves.map(leaf => leaf.flower),
     command.args
@@ -256,6 +254,7 @@ const crush = new PlantPattern('crush', 1, (plant, args) => {
  * @returns {boolean}
  */
 const even = new Pattern('even', 0, (value) => {
+  assert.type(value, 'number');
   return value % 2 === 0;
 });
 
@@ -287,6 +286,7 @@ const flatten = new Pattern('flatten', 0, (value) => {
  */
 const flowers = new PlantPattern('flowers', 1, (plant, args) => {
   const [list] = args;
+  assert.type(list, 'array');
   return new Plant(list);
 });
 
@@ -306,12 +306,14 @@ const focus = new Pattern('focus', 1, (value, args) => {
  * performs arg substitution
  * @example
  * flowers [5]
- * each of [1 2 3] (add *) -- { flower = [6, 7, 8] }
+ * foreach [1 2 3] (add *) -- { flower = [6, 7, 8] }
  * @param {*[]} list
  * @param {command} command
  */
 const foreach = new Pattern('foreach', 2, (value, args) => {
   const [list, command] = args;
+  assert.type(list, 'array');
+  assert.type(command, 'command');
   const arr = [];
   for (const item of list) {
     command.calculateArgs();
@@ -334,18 +336,18 @@ const foreach = new Pattern('foreach', 2, (value, args) => {
  * split a flower into groups of up to n values
  * @example
  * focus [1 2 3 4 5]
- * groups of 2 -- { flower = [[1, 2], [3, 4], [5]] }
+ * groups 2 -- { flower = [[1, 2], [3, 4], [5]] }
  * @flower {*[]}
  * @param {number} size
  * @returns {*[]}
  */
 const group = new Pattern('groups', 1, (value, args) => {
   const [size] = args;
+  assert.type(value, 'array');
   assert.type(size, 'number');
   if (size === 0) {
     throw new CloverError('cannot split into groups of 0');
   }
-  assert.type(value, 'array');
   const newArray = [];
   for (let i = 0; i < value.length; i += size) {
     newArray.push(value.slice(i, i + size));
@@ -404,6 +406,7 @@ const last = new Pattern('last', 0, (value) => {
  */
 const lazy = new PlantPattern('lazy', 1, (plant, args) => {
   const [command] = args;
+  assert.type(command, 'command');
   const lazyPlant = new LazyPlant(plant.leaves, command);
   return lazyPlant;
 });
@@ -465,6 +468,7 @@ const mod = new Pattern('mod', 1, (value, args) => {
  * @returns {boolean}
  */
 const odd = new Pattern('odd', 0, (value) => {
+  assert.type(value, 'number');
   return value % 2 === 1;
 });
 
@@ -494,7 +498,8 @@ const over = new Pattern('over', 1, (value, args) => {
  */
 const pluck = new PlantPattern('pluck', 1, (plant, args) => {
   const [command] = args;
-  return new Plant(Clover.plant.leaves.filter(leaf => {
+  assert.type(command, 'command');
+  return new Plant(plant.leaves.filter(leaf => {
     return command.run(leaf.flower, command.args) === false;
   }));
 });
@@ -536,7 +541,9 @@ const rld = new Pattern('rld', 0, (value) => {
   const result = [];
   for (const run of value) {
     assert.type(run, 'array');
-    assert.equal(run.length, 2); // TODO: make sure 'assert.equal' language doesn't talk about tokens, since this isn't a parser thing
+    // TODO: make sure 'assert.equal' language doesn't talk about tokens,
+    // since this isn't a parser thing
+    assert.equal(run.length, 2);
     const [length, item] = run;
     assert.type(length, 'number');
     for (let i = 0; i < length; i++) {
@@ -613,6 +620,7 @@ const sum = new Pattern('sum', 0, (value) => {
  */
 const take = new PlantPattern('take', 1, (plant, args) => {
   const [n] = args;
+  assert.type(n, 'number');
   if (!(plant instanceof LazyPlant)) {
     throw new CloverError("'take' command run on non-lazy plant");
   }
