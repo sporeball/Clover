@@ -20,8 +20,7 @@ class Pattern {
    * @param {string} str format string for the pattern
    * @param {Function} body underlying command code
    */
-  constructor (head, args, body) {
-    this.head = head;
+  constructor (args, body) {
     this.args = args;
     this.body = body;
   }
@@ -49,6 +48,7 @@ export class CommandInstance {
     const rhsIndex = tokens.findIndex(token => token.value === '=');
     if (rhsIndex === -1) {
       this.lhs = tokens;
+      this.rhs = undefined;
     } else {
       this.lhs = tokens.slice(0, rhsIndex);
       this.rhs = tokens.slice(rhsIndex + 1)[0];
@@ -96,8 +96,7 @@ export function tokenize (line) {
  */
 export function getPattern (tokens) {
   const head = tokens[0].value;
-  const pattern = Object.values(patterns)
-    .find(pattern => pattern.head === head);
+  const pattern = patterns[head];
   if (pattern === undefined) {
     throw new CloverError(
       'no pattern found for head token %t',
@@ -164,7 +163,7 @@ export function evaluate (line) {
     }
   }
 
-  // console.dir(command, { depth: 4 });
+  console.dir(command, { depth: 4 });
 
   // if there was a right-hand side...
   if (command.rhs) {
@@ -199,7 +198,7 @@ export function evaluate (line) {
  * @param {command} command
  * @returns {*[]}
  */
-const apply = new Pattern('apply', 1, (value, args) => {
+const apply = new Pattern(1, (value, args) => {
   const [command] = args;
   assert.type(value, 'array');
   assert.type(command, 'command');
@@ -214,7 +213,7 @@ const apply = new Pattern('apply', 1, (value, args) => {
  * @param {*} searchValue
  * @returns {number}
  */
-const count = new Pattern('count', 1, (value, args) => {
+const count = new Pattern(1, (value, args) => {
   const [searchValue] = args;
   assert.any(typeOf(value), ['array', 'string']);
   switch (typeOf(value)) {
@@ -238,7 +237,7 @@ const count = new Pattern('count', 1, (value, args) => {
  * crush (sum) -- { flower = 15 }
  * @param {command} command
  */
-const crush = new PlantPattern('crush', 1, (plant, args) => {
+const crush = new PlantPattern(1, (plant, args) => {
   const [command] = args;
   assert.type(command, 'command');
   const result = command.run(
@@ -253,7 +252,7 @@ const crush = new PlantPattern('crush', 1, (plant, args) => {
  * @flower {number}
  * @returns {boolean}
  */
-const even = new Pattern('even', 0, (value) => {
+const even = new Pattern(0, (value) => {
   assert.type(value, 'number');
   return value % 2 === 0;
 });
@@ -264,7 +263,7 @@ const even = new Pattern('even', 0, (value) => {
  * @param {*} filterValue
  * @returns {*[]}
  */
-const filter = new Pattern('filter', 1, (value, args) => {
+const filter = new Pattern(1, (value, args) => {
   const [filterValue] = args;
   assert.type(value, 'array');
   return value.filter(x => x.flower !== filterValue);
@@ -275,7 +274,7 @@ const filter = new Pattern('filter', 1, (value, args) => {
  * @flower {*[]}
  * @returns {*[]}
  */
-const flatten = new Pattern('flatten', 0, (value) => {
+const flatten = new Pattern(0, (value) => {
   assert.type(value, 'array');
   return value.flat();
 });
@@ -284,7 +283,7 @@ const flatten = new Pattern('flatten', 0, (value) => {
  * replace a plant's flowers with the values in a given list
  * @param {*[]} list
  */
-const flowers = new PlantPattern('flowers', 1, (plant, args) => {
+const flowers = new PlantPattern(1, (plant, args) => {
   const [list] = args;
   assert.type(list, 'array');
   return new Plant(list);
@@ -295,7 +294,7 @@ const flowers = new PlantPattern('flowers', 1, (plant, args) => {
  * mutables accepted
  * @param {*} focusValue
  */
-const focus = new Pattern('focus', 1, (value, args) => {
+const focus = new Pattern(1, (value, args) => {
   const [focusValue] = args;
   return focusValue;
 });
@@ -310,7 +309,7 @@ const focus = new Pattern('focus', 1, (value, args) => {
  * @param {*[]} list
  * @param {command} command
  */
-const foreach = new Pattern('foreach', 2, (value, args) => {
+const foreach = new Pattern(2, (value, args) => {
   const [list, command] = args;
   assert.type(list, 'array');
   assert.type(command, 'command');
@@ -341,7 +340,7 @@ const foreach = new Pattern('foreach', 2, (value, args) => {
  * @param {number} size
  * @returns {*[]}
  */
-const group = new Pattern('groups', 1, (value, args) => {
+const groups = new Pattern(1, (value, args) => {
   const [size] = args;
   assert.type(value, 'array');
   assert.type(size, 'number');
@@ -364,7 +363,7 @@ const group = new Pattern('groups', 1, (value, args) => {
  * -- { flower = 1, natural = 1 }, ...
  * @param {string} dest a plural word used to determine the mutable
  */
-const itemize = new PlantPattern('itemize', 1, (plant, args) => {
+const itemize = new PlantPattern(1, (plant, args) => {
   const [dest] = args;
   const leaves = plant.leaves;
   // assert.type(value, 'array');
@@ -391,7 +390,7 @@ const itemize = new PlantPattern('itemize', 1, (plant, args) => {
  * @flower {*}
  * @returns {*}
  */
-const last = new Pattern('last', 0, (value) => {
+const last = new Pattern(0, (value) => {
   if (typeOf(value) === 'array') {
     return value[value.length - 1];
   }
@@ -404,7 +403,7 @@ const last = new Pattern('last', 0, (value) => {
  * use `take` to get more terms
  * @param {command} command
  */
-const lazy = new PlantPattern('lazy', 1, (plant, args) => {
+const lazy = new PlantPattern(1, (plant, args) => {
   const [command] = args;
   assert.type(command, 'command');
   const lazyPlant = new LazyPlant(plant.leaves, command);
@@ -416,7 +415,7 @@ const lazy = new PlantPattern('lazy', 1, (plant, args) => {
  * @flower {*[]}
  * @returns {number}
  */
-const maximum = new Pattern('maximum', 0, (value) => {
+const maximum = new Pattern(0, (value) => {
   assert.type(value, 'array');
   return Math.max(...value.filter(Number));
 });
@@ -426,7 +425,7 @@ const maximum = new Pattern('maximum', 0, (value) => {
  * @flower {*[]}
  * @returns {number}
  */
-const minimum = new Pattern('minimum', 0, (value) => {
+const minimum = new Pattern(0, (value) => {
   assert.type(value, 'array');
   return Math.min(...value.filter(Number));
 });
@@ -438,7 +437,7 @@ const minimum = new Pattern('minimum', 0, (value) => {
  * @param {number} subtrahend
  * @returns {number}
  */
-const minus = new Pattern('minus', 1, (value, args) => {
+const minus = new Pattern(1, (value, args) => {
   const [subtrahend] = args;
   assert.type(value, 'number');
   assert.type(subtrahend, 'number');
@@ -452,7 +451,7 @@ const minus = new Pattern('minus', 1, (value, args) => {
  * @param {number} argument
  * @returns {number}
  */
-const mod = new Pattern('mod', 1, (value, args) => {
+const mod = new Pattern(1, (value, args) => {
   const [argument] = args;
   assert.type(value, 'number');
   assert.type(argument, 'number');
@@ -467,7 +466,7 @@ const mod = new Pattern('mod', 1, (value, args) => {
  * @flower {number}
  * @returns {boolean}
  */
-const odd = new Pattern('odd', 0, (value) => {
+const odd = new Pattern(0, (value) => {
   assert.type(value, 'number');
   return value % 2 === 1;
 });
@@ -479,7 +478,7 @@ const odd = new Pattern('odd', 0, (value) => {
  * @param {number} divisor
  * @returns {number}
  */
-const over = new Pattern('over', 1, (value, args) => {
+const over = new Pattern(1, (value, args) => {
   const [divisor] = args;
   assert.type(value, 'number');
   assert.type(divisor, 'number');
@@ -496,7 +495,7 @@ const over = new Pattern('over', 1, (value, args) => {
  * pluck (odd) -- { flower = 2 }, { flower = 4 }
  * @param {command} command
  */
-const pluck = new PlantPattern('pluck', 1, (plant, args) => {
+const pluck = new PlantPattern(1, (plant, args) => {
   const [command] = args;
   assert.type(command, 'command');
   return new Plant(plant.leaves.filter(leaf => {
@@ -511,7 +510,7 @@ const pluck = new PlantPattern('pluck', 1, (plant, args) => {
  * @param {number} addend
  * @returns {number}
  */
-const plus = new Pattern('plus', 1, (value, args) => {
+const plus = new Pattern(1, (value, args) => {
   const [addend] = args;
   assert.type(value, 'number');
   assert.type(addend, 'number');
@@ -523,7 +522,7 @@ const plus = new Pattern('plus', 1, (value, args) => {
  * @flower {*[]}
  * @returns {number}
  */
-const product = new Pattern('product', 0, (value) => {
+const product = new Pattern(0, (value) => {
   assert.type(value, 'array');
   // TODO: should it throw if it finds non-numbers instead?
   return value.filter(v => typeOf(v) === 'number')
@@ -535,7 +534,7 @@ const product = new Pattern('product', 0, (value) => {
  * @flower {*[][]}
  * @returns {*[]}
  */
-const rld = new Pattern('rld', 0, (value) => {
+const rld = new Pattern(0, (value) => {
   assert.type(value, 'array');
 
   const result = [];
@@ -559,7 +558,7 @@ const rld = new Pattern('rld', 0, (value) => {
  * @flower {*[]}
  * @returns {*[]}
  */
-const sort = new Pattern('sort', 0, (value) => {
+const sort = new Pattern(0, (value) => {
   assert.type(value, 'array');
   return [...value].sort((a, b) => a - b);
 });
@@ -571,7 +570,7 @@ const sort = new Pattern('sort', 0, (value) => {
  * @param {*} splitter
  * @returns {string[]}
  */
-const split = new Pattern('split', 1, (value, args) => {
+const split = new Pattern(1, (value, args) => {
   const [splitter] = args;
 
   assert.type(value, 'string');
@@ -595,7 +594,7 @@ const split = new Pattern('split', 1, (value, args) => {
 /**
  * stop execution early
  */
-const stop = new PlantPattern('stop', 0, (plant) => {
+const stop = new PlantPattern(0, (plant) => {
   Clover.stop = true;
   return plant;
 });
@@ -605,7 +604,7 @@ const stop = new PlantPattern('stop', 0, (plant) => {
  * @flower {*[]}
  * @returns {number}
  */
-const sum = new Pattern('sum', 0, (value) => {
+const sum = new Pattern(0, (value) => {
   assert.type(value, 'array');
   // TODO: should it throw if it finds non-numbers instead?
   return value.filter(v => typeOf(v) === 'number')
@@ -618,7 +617,7 @@ const sum = new Pattern('sum', 0, (value) => {
  * performs arg substitution
  * @param {number} n
  */
-const take = new PlantPattern('take', 1, (plant, args) => {
+const take = new PlantPattern(1, (plant, args) => {
   const [n] = args;
   assert.type(n, 'number');
   if (!(plant instanceof LazyPlant)) {
@@ -643,7 +642,7 @@ const take = new PlantPattern('take', 1, (plant, args) => {
  * @param {number} multiplier
  * @returns {number}
  */
-const times = new Pattern('times', 1, (value, args) => {
+const times = new Pattern(1, (value, args) => {
   const [multiplier] = args;
   assert.type(value, 'number');
   assert.type(multiplier, 'number');
@@ -657,7 +656,7 @@ const times = new Pattern('times', 1, (value, args) => {
  * @param {array} seconds
  * @returns {array}
  */
-const zip = new Pattern('zip', 1, (value, args) => {
+const zip = new Pattern(1, (value, args) => {
   const firsts = value;
   const [seconds] = args;
   assert.type(firsts, 'array');
@@ -670,12 +669,8 @@ const zip = new Pattern('zip', 1, (value, args) => {
   return result;
 });
 
-const M = new SugarPattern('*', times);
-const m = new SugarPattern('-', minus);
 const max = new SugarPattern('max', maximum);
 const min = new SugarPattern('min', minimum);
-const o = new SugarPattern('/', over);
-const p = new SugarPattern('+', plus);
 
 export const patterns = {
   // commands
@@ -688,7 +683,7 @@ export const patterns = {
   flowers,
   focus,
   foreach,
-  group,
+  groups,
   itemize,
   last,
   lazy,
@@ -710,12 +705,8 @@ export const patterns = {
   times,
   zip,
   // syntactic sugar
-  M,
-  m,
   max,
-  min,
-  o,
-  p
+  min
 };
 
 export const reservedWords = Object.values(patterns)
