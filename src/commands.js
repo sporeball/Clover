@@ -648,6 +648,21 @@ const times = new Pattern(1, (value, args) => {
 });
 
 /**
+ * replace a flower with the result of a command run on a different value
+ * @example
+ * flowers [1 2 3]
+ * using [4 5 6] (sum) -- { flower = 15 }
+ * @flower {*}
+ * @param {*} otherValue
+ * @param {command} command
+ */
+const using = new Pattern(2, (value, args) => {
+  const [otherValue, command] = args;
+  assert.type(command, 'command');
+  return command.run(otherValue, command.args);
+});
+
+/**
  * zip two arrays together
  * mutables accepted
  * @flower {array}
@@ -701,6 +716,7 @@ export const patterns = {
   sum,
   take,
   times,
+  using,
   zip,
   // syntactic sugar
   max,
