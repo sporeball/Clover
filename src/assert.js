@@ -14,10 +14,10 @@ const assert = {
       throw new CloverError("expected a token, but didn't get one");
     }
   },
-  equal (v1, v2) {
+  equal (name, v1, v2) {
     if (!equal(v1, v2)) {
       throw new CloverError(
-        'expected token %t, got %t instead', v1, v2
+        'expected %s to equal %t, got %t instead', name, v2, v1
       );
     }
   },
@@ -26,6 +26,13 @@ const assert = {
       throw new CloverError('token %t does not match regex', value);
     }
     return this;
+  },
+  tokenEqual (t1, t2) {
+    if (!equal(t1.value, t2.value)) {
+      throw new CloverError(
+        'expected token %t, got %t instead', t1, t2
+      );
+    }
   },
   type (value, T) {
     const t = typeOf(value);

@@ -540,9 +540,7 @@ const rld = new Pattern(0, (value) => {
   const result = [];
   for (const run of value) {
     assert.type(run, 'array');
-    // TODO: make sure 'assert.equal' language doesn't talk about tokens,
-    // since this isn't a parser thing
-    assert.equal(run.length, 2);
+    assert.equal('run length', run.length, 2);
     const [length, item] = run;
     assert.type(length, 'number');
     for (let i = 0; i < length; i++) {
