@@ -46,19 +46,32 @@ export class CommandInstance {
   constructor (line) {
     const tokens = tokenize(line);
     const rhsIndex = tokens.findIndex(token => token.value === '=');
+    this.head = tokens[0];
     if (rhsIndex === -1) {
-      this.lhs = tokens;
-      this.rhs = undefined;
+      this._args = tokens.slice(1);
     } else {
-      this.lhs = tokens.slice(0, rhsIndex);
-      this.rhs = tokens.slice(rhsIndex + 1)[0];
+      this._args = tokens.slice(1, rhsIndex);
+      this.sep = tokens[rhsIndex];
+      this.rhs = tokens.slice(rhsIndex + 1);
     }
-    this.pattern = getPattern(this.lhs);
-    this.calculateArgs();
+    this.pattern = patterns[this.head.value];
+    if (this.pattern === undefined) {
+      throw new CloverError(
+        'no pattern found for head token %t',
+        this.head.value
+      );
+    }
+    if (this._args.length !== this.pattern.args) {
+      throw new CloverError(
+        'expected %s argument(s), got %s',
+        this.pattern.args,
+        this._args.length
+      );
+    }
   }
 
-  run (value, args) {
-    return this.pattern.body(value, args);
+  get args () {
+    return this._args.map(arg => cast(arg));
   }
 
   substituteArg (sub) {
@@ -70,10 +83,8 @@ export class CommandInstance {
     });
   }
 
-  calculateArgs () {
-    const [args, source] = getArgs(this.pattern, this.lhs);
-    this.args = args;
-    this.source = source; // TODO: || ??
+  run (value, args) {
+    return this.pattern.body(value, args);
   }
 }
 
@@ -90,57 +101,6 @@ export function tokenize (line) {
 }
 
 /**
- * determine what command pattern is matched by a stream of tokens
- * @param {Token[]} tokens
- * @returns {Command}
- */
-export function getPattern (tokens) {
-  const head = tokens[0].value;
-  const pattern = patterns[head];
-  if (pattern === undefined) {
-    throw new CloverError(
-      'no pattern found for head token %t',
-      head
-    );
-  }
-  return pattern;
-}
-
-/**
- * get the arguments being passed to a command,
- * given that command and the tokens that match its pattern
- * @param {Command} command
- * @param {Token[]} tokens
- */
-export function getArgs (pattern, tokens) {
-  tokens = [...tokens].slice(1);
-  const minArgs = pattern.args;
-  const maxArgs = pattern.args + 1;
-  // there must be at least as many arguments as the pattern requires...
-  if (tokens.length < minArgs) {
-    throw new CloverError(
-      'expected at least %s args, got %s',
-      pattern.args,
-      tokens.length
-    );
-  }
-  // and at most one more (the source argument).
-  if (tokens.length > maxArgs) {
-    throw new CloverError(
-      'expected at most %s args, got %s',
-      pattern.args + 1,
-      tokens.length
-    );
-  }
-  // fill the source argument if it was given
-  let source;
-  if (tokens.length === maxArgs) {
-    source = cast(tokens.pop());
-  }
-  return [tokens.map(token => cast(token)), source];
-}
-
-/**
  * execute a command
  * @param {string} line
  */
@@ -149,7 +109,6 @@ export function evaluate (line) {
 
   // plant commands return an entirely new plant
   if (command.pattern instanceof PlantPattern) {
-    command.calculateArgs();
     Clover.plant = command.run(Clover.plant, command.args);
   // regular commands change the flower value of every leaf in the plant
   } else {
@@ -158,34 +117,37 @@ export function evaluate (line) {
         continue;
       }
       Clover.evItem = leaf;
-      command.calculateArgs();
-      leaf.flower = command.run(command.source || leaf.flower, command.args);
+      leaf.flower = command.run(leaf.flower, command.args);
     }
   }
 
-  console.dir(command, { depth: 4 });
+  // console.dir(command, { depth: 4 });
 
   // if there was a right-hand side...
-  if (command.rhs) {
-    const rhsValue = command.rhs.value.slice(1);
-    const rhsSpecifier = command.rhs.specifier;
-    switch (rhsSpecifier) {
+  if (command.rhs === undefined) {
+    return;
+  }
+  if (command.sep.value === '=') {
+    const rhs = command.rhs[0];
+    switch (rhs.specifier) {
       // for plants,
       case '%P':
         // store a clone of the plant
-        Clover.plants[rhsValue] = Clover.plant.clone();
+        Clover.plants[rhs.value] = Clover.plant.clone();
         break;
       // for mutables,
       case '%m':
         // update every flower
         Clover.plant.leaves.forEach(leaf => {
-          leaf[rhsValue] = leaf.flower;
+          leaf[rhs.value] = leaf.flower;
         });
         break;
       default:
-        throw new CloverError('invalid right-hand side value %t', rhsValue);
+        throw new CloverError('invalid assignment');
     }
+    return;
   }
+  throw new CloverError('invalid right-hand side separator');
 }
 
 /**
@@ -315,7 +277,6 @@ const foreach = new Pattern(2, (value, args) => {
   assert.type(command, 'command');
   const arr = [];
   for (const item of list) {
-    command.calculateArgs();
     arr.push(command.run(value, command.substituteArg(item)));
   }
   return arr;
@@ -625,7 +586,6 @@ const take = new PlantPattern(1, (plant, args) => {
     if (plant.getLeaf(i - 1) !== undefined) {
       continue;
     }
-    plant.command.calculateArgs();
     plant.addLeaf(
       plant.command.run(i, plant.command.substituteArg(i))
     );
