@@ -54,7 +54,6 @@ export class CommandInstance {
       this.sep = tokens[rhsIndex];
       this.rhs = tokens.slice(rhsIndex + 1);
     }
-    this.pattern = patterns[this.head.value];
     if (this.pattern === undefined) {
       throw new CloverError(
         'no pattern found for head token %t',
@@ -81,6 +80,10 @@ export class CommandInstance {
       }
       return arg;
     });
+  }
+
+  get pattern () {
+    return patterns[this.head.value];
   }
 
   run (value, args) {
