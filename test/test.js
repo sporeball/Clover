@@ -91,15 +91,44 @@ tentamen.add(
   5
 );
 tentamen.add(
+  'crush',
+  `flowers [1 2 3 4 5]
+  crush (sum)`,
+  15
+);
+tentamen.add(
+  'even',
+  `focus 4
+  even`,
+  true
+);
+tentamen.add(
+  'filter',
+  `focus [1 2 2 3 3 3 4 4 4 4]
+  filter 4`,
+  [1, 2, 2, 3, 3, 3]
+);
+tentamen.add(
   'flatten',
   `focus [1 2 3 4]
   groups 2
   flatten`,
   [1, 2, 3, 4]
 );
+tentamen.add(
+  'flowers',
+  'flowers [1 2 3 4 5]',
+  [1, 2, 3, 4, 5] // TODO: this is a weird line. cf. flatten test, above
+);
 tentamen.add('focus', 'focus 5', 5);
 tentamen.add(
-  'group',
+  'foreach',
+  `flowers [5]
+  foreach [1 2 3] (plus *)`,
+  [6, 7, 8]
+);
+tentamen.add(
+  'groups',
   `focus [1 2 3 4 5 6 7]
   groups 2`,
   [[1, 2], [3, 4], [5, 6], [7]]
@@ -118,9 +147,34 @@ tentamen.add(
   last`,
   5
 );
+tentamen.add(
+  'lazy',
+  `flowers [1]
+  lazy (plus 1)`,
+  // flower stays the same
+  1
+);
 tentamen.add('maximum', 'focus [1 5 6 2 3 4]\nmaximum', 6);
 tentamen.add('minimum', 'focus [6 2 1 5 4 3]\nminimum', 1);
+tentamen.add(
+  'mod',
+  `focus 5
+  mod 3`,
+  2
+);
+tentamen.add(
+  'odd',
+  `focus 4
+  odd`,
+  false
+);
 tentamen.add('over', 'focus 5\nover 5', 1);
+tentamen.add(
+  'pluck',
+  `flowers [1 2 3 4 5]
+  pluck (odd)`,
+  [2, 4]
+);
 tentamen.add('plus', 'focus 5\nplus 5', 10);
 tentamen.add(
   'product',
@@ -147,6 +201,15 @@ tentamen.add(
   split '\\n'`,
   ['1', '2', '3', '4']
 );
+tentamen.add(
+  'stop',
+  `focus 5
+  plus 5
+  stop
+  plus 5`,
+  // last line should be skipped, giving 10 instead of 15
+  10
+);
 tentamen.add('minus', 'focus 5\nminus 5', 0);
 tentamen.add(
   'sum',
@@ -154,8 +217,22 @@ tentamen.add(
   sum`,
   55
 );
+tentamen.add(
+  'take',
+  `flowers []
+  lazy (focus *)
+  take 10`,
+  // naturals
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+);
 tentamen.add('times', 'focus 5\ntimes 5', 25);
-
+tentamen.add(
+  'using',
+  `flowers [1]
+  using [4 5 6] (sum)`,
+  // flower should be ignored, giving 15 instead of 6
+  15
+);
 tentamen.add(
   'zip',
   `focus [1 2 3 4 5]
