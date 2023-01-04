@@ -231,7 +231,7 @@ const even = new Pattern(0, (value) => {
 const filter = new Pattern(1, (value, args) => {
   const [filterValue] = args;
   assert.type(value, 'array');
-  return value.filter(x => x.flower !== filterValue);
+  return value.filter(x => x !== filterValue);
 });
 
 /**
