@@ -163,11 +163,11 @@ export function evaluate (line) {
  * @param {command} command
  * @returns {*[]}
  */
-const apply = new Pattern(1, (value, args) => {
+const apply = new Pattern(1, (flower, args) => {
   const [command] = args;
-  assert.type(value, 'array');
+  assert.type(flower, 'array');
   assert.type(command, 'command');
-  return value.map(x => command.run(x, command.args));
+  return flower.map(x => command.run(x, command.args));
 });
 
 // TODO: comp used to be here - replace with destructuring bind
@@ -178,16 +178,16 @@ const apply = new Pattern(1, (value, args) => {
  * @param {*} searchValue
  * @returns {number}
  */
-const count = new Pattern(1, (value, args) => {
+const count = new Pattern(1, (flower, args) => {
   const [searchValue] = args;
-  assert.any(typeOf(value), ['array', 'string']);
-  switch (typeOf(value)) {
+  assert.any(typeOf(flower), ['array', 'string']);
+  switch (typeOf(flower)) {
     case 'array':
-      return value
+      return flower
         .filter(x => x === searchValue)
         .length;
     case 'string':
-      return (value.match(
+      return (flower.match(
         new RegExp(escape(searchValue), 'g')
       ) || [])
         .length;
@@ -217,9 +217,9 @@ const crush = new PlantPattern(1, (plant, args) => {
  * @flower {number}
  * @returns {boolean}
  */
-const even = new Pattern(0, (value) => {
-  assert.type(value, 'number');
-  return value % 2 === 0;
+const even = new Pattern(0, (flower) => {
+  assert.type(flower, 'number');
+  return flower % 2 === 0;
 });
 
 /**
@@ -228,10 +228,10 @@ const even = new Pattern(0, (value) => {
  * @param {*} filterValue
  * @returns {*[]}
  */
-const filter = new Pattern(1, (value, args) => {
+const filter = new Pattern(1, (flower, args) => {
   const [filterValue] = args;
-  assert.type(value, 'array');
-  return value.filter(x => x !== filterValue);
+  assert.type(flower, 'array');
+  return flower.filter(x => x !== filterValue);
 });
 
 /**
@@ -239,9 +239,9 @@ const filter = new Pattern(1, (value, args) => {
  * @flower {*[]}
  * @returns {*[]}
  */
-const flatten = new Pattern(0, (value) => {
-  assert.type(value, 'array');
-  return value.flat();
+const flatten = new Pattern(0, (flower) => {
+  assert.type(flower, 'array');
+  return flower.flat();
 });
 
 /**
@@ -259,7 +259,7 @@ const flowers = new PlantPattern(1, (plant, args) => {
  * mutables accepted
  * @param {*} focusValue
  */
-const focus = new Pattern(1, (value, args) => {
+const focus = new Pattern(1, (flower, args) => {
   const [focusValue] = args;
   return focusValue;
 });
@@ -274,13 +274,13 @@ const focus = new Pattern(1, (value, args) => {
  * @param {*[]} list
  * @param {command} command
  */
-const foreach = new Pattern(2, (value, args) => {
+const foreach = new Pattern(2, (flower, args) => {
   const [list, command] = args;
   assert.type(list, 'array');
   assert.type(command, 'command');
   const arr = [];
   for (const item of list) {
-    arr.push(command.run(value, command.substituteArg(item)));
+    arr.push(command.run(flower, command.substituteArg(item)));
   }
   return arr;
 });
@@ -294,16 +294,16 @@ const foreach = new Pattern(2, (value, args) => {
  * @param {number} size
  * @returns {*[]}
  */
-const groups = new Pattern(1, (value, args) => {
+const groups = new Pattern(1, (flower, args) => {
   const [size] = args;
-  assert.type(value, 'array');
+  assert.type(flower, 'array');
   assert.type(size, 'number');
   if (size === 0) {
     throw new CloverError('cannot split into groups of 0');
   }
   const newArray = [];
-  for (let i = 0; i < value.length; i += size) {
-    newArray.push(value.slice(i, i + size));
+  for (let i = 0; i < flower.length; i += size) {
+    newArray.push(flower.slice(i, i + size));
   }
   return [...newArray];
 });
@@ -344,11 +344,11 @@ const itemize = new PlantPattern(1, (plant, args) => {
  * @flower {*}
  * @returns {*}
  */
-const last = new Pattern(0, (value) => {
-  if (typeOf(value) === 'array') {
-    return value[value.length - 1];
+const last = new Pattern(0, (flower) => {
+  if (typeOf(flower) === 'array') {
+    return flower[flower.length - 1];
   }
-  return value;
+  return flower;
 });
 
 /**
@@ -369,9 +369,9 @@ const lazy = new PlantPattern(1, (plant, args) => {
  * @flower {*[]}
  * @returns {number}
  */
-const maximum = new Pattern(0, (value) => {
-  assert.type(value, 'array');
-  return Math.max(...value.filter(Number));
+const maximum = new Pattern(0, (flower) => {
+  assert.type(flower, 'array');
+  return Math.max(...flower.filter(Number));
 });
 
 /**
@@ -379,9 +379,9 @@ const maximum = new Pattern(0, (value) => {
  * @flower {*[]}
  * @returns {number}
  */
-const minimum = new Pattern(0, (value) => {
-  assert.type(value, 'array');
-  return Math.min(...value.filter(Number));
+const minimum = new Pattern(0, (flower) => {
+  assert.type(flower, 'array');
+  return Math.min(...flower.filter(Number));
 });
 
 /**
@@ -391,11 +391,11 @@ const minimum = new Pattern(0, (value) => {
  * @param {number} subtrahend
  * @returns {number}
  */
-const minus = new Pattern(1, (value, args) => {
+const minus = new Pattern(1, (flower, args) => {
   const [subtrahend] = args;
-  assert.type(value, 'number');
+  assert.type(flower, 'number');
   assert.type(subtrahend, 'number');
-  return value - subtrahend;
+  return flower - subtrahend;
 });
 
 /**
@@ -405,14 +405,14 @@ const minus = new Pattern(1, (value, args) => {
  * @param {number} argument
  * @returns {number}
  */
-const mod = new Pattern(1, (value, args) => {
+const mod = new Pattern(1, (flower, args) => {
   const [argument] = args;
-  assert.type(value, 'number');
+  assert.type(flower, 'number');
   assert.type(argument, 'number');
   if (argument === 0) {
     throw new CloverError('cannot divide by 0');
   }
-  return value % argument;
+  return flower % argument;
 });
 
 /**
@@ -420,9 +420,9 @@ const mod = new Pattern(1, (value, args) => {
  * @flower {number}
  * @returns {boolean}
  */
-const odd = new Pattern(0, (value) => {
-  assert.type(value, 'number');
-  return value % 2 === 1;
+const odd = new Pattern(0, (flower) => {
+  assert.type(flower, 'number');
+  return flower % 2 === 1;
 });
 
 /**
@@ -432,14 +432,14 @@ const odd = new Pattern(0, (value) => {
  * @param {number} divisor
  * @returns {number}
  */
-const over = new Pattern(1, (value, args) => {
+const over = new Pattern(1, (flower, args) => {
   const [divisor] = args;
-  assert.type(value, 'number');
+  assert.type(flower, 'number');
   assert.type(divisor, 'number');
   if (divisor === 0) {
     throw new CloverError('cannot divide by 0');
   }
-  return value / divisor;
+  return flower / divisor;
 });
 
 /**
@@ -464,11 +464,11 @@ const pluck = new PlantPattern(1, (plant, args) => {
  * @param {number} addend
  * @returns {number}
  */
-const plus = new Pattern(1, (value, args) => {
+const plus = new Pattern(1, (flower, args) => {
   const [addend] = args;
-  assert.type(value, 'number');
+  assert.type(flower, 'number');
   assert.type(addend, 'number');
-  return value + addend;
+  return flower + addend;
 });
 
 /**
@@ -476,10 +476,10 @@ const plus = new Pattern(1, (value, args) => {
  * @flower {*[]}
  * @returns {number}
  */
-const product = new Pattern(0, (value) => {
-  assert.type(value, 'array');
+const product = new Pattern(0, (flower) => {
+  assert.type(flower, 'array');
   // TODO: should it throw if it finds non-numbers instead?
-  return value.filter(v => typeOf(v) === 'number')
+  return flower.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a * c, 1);
 });
 
@@ -488,11 +488,11 @@ const product = new Pattern(0, (value) => {
  * @flower {*[][]}
  * @returns {*[]}
  */
-const rld = new Pattern(0, (value) => {
-  assert.type(value, 'array');
+const rld = new Pattern(0, (flower) => {
+  assert.type(flower, 'array');
 
   const result = [];
-  for (const run of value) {
+  for (const run of flower) {
     assert.type(run, 'array');
     assert.equal('run length', run.length, 2);
     const [length, item] = run;
@@ -510,9 +510,9 @@ const rld = new Pattern(0, (value) => {
  * @flower {*[]}
  * @returns {*[]}
  */
-const sort = new Pattern(0, (value) => {
-  assert.type(value, 'array');
-  return [...value].sort((a, b) => a - b);
+const sort = new Pattern(0, (flower) => {
+  assert.type(flower, 'array');
+  return [...flower].sort((a, b) => a - b);
 });
 
 /**
@@ -521,11 +521,11 @@ const sort = new Pattern(0, (value) => {
  * @param {string} splitter
  * @returns {string[]}
  */
-const split = new Pattern(1, (value, args) => {
+const split = new Pattern(1, (flower, args) => {
   const [splitter] = args;
-  assert.type(value, 'string');
+  assert.type(flower, 'string');
   assert.type(splitter, 'string');
-  return value.split(splitter);
+  return flower.split(splitter);
 });
 
 /**
@@ -541,10 +541,10 @@ const stop = new PlantPattern(0, (plant) => {
  * @flower {*[]}
  * @returns {number}
  */
-const sum = new Pattern(0, (value) => {
-  assert.type(value, 'array');
+const sum = new Pattern(0, (flower) => {
+  assert.type(flower, 'array');
   // TODO: should it throw if it finds non-numbers instead?
-  return value.filter(v => typeOf(v) === 'number')
+  return flower.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a + c, 0);
 });
 
@@ -578,11 +578,11 @@ const take = new PlantPattern(1, (plant, args) => {
  * @param {number} multiplier
  * @returns {number}
  */
-const times = new Pattern(1, (value, args) => {
+const times = new Pattern(1, (flower, args) => {
   const [multiplier] = args;
-  assert.type(value, 'number');
+  assert.type(flower, 'number');
   assert.type(multiplier, 'number');
-  return value * multiplier;
+  return flower * multiplier;
 });
 
 /**
@@ -595,7 +595,7 @@ const times = new Pattern(1, (value, args) => {
  * @param {command} command
  */
 // TODO: unintuitive behavior when mapped over multiple flowers
-const using = new Pattern(2, (value, args) => {
+const using = new Pattern(2, (flower, args) => {
   const [otherValue, command] = args;
   assert.type(command, 'command');
   return command.run(otherValue, command.args);
@@ -608,8 +608,8 @@ const using = new Pattern(2, (value, args) => {
  * @param {array} seconds
  * @returns {array}
  */
-const zip = new Pattern(1, (value, args) => {
-  const firsts = value;
+const zip = new Pattern(1, (flower, args) => {
+  const firsts = flower;
   const [seconds] = args;
   assert.type(firsts, 'array');
   assert.type(seconds, 'array');
