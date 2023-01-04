@@ -270,7 +270,7 @@ const focus = new Pattern(1, (value, args) => {
  * performs arg substitution
  * @example
  * flowers [5]
- * foreach [1 2 3] (add *) -- { flower = [6, 7, 8] }
+ * foreach [1 2 3] (plus *) -- { flower = [6, 7, 8] }
  * @param {*[]} list
  * @param {command} command
  */
