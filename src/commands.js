@@ -87,7 +87,12 @@ export class CommandInstance {
   }
 
   run (value, args) {
-    return this.pattern.body(value, args);
+    try {
+      const result = this.pattern.body(value, args);
+      return result;
+    } catch (e) {
+      throw new CloverError('%s: %s', this.head.value, e.message);
+    }
   }
 }
 
