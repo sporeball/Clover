@@ -588,12 +588,13 @@ const times = new Pattern(1, (value, args) => {
 /**
  * replace a flower with the result of a command run on a different value
  * @example
- * flowers [1 2 3]
+ * flowers [1]
  * using [4 5 6] (sum) -- { flower = 15 }
  * @flower {*}
  * @param {*} otherValue
  * @param {command} command
  */
+// TODO: unintuitive behavior when mapped over multiple flowers
 const using = new Pattern(2, (value, args) => {
   const [otherValue, command] = args;
   assert.type(command, 'command');
