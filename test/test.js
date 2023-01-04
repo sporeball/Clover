@@ -144,7 +144,7 @@ tentamen.add(
 tentamen.add(
   'split',
   `focus '1\\n2\\n3\\n4'
-  split newlines`,
+  split '\\n'`,
   ['1', '2', '3', '4']
 );
 tentamen.add('minus', 'focus 5\nminus 5', 0);

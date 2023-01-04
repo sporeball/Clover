@@ -35,7 +35,12 @@ export function typeOf (v) {
   }
   if (
     typeof value === 'number' ||
-    (typeof value === 'string' && value !== '' && !isNaN(Number(value)))
+    (
+      typeof value === 'string' &&
+      value !== '' &&
+      value !== '\n' &&
+      !isNaN(Number(value))
+    )
   ) {
     return 'number';
   }
