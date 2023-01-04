@@ -285,16 +285,6 @@ const foreach = new Pattern(2, (value, args) => {
   return arr;
 });
 
-// TODO: best thing to do with this command
-// /**
-//  * set a plant equal to a different plant
-//  * @param {Plant} focusValue
-//  */
-// const focusPlant = new PlantPattern('focus %P', (plant, args) => {
-//   const [focusValue] = args;
-//   return focusValue.clone();
-// });
-
 /**
  * split a flower into groups of up to n values
  * @example
@@ -527,30 +517,15 @@ const sort = new Pattern(0, (value) => {
 
 /**
  * string split a flower
- * accepts some special keywords
  * @flower {string}
- * @param {*} splitter
+ * @param {string} splitter
  * @returns {string[]}
  */
 const split = new Pattern(1, (value, args) => {
   const [splitter] = args;
-
   assert.type(value, 'string');
-  // Token.assertType(splitter, 'string');
-
-  // TODO: singular and plural
-  switch (splitter) {
-    case 'newlines':
-      return value.split('\n');
-    case 'blocks':
-      return value.split('\n\n');
-    case 'spaces':
-      return value.split(' ');
-    case 'chars':
-      return value.split('');
-    default:
-      return value.split(splitter);
-  }
+  assert.type(splitter, 'string');
+  return value.split(splitter);
 });
 
 /**
