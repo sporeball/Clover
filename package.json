@@ -33,6 +33,7 @@
     "picocolors": "^1.0.0"
   },
   "devDependencies": {
+    "semistandard": "^16.0.1",
     "tentamen": "^0.4.1"
   }
 }
