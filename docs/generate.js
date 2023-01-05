@@ -109,17 +109,20 @@ function getFlowerType (docs) {
 }
 
 function getDescription (docs) {
-  const str = docs
+  return docs
     .replace(/ \* @example.+?--.+?\n/gs, '')
     .split('\n')
     .filter(line => line.match(/^ \* [^@]/))
     .map(line => line.slice(3))
-    .join(' ');
-  return (str.charAt(0).toUpperCase() + str.slice(1) + '.')
-    .replace(
-      ' performs arg substitution.',
-      '.\\\nPerforms arg substitution.'
-    );
+    .join(' ')
+    .match(/.+?(\.|$)/g)
+    .map(sentence => sentence.trim())
+    .map(sentence =>
+      sentence.charAt(0).toUpperCase() +
+      sentence.slice(1) +
+      (sentence.endsWith('.') ? '' : '.')
+    )
+    .join('\\\n');
 }
 
 function getParams (docs) {

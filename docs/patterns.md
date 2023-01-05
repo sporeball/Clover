@@ -128,12 +128,14 @@ itemize naturals
 **Flower type:** `any`\
 **Returns:** `any`
 
-Return the last element of a flower returns the flower itself if it is not an array.
+Return the last element of a flower.\
+Returns the flower itself if it is not an array.
 
 ## lazy
 **Type:** `PlantPattern`
 
-Convert a plant into a lazy plant, with known terms taken from the original, and further terms calculated as needed using the result of a command use `take` to get more terms.
+Convert a plant into a lazy plant, with known terms taken from the original, and further terms calculated as needed using the result of a command.\
+Use `take` to get more terms.
 
 #### command
 Type: `command`
@@ -167,7 +169,7 @@ Type: `number`
 **Flower type:** `number`\
 **Returns:** `number`
 
-Return a flower mod n (%).
+Return a flower mod n.
 
 #### argument
 Type: `number`
@@ -260,7 +262,8 @@ Return the sum of all numbers in a flower.
 ## take
 **Type:** `PlantPattern`
 
-Yield the first n terms of a lazy plant skips known terms and uses the plant's command to generate unknown terms.\
+Yield the first n terms of a lazy plant.\
+Skips known terms and uses the plant's command to generate unknown terms.\
 Performs arg substitution.
 
 #### n

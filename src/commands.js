@@ -271,7 +271,7 @@ const focus = new Pattern(1, (flower, args) => {
 
 /**
  * run a command on a flower multiple times,
- * and replace the flower with an array of the results
+ * and replace the flower with an array of the results.
  * performs arg substitution
  * @example
  * flowers [5]
@@ -346,7 +346,7 @@ const itemize = new PlantPattern(1, (plant, args) => {
 });
 
 /**
- * return the last element of a flower
+ * return the last element of a flower.
  * returns the flower itself if it is not an array
  * @flower {any}
  * @returns {any}
@@ -360,7 +360,7 @@ const last = new Pattern(0, (flower) => {
 
 /**
  * convert a plant into a lazy plant, with known terms taken from the original,
- * and further terms calculated as needed using the result of a command
+ * and further terms calculated as needed using the result of a command.
  * use `take` to get more terms
  * @param {command} command
  */
@@ -405,7 +405,7 @@ const minus = new Pattern(1, (flower, args) => {
 });
 
 /**
- * return a flower mod n (%)
+ * return a flower mod n
  * @flower {number}
  * @param {number} argument
  * @returns {number}
@@ -553,8 +553,8 @@ const sum = new Pattern(0, (flower) => {
 });
 
 /**
- * yield the first n terms of a lazy plant
- * skips known terms and uses the plant's command to generate unknown terms
+ * yield the first n terms of a lazy plant.
+ * skips known terms and uses the plant's command to generate unknown terms.
  * performs arg substitution
  * @param {number} n
  */
