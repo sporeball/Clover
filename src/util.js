@@ -2,15 +2,15 @@ import pretty from '../util/pretty.js';
 
 /**
  * return whether a value is equal to one of multiple passed values
- * @param {*} value the value to check
- * @param {*[]} values array of valid values
+ * @param {any} value the value to check
+ * @param {array} values array of valid values
  */
 export function any (value, values) {
   return values.includes(value);
 }
 
 /**
- * @param {*} value
+ * @param {any} value
  */
 export function defined (value) {
   return value !== undefined;
@@ -18,8 +18,8 @@ export function defined (value) {
 
 /**
  * return whether one value is equal to another
- * @param {*} v1
- * @param {*} v2
+ * @param {any} v1
+ * @param {any} v2
  */
 export function equal (v1, v2) {
   return v1 === v2;
@@ -27,7 +27,7 @@ export function equal (v1, v2) {
 
 /**
  * return whether a value matches a regular expression
- * @param {*} value
+ * @param {any} value
  * @param {RegExp} regexp
  */
 export function matches (value, regexp) {
@@ -36,7 +36,7 @@ export function matches (value, regexp) {
 
 /**
  * pretty print a value
- * @param {*} value
+ * @param {any} value
  */
 export function pprint (value) {
   console.log(pretty(value));
@@ -48,7 +48,7 @@ export function pprint (value) {
  *   %s  plain string
  *   %t  Clover token
  * @param {string} str
- * @param {...*} subs values to substitute in
+ * @param {...any} subs values to substitute in
  */
 export function format (str, ...subs) {
   (str.match(/%./gm) || []).forEach((match, index) => {
@@ -66,7 +66,7 @@ export function format (str, ...subs) {
 /**
  * cause Clover to output a value
  * updates Clover.outputs
- * @param {*} value
+ * @param {any} value
  */
 export function output (value) {
   Clover.outputs.push(value);

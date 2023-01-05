@@ -88,7 +88,7 @@ function leaf (L) {
 }
 
 /**
- * @param {*} v
+ * @param {any} v
  */
 function other (v) {
   return v;
@@ -108,7 +108,7 @@ const functions = {
 };
 
 /**
- * @param {*} value
+ * @param {any} value
  */
 export default function pretty (value) {
   const T = typeOf(value);

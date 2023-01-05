@@ -9,7 +9,7 @@ import { matches } from './util.js';
  */
 export class Token {
   /**
-   * @param {*} value
+   * @param {any} value
    */
   constructor (value) {
     this.value = value;
@@ -20,7 +20,7 @@ export class Token {
 /**
  * return the type of a value
  * works with Tokens and with primitive values
- * @param {*} v
+ * @param {any} v
  */
 export function typeOf (v) {
   let value = v; // true value to work with
@@ -105,7 +105,7 @@ export function typeOf (v) {
 /**
  * cast a value to a primitive JavaScript type
  * does not mutate the original value
- * @param {*} v
+ * @param {any} v
  * @returns {number|string}
  */
 // TODO: automatic and manual
@@ -172,7 +172,7 @@ export function cast (v) {
 
 /**
  * return the format specifier that matches a token value
- * @param {*} value
+ * @param {any} value
  */
 function specifier (value) {
   const T = typeOf(value);

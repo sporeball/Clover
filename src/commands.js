@@ -164,9 +164,9 @@ export function evaluate (line) {
 
 /**
  * run a command on each element of a flower
- * @flower {*[]}
+ * @flower {array}
  * @param {command} command
- * @returns {*[]}
+ * @returns {array}
  */
 const apply = new Pattern(1, (flower, args) => {
   const [command] = args;
@@ -179,8 +179,8 @@ const apply = new Pattern(1, (flower, args) => {
 
 /**
  * count occurrences of a value in a flower
- * @flower {*[]|string}
- * @param {*} searchValue
+ * @flower {array|string}
+ * @param {any} searchValue
  * @returns {number}
  */
 const count = new Pattern(1, (flower, args) => {
@@ -229,9 +229,9 @@ const even = new Pattern(0, (flower) => {
 
 /**
  * remove occurrences of a value from a flower
- * @flower {*[]}
- * @param {*} filterValue
- * @returns {*[]}
+ * @flower {array}
+ * @param {any} filterValue
+ * @returns {array}
  */
 const filter = new Pattern(1, (flower, args) => {
   const [filterValue] = args;
@@ -241,8 +241,8 @@ const filter = new Pattern(1, (flower, args) => {
 
 /**
  * flatten a flower
- * @flower {*[]}
- * @returns {*[]}
+ * @flower {array}
+ * @returns {array}
  */
 const flatten = new Pattern(0, (flower) => {
   assert.type(flower, 'array');
@@ -251,7 +251,7 @@ const flatten = new Pattern(0, (flower) => {
 
 /**
  * replace a plant's flowers with the values in a given list
- * @param {*[]} list
+ * @param {array} list
  */
 const flowers = new PlantPattern(1, (plant, args) => {
   const [list] = args;
@@ -262,7 +262,7 @@ const flowers = new PlantPattern(1, (plant, args) => {
 /**
  * set a flower equal to another value
  * mutables accepted
- * @param {*} focusValue
+ * @param {any} focusValue
  */
 const focus = new Pattern(1, (flower, args) => {
   const [focusValue] = args;
@@ -276,7 +276,7 @@ const focus = new Pattern(1, (flower, args) => {
  * @example
  * flowers [5]
  * foreach [1 2 3] (plus *) -- { flower = [6, 7, 8] }
- * @param {*[]} list
+ * @param {array} list
  * @param {command} command
  */
 const foreach = new Pattern(2, (flower, args) => {
@@ -295,9 +295,9 @@ const foreach = new Pattern(2, (flower, args) => {
  * @example
  * focus [1 2 3 4 5]
  * groups 2 -- { flower = [[1, 2], [3, 4], [5]] }
- * @flower {*[]}
+ * @flower {array}
  * @param {number} size
- * @returns {*[]}
+ * @returns {array}
  */
 const groups = new Pattern(1, (flower, args) => {
   const [size] = args;
@@ -346,8 +346,8 @@ const itemize = new PlantPattern(1, (plant, args) => {
 /**
  * return the last element of a flower
  * returns the flower itself if it is not an array
- * @flower {*}
- * @returns {*}
+ * @flower {any}
+ * @returns {any}
  */
 const last = new Pattern(0, (flower) => {
   if (typeOf(flower) === 'array') {
@@ -371,7 +371,7 @@ const lazy = new PlantPattern(1, (plant, args) => {
 
 /**
  * return the highest number which is an element of a flower
- * @flower {*[]}
+ * @flower {array}
  * @returns {number}
  */
 const maximum = new Pattern(0, (flower) => {
@@ -381,7 +381,7 @@ const maximum = new Pattern(0, (flower) => {
 
 /**
  * return the lowest number which is an element of a flower
- * @flower {*[]}
+ * @flower {array}
  * @returns {number}
  */
 const minimum = new Pattern(0, (flower) => {
@@ -478,7 +478,7 @@ const plus = new Pattern(1, (flower, args) => {
 
 /**
  * return the product of all numbers in a flower
- * @flower {*[]}
+ * @flower {array}
  * @returns {number}
  */
 const product = new Pattern(0, (flower) => {
@@ -490,8 +490,8 @@ const product = new Pattern(0, (flower) => {
 
 /**
  * array run-length decode
- * @flower {*[][]}
- * @returns {*[]}
+ * @flower {array[]}
+ * @returns {array}
  */
 const rld = new Pattern(0, (flower) => {
   assert.type(flower, 'array');
@@ -512,8 +512,8 @@ const rld = new Pattern(0, (flower) => {
 
 /**
  * sort a flower
- * @flower {*[]}
- * @returns {*[]}
+ * @flower {array}
+ * @returns {array}
  */
 const sort = new Pattern(0, (flower) => {
   assert.type(flower, 'array');
@@ -543,7 +543,7 @@ const stop = new PlantPattern(0, (plant) => {
 
 /**
  * return the sum of all numbers in a flower
- * @flower {*[]}
+ * @flower {array}
  * @returns {number}
  */
 const sum = new Pattern(0, (flower) => {
@@ -595,8 +595,8 @@ const times = new Pattern(1, (flower, args) => {
  * @example
  * flowers [1]
  * using [4 5 6] (sum) -- { flower = 15 }
- * @flower {*}
- * @param {*} otherValue
+ * @flower {any}
+ * @param {any} otherValue
  * @param {command} command
  */
 // TODO: unintuitive behavior when mapped over multiple flowers
