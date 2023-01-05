@@ -204,7 +204,8 @@ const count = new Pattern(1, (flower, args) => {
  * all of its flowers
  * @example
  * flowers [1 2 3 4 5]
- * crush (sum) -- { flower = 15 }
+ * crush (sum)
+ * -- { flower = 15 }
  * @param {command} command
  */
 const crush = new PlantPattern(1, (plant, args) => {
@@ -261,7 +262,6 @@ const flowers = new PlantPattern(1, (plant, args) => {
 
 /**
  * set a flower equal to another value
- * mutables accepted
  * @param {any} focusValue
  */
 const focus = new Pattern(1, (flower, args) => {
@@ -275,7 +275,8 @@ const focus = new Pattern(1, (flower, args) => {
  * performs arg substitution
  * @example
  * flowers [5]
- * foreach [1 2 3] (plus *) -- { flower = [6, 7, 8] }
+ * foreach [1 2 3] (plus *)
+ * -- { flower = [6, 7, 8] }
  * @param {array} list
  * @param {command} command
  */
@@ -294,7 +295,8 @@ const foreach = new Pattern(2, (flower, args) => {
  * split a flower into groups of up to n values
  * @example
  * focus [1 2 3 4 5]
- * groups 2 -- { flower = [[1, 2], [3, 4], [5]] }
+ * groups 2
+ * -- { flower = [[1, 2], [3, 4], [5]] }
  * @flower {array}
  * @param {number} size
  * @returns {array}
@@ -390,8 +392,7 @@ const minimum = new Pattern(0, (flower) => {
 });
 
 /**
- * subtract from a flower (-)
- * mutables accepted
+ * subtract from a flower
  * @flower {number}
  * @param {number} subtrahend
  * @returns {number}
@@ -405,7 +406,6 @@ const minus = new Pattern(1, (flower, args) => {
 
 /**
  * return a flower mod n (%)
- * mutables accepted
  * @flower {number}
  * @param {number} argument
  * @returns {number}
@@ -431,8 +431,7 @@ const odd = new Pattern(0, (flower) => {
 });
 
 /**
- * divide a flower (/)
- * mutables accepted
+ * divide a flower
  * @flower {number}
  * @param {number} divisor
  * @returns {number}
@@ -451,7 +450,8 @@ const over = new Pattern(1, (flower, args) => {
  * remove leaves from a plant for which a command is false
  * @example
  * flowers [1 2 3 4 5]
- * pluck (odd) -- { flower = 2 }, { flower = 4 }
+ * pluck (odd)
+ * -- { flower = 2 }, { flower = 4 }
  * @param {command} command
  */
 const pluck = new PlantPattern(1, (plant, args) => {
@@ -463,8 +463,7 @@ const pluck = new PlantPattern(1, (plant, args) => {
 });
 
 /**
- * add to a flower (+)
- * mutables accepted
+ * add to a flower
  * @flower {number}
  * @param {number} addend
  * @returns {number}
@@ -577,8 +576,7 @@ const take = new PlantPattern(1, (plant, args) => {
 });
 
 /**
- * multiply a flower (*)
- * mutables accepted
+ * multiply a flower
  * @flower {number}
  * @param {number} multiplier
  * @returns {number}
@@ -594,7 +592,8 @@ const times = new Pattern(1, (flower, args) => {
  * replace a flower with the result of a command run on a different value
  * @example
  * flowers [1]
- * using [4 5 6] (sum) -- { flower = 15 }
+ * using [4 5 6] (sum)
+ * -- { flower = 15 }
  * @flower {any}
  * @param {any} otherValue
  * @param {command} command
@@ -608,7 +607,6 @@ const using = new Pattern(2, (flower, args) => {
 
 /**
  * zip two arrays together
- * mutables accepted
  * @flower {array}
  * @param {array} seconds
  * @returns {array}
