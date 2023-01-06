@@ -223,6 +223,17 @@ Type: `number`
 
 Return the product of all numbers in a flower.
 
+## range
+**Type:** `Pattern`\
+**Flower type:** `any`\
+**Returns:** `array`
+
+Return a range between two numbers `start` and `end`, both inclusive.\
+If `end` is less than `start`, the range will count down.
+
+#### array
+Type: `number[]`
+
 ## rld
 **Type:** `Pattern`\
 **Flower type:** `array[]`\

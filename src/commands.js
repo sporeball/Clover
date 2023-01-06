@@ -488,6 +488,33 @@ const product = new Pattern(0, (flower) => {
 });
 
 /**
+ * return a range between two numbers `start` and `end`, both inclusive.
+ * if `end` is less than `start`, the range will count down
+ * @flower {any}
+ * @param {number[]} array
+ * @returns {array}
+ */
+const range = new Pattern(1, (flower, args) => {
+  const [array] = args;
+  assert.equal('array length', array.length, 2);
+  const [start, end] = array;
+  if (typeOf(start) !== 'number') {
+    throw new CloverError('invalid start value');
+  }
+  if (typeOf(end) !== 'number') {
+    throw new CloverError('invalid end value');
+  }
+  if (start > end) {
+    return Array(start - end + 1)
+      .fill(0)
+      .map((x, i) => start - i);
+  }
+  return Array(end - start + 1)
+    .fill(0)
+    .map((x, i) => start + i);
+});
+
+/**
  * array run-length decode
  * @flower {array[]}
  * @returns {array}
@@ -651,6 +678,7 @@ export const patterns = {
   pluck,
   plus,
   product,
+  range,
   rld,
   sort,
   split,
