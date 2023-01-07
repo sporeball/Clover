@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import pretty from '../util/pretty.js';
 
 /**
@@ -88,4 +90,10 @@ export function arrayDepth (arr) {
   return Array.isArray(arr)
     ? 1 + Math.max(0, ...arr.map(arrayDepth))
     : 0;
+}
+
+export function open (filePath) {
+  return fs.readFileSync(
+    path.resolve(filePath), { encoding: 'utf-8' }
+  );
 }

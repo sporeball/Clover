@@ -1,9 +1,29 @@
-import fs from 'fs';
-import path from 'path';
 import parse from '../src/index.js';
 import { patterns } from '../src/commands.js';
+import { open } from '../src/util.js';
 import colors from 'picocolors';
 import Tentamen from 'tentamen';
+
+function assertAlphabetized (name, array) {
+  const outOfOrderIndex = array.findIndex((x, i) => {
+    if (array[i - 1] === undefined) {
+      return false;
+    }
+    return array[i - 1].localeCompare(array[i]) === 1;
+  });
+  if (outOfOrderIndex === -1) {
+    console.log(
+      colors.green('  o  ') +
+      `${name} in alphabetical order`
+    );
+  } else {
+    console.log(
+      colors.red('  X  ') +
+      colors.yellow(`${name} not in alphabetical order\n`) +
+      `     (see '${array[outOfOrderIndex]}')`
+    );
+  }
+}
 
 const tentamen = new Tentamen({});
 tentamen.fn = () => parse(tentamen.input, { test: true });
@@ -11,31 +31,19 @@ tentamen.fn = () => parse(tentamen.input, { test: true });
 const uncovered = Object.keys(patterns)
   .filter(key => patterns[key].constructor.name !== 'SugarPattern');
 
-// assert that the patterns in the source code are in alphabetical order
-const names = fs.readFileSync(
-  path.resolve('src/commands.js'),
-  { encoding: 'utf-8' }
-)
-  .split('\n')
-  .filter(line => line.match(/^const .+ = new (Pattern|PlantPattern)/))
+const patternSignatures = open('src/commands.js')
+  .match(/^const .+ = new (Pattern|PlantPattern)/gm)
   .map(line => line.slice(6, line.indexOf('=') - 1));
-const sortedNames = [...names].sort();
-const unsortedIndex = names.findIndex((x, i) => names[i] !== sortedNames[i]);
-if (unsortedIndex === -1) {
-  console.log(
-    colors.green('  o  ') +
-    'source patterns in alphabetical order\n'
-  );
-} else {
-  console.log(
-    colors.red('  X  ') +
-    colors.yellow('source patterns not in alphabetical order\n') +
-    `     (see '${names[unsortedIndex]}')\n`
-  );
-}
+assertAlphabetized('source pattern signatures', patternSignatures);
 
+const tests = open('test/test.js') // this file!
+  .match(/tentamen\.add\(.*?'.+?'/gs)
+  .map(match => match.match(/'.+?'/)[0].slice(1, -1));
+assertAlphabetized('tests', tests);
+
+// TODO: remove the hijacking
 // TODO: check order of sugar patterns independently
-// TODO: check order of the tests themselves too
+// TODO: assert that all patterns are documented
 
 // hijack tentamen's methods to add coverage information
 tentamen.add = (function () {
@@ -72,6 +80,8 @@ tentamen.done = (function () {
     }
   };
 })();
+
+console.log('');
 
 /**
  * tests below
@@ -156,6 +166,7 @@ tentamen.add(
 );
 tentamen.add('maximum', 'focus [1 5 6 2 3 4]\nmaximum', 6);
 tentamen.add('minimum', 'focus [6 2 1 5 4 3]\nminimum', 1);
+tentamen.add('minus', 'focus 5\nminus 5', 0);
 tentamen.add(
   'mod',
   `focus 5
@@ -215,7 +226,6 @@ tentamen.add(
   // last line should be skipped, giving 10 instead of 15
   10
 );
-tentamen.add('minus', 'focus 5\nminus 5', 0);
 tentamen.add(
   'sum',
   `focus [1 2 3 4 5 6 7 8 9 10]
