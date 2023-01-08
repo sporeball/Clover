@@ -187,11 +187,6 @@ tentamen.add(
   3628800
 );
 tentamen.add(
-  'range',
-  'range [1 10]',
-  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-);
-tentamen.add(
   'rld',
   `focus [1 'a' 2 'b' 3 'c']
   groups 2
@@ -234,6 +229,12 @@ tentamen.add(
   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 );
 tentamen.add('times', 'focus 5\ntimes 5', 25);
+tentamen.add(
+  'to',
+  `focus 1
+  to 10`,
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+);
 tentamen.add(
   'using',
   `focus 1

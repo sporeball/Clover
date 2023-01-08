@@ -479,33 +479,6 @@ const product = new Pattern(0, (flower) => {
 });
 
 /**
- * return a range between two numbers `start` and `end`, both inclusive.
- * if `end` is less than `start`, the range will count down
- * @flower {any}
- * @param {number[]} array
- * @returns {array}
- */
-const range = new Pattern(1, (flower, args) => {
-  const [array] = args;
-  assert.equal('array length', array.length, 2);
-  const [start, end] = array;
-  if (typeOf(start) !== 'number') {
-    throw new CloverError('invalid start value');
-  }
-  if (typeOf(end) !== 'number') {
-    throw new CloverError('invalid end value');
-  }
-  if (start > end) {
-    return Array(start - end + 1)
-      .fill(0)
-      .map((x, i) => start - i);
-  }
-  return Array(end - start + 1)
-    .fill(0)
-    .map((x, i) => start + i);
-});
-
-/**
  * array run-length decode
  * @flower {array[]}
  * @returns {array}
@@ -607,6 +580,27 @@ const times = new Pattern(1, (flower, args) => {
 });
 
 /**
+ * return a range between a flower and another number.
+ * if applicable, the range will count down
+ * @flower {number}
+ * @param {number} end
+ * @returns {array}
+ */
+const to = new Pattern(1, (flower, args) => {
+  const [end] = args;
+  assert.type(flower, 'number');
+  assert.type(end, 'number');
+  if (flower > end) {
+    return Array(flower - end + 1)
+      .fill(0)
+      .map((x, i) => flower - i);
+  }
+  return Array(end - flower + 1)
+    .fill(0)
+    .map((x, i) => flower + i);
+});
+
+/**
  * replace a flower with the result of a command run on a different value
  * @example
  * flowers [1]
@@ -668,7 +662,6 @@ export const patterns = {
   pluck,
   plus,
   product,
-  range,
   rld,
   sort,
   split,
@@ -676,6 +669,7 @@ export const patterns = {
   sum,
   take,
   times,
+  to,
   using,
   zip,
   // syntactic sugar
