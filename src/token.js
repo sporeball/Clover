@@ -47,7 +47,12 @@ export function typeOf (v) {
   if (matches(value, /^'.*?'$/)) {
     return 'string';
   }
-  if (value === true || value === false) {
+  if (
+    value === true ||
+    value === false ||
+    value === 'true' ||
+    value === 'false'
+  ) {
     return 'boolean';
   }
   if (
@@ -163,6 +168,17 @@ export function cast (v) {
       return value.slice(1, -1); // remove
     }
     return value;
+  }
+  if (T === 'boolean') {
+    if (value === true || value === false) {
+      return value;
+    }
+    if (value === 'true') {
+      return true;
+    }
+    if (value === 'false') {
+      return false;
+    }
   }
   if (T === 'mutable') {
     return Clover.evItem[value.slice(1)];

@@ -29,6 +29,9 @@ function string (s) {
  * @param {boolean} b
  */
 function boolean (b) {
+  if (b === 'true' || b === 'false') {
+    return string(b);
+  }
   if (b === true) {
     return colors.green('true');
   }
