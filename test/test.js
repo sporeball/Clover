@@ -19,12 +19,12 @@ function assertAlphabetized (name, array) {
   if (outOfOrderIndex === -1) {
     console.log(
       colors.green('  o  ') +
-      `${name} in alphabetical order`
+      name
     );
   } else {
     console.log(
       colors.red('  X  ') +
-      colors.yellow(`${name} not in alphabetical order\n`) +
+      colors.yellow(`${name}\n`) +
       `     (see '${array[outOfOrderIndex]}')`
     );
   }
@@ -34,32 +34,33 @@ function assertAlphabetized (name, array) {
 const tentamen = new Tentamen({});
 tentamen.fn = () => parse(tentamen.input, { test: true });
 
+const COMMANDS_JS = open('src/commands.js');
+const TEST_JS = open('test/test.js');
+const PATTERNS_MD = open('docs/patterns.md');
+
 // patterns in the main export
 const patternHeads = Object.keys(patterns)
   .filter(key => patterns[key].constructor.name !== 'SugarPattern');
-assertAlphabetized('pattern export keys', patternHeads);
 
+// sugar patterns in the main export
 const sugarPatternHeads = Object.keys(patterns)
   .filter(key => patterns[key].constructor.name === 'SugarPattern');
-assertAlphabetized('sugar pattern export keys', sugarPatternHeads);
 
 // pattern names, taken from their definitions
-const patternSignatures = open('src/commands.js')
+const patternSignatures = COMMANDS_JS
   .match(/^const .+ = new (Pattern|PlantPattern)/gm)
   .map(line => line.slice(6, line.indexOf('=') - 1));
-assertAlphabetized('pattern signatures', patternSignatures);
 
 // sugar pattern names, taken from their definitions
-const sugarPatternSignatures = open('src/commands.js')
+const sugarPatternSignatures = COMMANDS_JS
   .match(/^const .+ = new SugarPattern/gm)
   .map(line => line.slice(6, line.indexOf('=') - 1));
-assertAlphabetized('sugar pattern signatures', sugarPatternSignatures);
 
-// test titles
-const tests = open('test/test.js')
+// command test titles, taken from this file
+const tests = TEST_JS
+  .slice(TEST_JS.indexOf("tentamen.suite('commands')"))
   .match(/tentamen\.add\(.*?'.+?'/gs)
   .map(match => match.match(/'.+?'/)[0].slice(1, -1));
-assertAlphabetized('tests', tests);
 
 // to determine which commands are missing a test...
 // get their names,
@@ -68,15 +69,19 @@ const uncovered = patternHeads
   .filter(head => !tests.includes(head));
 // this is reported at the end
 
-// TODO: assert that all patterns are documented
-
+console.log(colors.cyan('alphabetization checks'));
+assertAlphabetized('pattern export keys', patternHeads);
+assertAlphabetized('sugar pattern export keys', sugarPatternHeads);
+assertAlphabetized('pattern signatures', patternSignatures);
+assertAlphabetized('sugar pattern signatures', sugarPatternSignatures);
+assertAlphabetized('command tests', tests);
 console.log('');
 
 /**
  * tests below
  */
 
-tentamen.suite('tests');
+tentamen.suite('commands');
 tentamen.add(
   'apply',
   `focus [1 2 3 4 5]
@@ -262,3 +267,24 @@ if (uncovered.length === 0) {
     `     (${uncovered.join(', ')})`
   );
 }
+console.log('');
+
+// report documentation coverage
+console.log(colors.cyan('documentation'));
+const documented = PATTERNS_MD
+  .match(/^## .+/gm)
+  .map(match => match.slice(3));
+if (documented.length === patternHeads.length) {
+  console.log(
+    colors.green('  o  ') +
+    'all commands documented'
+  );
+} else {
+  const missingCount = patternHeads.length - documented.length;
+  console.log(
+    colors.red('  X  ') +
+    colors.yellow(`${missingCount} command(s) missing documentation\n`) +
+    `     ensure ${colors.cyan('npm run docs')} has been used`
+  );
+}
+console.log('');
