@@ -30,6 +30,8 @@ function assertAlphabetized (name, array) {
   }
 }
 
+const t0 = performance.now();
+
 // tentamen instance
 const tentamen = new Tentamen({});
 tentamen.fn = () => parse(tentamen.input, { test: true });
@@ -288,3 +290,7 @@ if (documented.length === patternHeads.length) {
   );
 }
 console.log('');
+
+const t1 = performance.now();
+
+console.log(`finished in ${(t1 - t0).toFixed(2)}ms\n`);
