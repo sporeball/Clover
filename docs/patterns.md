@@ -283,6 +283,13 @@ If applicable, the range will count down.
 #### end
 Type: `number`
 
+## unique
+**Type:** `Pattern`\
+**Flower type:** `array|string`\
+**Returns:** `array`
+
+Return unique elements of a flower.
+
 ## using
 **Type:** `Pattern`\
 **Flower type:** `any`

@@ -601,6 +601,19 @@ const to = new Pattern(1, (flower, args) => {
 });
 
 /**
+ * return unique elements of a flower
+ * @flower {array|string}
+ * @returns {array}
+ */
+const unique = new Pattern(0, (flower, args) => {
+  assert.any(typeOf(flower), ['array', 'string']);
+  if (typeOf(flower) === 'string') {
+    flower = flower.split('');
+  }
+  return flower.filter((x, i, r) => r.indexOf(x) === i);
+});
+
+/**
  * replace a flower with the result of a command run on a different value
  * @example
  * flowers [1]
@@ -671,6 +684,7 @@ export const patterns = {
   times,
   to,
   using,
+  unique,
   zip,
   // syntactic sugar
   max,

@@ -243,6 +243,12 @@ tentamen.add(
   15
 );
 tentamen.add(
+  'unique',
+  `focus 'aaaaabbbbcccdde'
+  unique`,
+  ['a', 'b', 'c', 'd', 'e']
+);
+tentamen.add(
   'zip',
   `focus [1 2 3 4 5]
   zip [6 7 8 9]`,
