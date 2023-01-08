@@ -54,6 +54,7 @@ export class CommandInstance {
       this.sep = tokens[rhsIndex];
       this.rhs = tokens.slice(rhsIndex + 1);
     }
+    // console.log(this);
     if (this.pattern === undefined) {
       throw new CloverError(
         'no pattern found for head token %t',
@@ -102,9 +103,34 @@ export class CommandInstance {
  * @returns {Token[]}
  */
 export function tokenize (line) {
-  return line.match(
-    /'.*?'|\[.*?\](:(0|[1-9]\d*))?|\(.*?\)|[^ ]+/g
-  )
+  const match = line.match(
+    /'.*?'|\[.*?\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
+  );
+  // console.log(match);
+  // TODO: for the rare case (command) 'string' (command),
+  // this actually still doesn't work
+  // maybe try getting a result by using the big regex a second time
+  return match
+    // when the regex matches commands, it does so greedily:
+    // (first) (second) becomes one token, not two.
+    // but we *want* a greedy match (e.g. for nested commands),
+    // so to counteract that...
+    .flatMap(token => {
+      // if the regex has returned a match which
+      if (
+        // contains one or more commands,
+        token.startsWith('(') &&
+        // none of which are nested,
+        !token.match(/\([^()]+?\(/g) &&
+        !token.match(/\)[^()]+?\)/g) &&
+        token.match(/\([^()]*?\)/g) // TODO: is this line a no-op?
+      ) {
+        // return an array of all of them (split up the match).
+        return token.match(/\([^()]*?\)/g);
+      }
+      // otherwise, return the original match
+      return token;
+    })
     .map(token => new Token(token));
 }
 
