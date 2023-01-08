@@ -203,7 +203,8 @@ const count = new Pattern(1, (flower, args) => {
  * reduce a plant to just one leaf, by running a command on an array containing
  * all of its flowers
  * @example
- * flowers [1 2 3 4 5]
+ * focus [1 2 3 4 5]
+ * itemize naturals
  * crush (sum)
  * -- { flower = 15 }
  * @param {command} command
@@ -251,16 +252,6 @@ const flatten = new Pattern(0, (flower) => {
 });
 
 /**
- * replace a plant's flowers with the values in a given list
- * @param {array} list
- */
-const flowers = new PlantPattern(1, (plant, args) => {
-  const [list] = args;
-  assert.type(list, 'array');
-  return new Plant(list);
-});
-
-/**
  * set a flower equal to another value
  * @param {any} focusValue
  */
@@ -274,7 +265,7 @@ const focus = new Pattern(1, (flower, args) => {
  * and replace the flower with an array of the results.
  * performs arg substitution
  * @example
- * flowers [5]
+ * focus 5
  * foreach [1 2 3] (plus *)
  * -- { flower = [6, 7, 8] }
  * @param {array} list
@@ -662,7 +653,6 @@ export const patterns = {
   even,
   filter,
   flatten,
-  flowers,
   focus,
   foreach,
   groups,

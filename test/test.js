@@ -98,7 +98,8 @@ tentamen.add(
 );
 tentamen.add(
   'crush',
-  `flowers [1 2 3 4 5]
+  `focus [1 2 3 4 5]
+  itemize naturals
   crush (sum)`,
   15
 );
@@ -121,15 +122,10 @@ tentamen.add(
   flatten`,
   [1, 2, 3, 4]
 );
-tentamen.add(
-  'flowers',
-  'flowers [1 2 3 4 5]',
-  [1, 2, 3, 4, 5] // TODO: this is a weird line. cf. flatten test, above
-);
 tentamen.add('focus', 'focus 5', 5);
 tentamen.add(
   'foreach',
-  `flowers [5]
+  `focus 5
   foreach [1 2 3] (plus *)`,
   [6, 7, 8]
 );
@@ -155,7 +151,7 @@ tentamen.add(
 );
 tentamen.add(
   'lazy',
-  `flowers [1]
+  `focus 1
   lazy (plus 1)`,
   // flower stays the same
   1
@@ -178,7 +174,8 @@ tentamen.add(
 tentamen.add('over', 'focus 5\nover 5', 1);
 tentamen.add(
   'pluck',
-  `flowers [1 2 3 4 5]
+  `focus [1 2 3 4 5]
+  itemize naturals
   pluck (odd)`,
   [2, 4]
 );
@@ -230,7 +227,7 @@ tentamen.add(
 );
 tentamen.add(
   'take',
-  `flowers []
+  `focus 1
   lazy (focus *)
   take 10`,
   // naturals
@@ -239,7 +236,7 @@ tentamen.add(
 tentamen.add('times', 'focus 5\ntimes 5', 25);
 tentamen.add(
   'using',
-  `flowers [1]
+  `focus 1
   using [4 5 6] (sum)`,
   // flower should be ignored, giving 15 instead of 6
   15
@@ -282,6 +279,7 @@ if (documented.length === patternHeads.length) {
     'all commands documented'
   );
 } else {
+  // TODO: produces a negative number if a command has recently been removed
   const missingCount = patternHeads.length - documented.length;
   console.log(
     colors.red('  X  ') +

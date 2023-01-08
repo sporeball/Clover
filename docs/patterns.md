@@ -28,7 +28,8 @@ Type: `command`
 
 ### Examples
 ```lua
-flowers [1 2 3 4 5]
+focus [1 2 3 4 5]
+itemize naturals
 crush (sum)
 -- { flower = 15 }
 ```
@@ -57,14 +58,6 @@ Type: `any`
 
 Flatten a flower.
 
-## flowers
-**Type:** `PlantPattern`
-
-Replace a plant's flowers with the values in a given list.
-
-#### list
-Type: `array`
-
 ## focus
 **Type:** `Pattern`
 
@@ -86,7 +79,7 @@ Type: `command`
 
 ### Examples
 ```lua
-flowers [5]
+focus 5
 foreach [1 2 3] (plus *)
 -- { flower = [6, 7, 8] }
 ```
