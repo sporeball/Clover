@@ -104,6 +104,12 @@ tentamen.add(
   15
 );
 tentamen.add(
+  'divisible',
+  `focus 10
+  divisible 5`,
+  true
+);
+tentamen.add(
   'even',
   `focus 4
   even`,

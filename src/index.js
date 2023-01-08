@@ -66,8 +66,6 @@ export default function parse (code, options = {}) {
     }
   }
 
-  console.dir(Clover.plant, { depth: 4 });
-
   // implicit output
   output(Clover.plant);
 

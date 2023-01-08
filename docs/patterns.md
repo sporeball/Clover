@@ -34,6 +34,16 @@ crush (sum)
 -- { flower = 15 }
 ```
 
+## divisible
+**Type:** `Pattern`\
+**Flower type:** `number`\
+**Returns:** `boolean`
+
+Return whether a flower is divisible by a number.
+
+#### divisor
+Type: `number`
+
 ## even
 **Type:** `Pattern`\
 **Flower type:** `number`\

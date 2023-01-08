@@ -29,6 +29,9 @@ function string (s) {
  * @param {boolean} b
  */
 function boolean (b) {
+  // the type checker additionally returns 'boolean' for string booleans,
+  // but the caster only returns actual booleans.
+  // special case the string booleans first
   if (b === 'true' || b === 'false') {
     return string(b);
   }

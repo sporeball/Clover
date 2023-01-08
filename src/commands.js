@@ -2,7 +2,7 @@ import assert from './assert.js';
 // import { Leaf } from './leaf.js';
 import { Plant, LazyPlant } from './plant.js';
 import { Token, typeOf, cast } from './token.js';
-import { escape } from './util.js';
+import { escape, equal } from './util.js';
 
 /**
  * each command written in a Clover program consists of a list of tokens.
@@ -189,7 +189,7 @@ const count = new Pattern(1, (flower, args) => {
   switch (typeOf(flower)) {
     case 'array':
       return flower
-        .filter(x => x === searchValue)
+        .filter(x => equal(x, searchValue))
         .length;
     case 'string':
       return (flower.match(
@@ -220,6 +220,19 @@ const crush = new PlantPattern(1, (plant, args) => {
 });
 
 /**
+ * return whether a flower is divisible by a number
+ * @flower {number}
+ * @param {number} divisor
+ * @returns {boolean}
+ */
+const divisible = new Pattern(1, (flower, args) => {
+  const [divisor] = args;
+  assert.type(flower, 'number');
+  assert.type(divisor, 'number');
+  return flower % divisor === 0;
+});
+
+/**
  * return whether a flower is even
  * @flower {number}
  * @returns {boolean}
@@ -238,7 +251,7 @@ const even = new Pattern(0, (flower) => {
 const filter = new Pattern(1, (flower, args) => {
   const [filterValue] = args;
   assert.type(flower, 'array');
-  return flower.filter(x => x !== filterValue);
+  return flower.filter(x => equal(x, filterValue) === false);
 });
 
 /**
@@ -487,7 +500,7 @@ const product = new Pattern(0, (flower) => {
  */
 const replace = new Pattern(2, (flower, args) => {
   const [matchValue, replacementValue] = args;
-  if (flower === matchValue) {
+  if (equal(flower, matchValue)) {
     return replacementValue;
   }
   return flower;
@@ -672,6 +685,7 @@ export const patterns = {
   apply,
   count,
   crush,
+  divisible,
   even,
   filter,
   flatten,

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { dequal } from 'dequal/lite';
 import pretty from '../util/pretty.js';
 
 /**
@@ -24,7 +25,7 @@ export function defined (value) {
  * @param {any} v2
  */
 export function equal (v1, v2) {
-  return v1 === v2;
+  return dequal(v1, v2);
 }
 
 /**
