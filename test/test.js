@@ -4,6 +4,11 @@ import { open } from '../src/util.js';
 import colors from 'picocolors';
 import Tentamen from 'tentamen';
 
+/**
+ * assert that an array is alphabetized
+ * @param {string} name what's in the array?
+ * @param {array} array
+ */
 function assertAlphabetized (name, array) {
   const outOfOrderIndex = array.findIndex((x, i) => {
     if (array[i - 1] === undefined) {
@@ -25,61 +30,45 @@ function assertAlphabetized (name, array) {
   }
 }
 
+// tentamen instance
 const tentamen = new Tentamen({});
 tentamen.fn = () => parse(tentamen.input, { test: true });
 
-const uncovered = Object.keys(patterns)
+// patterns in the main export
+const patternHeads = Object.keys(patterns)
   .filter(key => patterns[key].constructor.name !== 'SugarPattern');
+assertAlphabetized('pattern export keys', patternHeads);
 
+const sugarPatternHeads = Object.keys(patterns)
+  .filter(key => patterns[key].constructor.name === 'SugarPattern');
+assertAlphabetized('sugar pattern export keys', sugarPatternHeads);
+
+// pattern names, taken from their definitions
 const patternSignatures = open('src/commands.js')
   .match(/^const .+ = new (Pattern|PlantPattern)/gm)
   .map(line => line.slice(6, line.indexOf('=') - 1));
-assertAlphabetized('source pattern signatures', patternSignatures);
+assertAlphabetized('pattern signatures', patternSignatures);
 
-const tests = open('test/test.js') // this file!
+// sugar pattern names, taken from their definitions
+const sugarPatternSignatures = open('src/commands.js')
+  .match(/^const .+ = new SugarPattern/gm)
+  .map(line => line.slice(6, line.indexOf('=') - 1));
+assertAlphabetized('sugar pattern signatures', sugarPatternSignatures);
+
+// test titles
+const tests = open('test/test.js')
   .match(/tentamen\.add\(.*?'.+?'/gs)
   .map(match => match.match(/'.+?'/)[0].slice(1, -1));
 assertAlphabetized('tests', tests);
 
-// TODO: remove the hijacking
-// TODO: check order of sugar patterns independently
-// TODO: assert that all patterns are documented
+// to determine which commands are missing a test...
+// get their names,
+const uncovered = patternHeads
+  // and filter to those for which there is no exact match in test title
+  .filter(head => !tests.includes(head));
+// this is reported at the end
 
-// hijack tentamen's methods to add coverage information
-tentamen.add = (function () {
-  const cached = tentamen.add;
-  return function () {
-    cached.apply(this, arguments); // run the test
-    const title = arguments[0];
-    // find the index of an uncovered command...
-    const index = uncovered
-      // whose name is at the beginning of the current test...
-      .findIndex(name => title.startsWith(name));
-    // and remove it from the uncovered commands
-    if (index > -1) {
-      uncovered.splice(index, 1);
-    }
-  };
-})();
-tentamen.done = (function () {
-  const cached = tentamen.done;
-  return function () {
-    cached.apply(this, arguments); // output pass/fail count
-    const numCommands = Object.keys(patterns).length;
-    // percentage of commands which were found to be covered
-    const p = (100 * ((numCommands - uncovered.length) / numCommands))
-      .toFixed(2);
-    if (uncovered.length === 0) {
-      console.log(colors.green('  o  ') + `${p}% command coverage`);
-    } else {
-      console.log(
-        colors.red('  X  ') +
-        colors.yellow(`${p}% command coverage (${uncovered.length} commands untested)`)
-      );
-      console.log(`     (${uncovered.join(', ')})`);
-    }
-  };
-})();
+// TODO: assert that all patterns are documented
 
 console.log('');
 
@@ -256,3 +245,20 @@ tentamen.add(
 );
 
 tentamen.done();
+
+// report coverage
+if (uncovered.length === 0) {
+  console.log(
+    colors.green('  o  ') +
+    '100.00% coverage'
+  );
+} else {
+  const p = (
+    100 * ((patternHeads.length - uncovered.length) / patternHeads.length)
+  );
+  console.log(
+    colors.red('  X  ') +
+    colors.yellow(`${p}% coverage (${uncovered.length} commands untested)\n`) +
+    `     (${uncovered.join(', ')})`
+  );
+}
