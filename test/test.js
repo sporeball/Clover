@@ -187,6 +187,12 @@ tentamen.add(
 );
 tentamen.add('plus', 'focus 5\nplus 5', 10);
 tentamen.add(
+  'prime',
+  `focus 7
+  prime`,
+  true
+);
+tentamen.add(
   'product',
   `focus [1 2 3 4 5 6 7 8 9 10]
   product`,

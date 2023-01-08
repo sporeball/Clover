@@ -480,6 +480,21 @@ const plus = new Pattern(1, (flower, args) => {
 });
 
 /**
+ * return if a flower is prime
+ * @flower {number}
+ * @returns {boolean}
+ */
+const prime = new Pattern(0, (flower) => {
+  assert.type(flower, 'number');
+  for (let i = 2; i <= Math.sqrt(flower); i++) {
+    if (flower % i === 0) {
+      return false;
+    }
+  }
+  return true;
+});
+
+/**
  * return the product of all numbers in a flower
  * @flower {array}
  * @returns {number}
@@ -703,6 +718,7 @@ export const patterns = {
   over,
   pluck,
   plus,
+  prime,
   product,
   replace,
   rld,

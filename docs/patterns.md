@@ -219,6 +219,13 @@ Add to a flower.
 #### addend
 Type: `number`
 
+## prime
+**Type:** `Pattern`\
+**Flower type:** `number`\
+**Returns:** `boolean`
+
+Return if a flower is prime.
+
 ## product
 **Type:** `Pattern`\
 **Flower type:** `array`\
