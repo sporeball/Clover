@@ -103,7 +103,7 @@ export class CommandInstance {
  */
 export function tokenize (line) {
   return line.match(
-    /'.*?'|\[.*?\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
+    /'.*?'|\[.*?\](:(0|[1-9]\d*))?|\(.*?\)|[^ ]+/g
   )
     .map(token => new Token(token));
 }
@@ -486,6 +486,9 @@ const plus = new Pattern(1, (flower, args) => {
  */
 const prime = new Pattern(0, (flower) => {
   assert.type(flower, 'number');
+  if (flower === Infinity) {
+    throw new CloverError('cannot check against infinity');
+  }
   for (let i = 2; i <= Math.sqrt(flower); i++) {
     if (flower % i === 0) {
       return false;
@@ -657,6 +660,26 @@ const unique = new Pattern(0, (flower, args) => {
 });
 
 /**
+ * repeatedly run one command on a flower until another command returns true
+ * @flower {any}
+ * @param {command} conditionCommand
+ * @param {command} command
+ * @returns {any}
+ */
+const until = new Pattern(2, (flower, args) => {
+  const [conditionCommand, command] = args;
+  assert.type(conditionCommand, 'command');
+  assert.type(command, 'command');
+  for (let i = 0; i < 1000000; i++) {
+    flower = command.run(flower, command.args);
+    if (conditionCommand.run(flower, conditionCommand.args) === true) {
+      return flower;
+    }
+  }
+  throw new CloverError('did not return true within a million iterations');
+});
+
+/**
  * replace a flower with the result of a command run on a different value
  * @example
  * flowers [1]
@@ -730,6 +753,7 @@ export const patterns = {
   times,
   to,
   unique,
+  until,
   using,
   zip,
   // syntactic sugar

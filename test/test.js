@@ -260,6 +260,12 @@ tentamen.add(
   ['a', 'b', 'c', 'd', 'e']
 );
 tentamen.add(
+  'until',
+  `focus 200
+  until (prime) (plus 1)`,
+  211
+);
+tentamen.add(
   'using',
   `focus 1
   using [4 5 6] (sum)`,

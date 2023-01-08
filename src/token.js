@@ -90,7 +90,7 @@ export function typeOf (v) {
   }
   if (
     value instanceof CommandInstance ||
-    matches(value, /^\(.*\)/)
+    matches(value, /^\(.*?\)/)
   ) {
     return 'command';
   }

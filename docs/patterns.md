@@ -319,6 +319,18 @@ Type: `number`
 
 Return unique elements of a flower.
 
+## until
+**Type:** `Pattern`\
+**Flower type:** `any`\
+**Returns:** `any`
+
+Repeatedly run one command on a flower until another command returns true.
+
+#### conditionCommand
+Type: `command`
+#### command
+Type: `command`
+
 ## using
 **Type:** `Pattern`\
 **Flower type:** `any`
