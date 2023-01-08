@@ -216,6 +216,18 @@ Type: `number`
 
 Return the product of all numbers in a flower.
 
+## replace
+**Type:** `Pattern`\
+**Flower type:** `any`\
+**Returns:** `any`
+
+If a flower matches one value, replace it with another.
+
+#### matchValue
+Type: `any`
+#### replacementValue
+Type: `any`
+
 ## rld
 **Type:** `Pattern`\
 **Flower type:** `array[]`\

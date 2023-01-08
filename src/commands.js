@@ -103,7 +103,7 @@ export class CommandInstance {
  */
 export function tokenize (line) {
   return line.match(
-    /'.*'|\[.*?\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
+    /'.*?'|\[.*?\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
   )
     .map(token => new Token(token));
 }
@@ -479,6 +479,21 @@ const product = new Pattern(0, (flower) => {
 });
 
 /**
+ * if a flower matches one value, replace it with another
+ * @flower {any}
+ * @param {any} matchValue
+ * @param {any} replacementValue
+ * @returns {any}
+ */
+const replace = new Pattern(2, (flower, args) => {
+  const [matchValue, replacementValue] = args;
+  if (flower === matchValue) {
+    return replacementValue;
+  }
+  return flower;
+});
+
+/**
  * array run-length decode
  * @flower {array[]}
  * @returns {array}
@@ -675,6 +690,7 @@ export const patterns = {
   pluck,
   plus,
   product,
+  replace,
   rld,
   sort,
   split,
@@ -683,8 +699,8 @@ export const patterns = {
   take,
   times,
   to,
-  using,
   unique,
+  using,
   zip,
   // syntactic sugar
   max,
