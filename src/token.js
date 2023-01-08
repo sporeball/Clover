@@ -44,7 +44,7 @@ export function typeOf (v) {
   ) {
     return 'number';
   }
-  if (matches(value, /^'.*'$/)) {
+  if (matches(value, /^'.*?'$/)) {
     return 'string';
   }
   if (value === true || value === false) {
