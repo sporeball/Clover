@@ -7,26 +7,60 @@ class Token {
   }
 }
 
-const tokenPatterns = {
+class Structure {
+  constructor (type, value) {
+    this.type = type;
+    this.value = value;
+  }
+}
+
+const $ = {
   openParen: '(',
   closeParen: ')'
 };
 
+const $$ = {
+  matching: [$.openParen, $.closeParen]
+};
+
 export function tokenize (code) {
-  const tokens = [];
+  let tokens = [];
   while (code.length > 0) {
-    const pattern = Object.keys(tokenPatterns)
-      .find(key => code.match(escape(tokenPatterns[key])));
+    const pattern = Object.keys($)
+      .find(key => code.match(escape($[key])));
     if (pattern === undefined) {
       throw new Error('no token pattern found');
     }
-    const match = code.match(escape(tokenPatterns[pattern]))[0];
+    const match = code.match(escape($[pattern]))[0];
     tokens.push(
       new Token(pattern, match)
     );
     code = code.slice(match.length);
   }
-  return tokens;
+  // turn into structures
+  const structures = [];
+  while (tokens.length > 0) {
+    const valuesOnly = tokens.map(token => token.type);
+    const structure = Object.keys($$)
+      .find(key => {
+        const structureValue = $$[key];
+        const sliding = valuesOnly.slice(0, structureValue.length);
+        if (sliding.every((value, i) => $[value].match(escape(structureValue[i]))
+        )) {
+          return true;
+        }
+          return false;
+      });
+    if (structure === undefined) {
+      structures.push(tokens.shift());
+    } else {
+      structures.push(
+        new Structure(structure, tokens.slice(0, $$[structure].length))
+      );
+      tokens = tokens.slice($$[structure].length);
+    }
+  }
+  return structures;
 }
 
-console.log(tokenize('((())'));
+console.dir(tokenize('((())'), { depth: null });
