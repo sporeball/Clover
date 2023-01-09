@@ -8,59 +8,58 @@ class Token {
 }
 
 class Structure {
-  constructor (type, value) {
-    this.type = type;
+  constructor (value) {
     this.value = value;
   }
 }
 
-const $ = {
+const T = {
+  whitespace: /^\s+/,
   openParen: '(',
-  closeParen: ')'
-};
+  closeParen: ')',
+  openBracket: '[',
+  closeBracket: ']',
+  number: /^0|^[1-9]\d*/,
+  string: /^'.*?'/,
+  word: /^[^ ]+/
+}
 
-const $$ = {
-  matching: [$.openParen, $.closeParen]
-};
+// const S = {
+// }
 
 export function tokenize (code) {
   let tokens = [];
   while (code.length > 0) {
-    const pattern = Object.keys($)
-      .find(key => code.match(escape($[key])));
-    if (pattern === undefined) {
-      throw new Error('no token pattern found');
+    const token = Object.entries(T)
+      .find(entry => {
+        const [key, value] = entry;
+        if (typeof value === 'string') {
+          return code.match(escape(value));
+        }
+        return code.match(value);
+      });
+    if (token === undefined) {
+      throw new Error('no matching token type found');
     }
-    const match = code.match(escape($[pattern]))[0];
+    const [type, matchValue] = token;
+    let match;
+    if (typeof matchValue === 'string') {
+      match = code.match(escape(matchValue))[0];
+    } else {
+      match = code.match(matchValue)[0];
+    }
     tokens.push(
-      new Token(pattern, match)
+      new Token(type, match)
     );
     code = code.slice(match.length);
   }
-  // turn into structures
-  const structures = [];
-  while (tokens.length > 0) {
-    const valuesOnly = tokens.map(token => token.type);
-    const structure = Object.keys($$)
-      .find(key => {
-        const structureValue = $$[key];
-        const sliding = valuesOnly.slice(0, structureValue.length);
-        if (sliding.every((value, i) => $[value].match(escape(structureValue[i]))
-        )) {
-          return true;
-        }
-          return false;
-      });
-    if (structure === undefined) {
-      structures.push(tokens.shift());
-    } else {
-      structures.push(
-        new Structure(structure, tokens.slice(0, $$[structure].length))
-      );
-      tokens = tokens.slice($$[structure].length);
-    }
-  }
-  return structures;
+  return tokens
+    .filter(token => token.type !== 'whitespace');
 }
 
-console.dir(tokenize('((())'), { depth: null });
+console.dir(
+  tokenize(
+    "focus 20"
+  ),
+  { depth: null }
+);
