@@ -31,12 +31,43 @@ class Expr {
 class Choice {
   constructor (type, choices, obj) {
     this.type = type;
-    this.choices = choices.map(choice => choice.bind(T)());
-    this.prec = obj.prec;
+    this.choices = choices.map(choice => {
+      if (choice instanceof Function) {
+        return choice.bind(T)();
+      }
+      return choice;
+    });
+    this.prec = obj.prec || 0;
+  }
+}
+
+class Seq {
+  constructor (type, seq, obj) {
+    this.type = type;
+    this.seq = seq.map(item => {
+      if (item instanceof Function) {
+        return item.bind(T)();
+      }
+      return item;
+    });
+    this.prec = obj.prec || 0;
+  }
+}
+
+class Repeat {
+  constructor (repeat) {
+    this.repeat = repeat.bind(T)();
   }
 }
 
 const T = {
+  command: function() {
+    return new Seq(
+      'command',
+      [this.word, this.value],
+      { prec: 2 }
+    );
+  },
   value: function() {
     return new Choice(
       'value',
@@ -67,10 +98,25 @@ function stringMatch (value, expr) {
 }
 
 function tokenMatch (tokens, matcher) {
+  if (matcher instanceof Expr) {
+    if (stringMatch(tokens[0].value, matcher)) {
+      return [tokens[0]];
+    }
+  }
   if (matcher instanceof Choice) {
     if (matcher.choices.find(choice => tokens[0].type === choice.type)) {
       return [tokens[0]];
     }
+  }
+  if (matcher instanceof Seq) {
+    console.log(matcher.seq);
+    if (matcher.seq.every((item, index) => tokens[index].type === item.type)) {
+      return tokens.slice(0, matcher.seq.length);
+    }
+  }
+  if (matcher instanceof Repeat) {
+    console.log(matcher);
+    console.log(tokens);
   }
 }
 
@@ -121,6 +167,7 @@ export function tokenize (code) {
   while (true) {
     // stop if there are no rules with the current precedence
     if (startPosition > tokens.length - 1) {
+      startPosition = 0;
       prec++;
     }
     const now = Object.values(bound)
@@ -149,7 +196,7 @@ export function tokenize (code) {
 
 console.dir(
   tokenize(
-    "focus 20"
+    "replace 'a' 'b'"
   ),
   { depth: null }
 );
