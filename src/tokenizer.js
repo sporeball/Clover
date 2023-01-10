@@ -21,31 +21,34 @@ class Expr {
   /**
    * @param {string|RegExp} pattern
    */
-  constructor (pattern) {
+  constructor (type, pattern) {
+    this.type = type;
     this.pattern = pattern;
     this.prec = 0;
   }
 }
 
-// class Choice {
-//   constructor (choices, obj) {
-//     this.choices = choices;
-//     this.prec = obj.prec;
-//   }
-// }
+class Choice {
+  constructor (type, choices, obj) {
+    this.type = type;
+    this.choices = choices.map(choice => choice.bind(T)());
+    this.prec = obj.prec;
+  }
+}
 
 const T = {
-  // value: function() {
-  //   return new Choice(
-  //     [this.number, this.string],
-  //     { prec: 1 }
-  //   );
-  // },
-  number: () => new Expr(/^0|^[1-9]\d*/g),
-  string: () => new Expr(/^'.*?'/g),
-  whitespace: () => new Expr(/^\s+/g),
-  word: () => new Expr(/[^ ]+/g)
-}
+  value: function() {
+    return new Choice(
+      'value',
+      [this.number, this.string],
+      { prec: 1 }
+    );
+  },
+  number: () => new Expr('number', /^0|^[1-9]\d*/g),
+  string: () => new Expr('string', /^'.*?'/g),
+  whitespace: () => new Expr('whitespace', /^\s+/g),
+  word: () => new Expr('word', /[^ ]+/g)
+};
 
 /**
  * match a string against an Expr
@@ -63,6 +66,14 @@ function stringMatch (value, expr) {
   }
 }
 
+function tokenMatch (tokens, matcher) {
+  if (matcher instanceof Choice) {
+    if (matcher.choices.find(choice => tokens[0].type === choice.type)) {
+      return [tokens[0]];
+    }
+  }
+}
+
 /**
  * @param {string} code
  * @returns {Token[]}
@@ -75,10 +86,8 @@ export function tokenize (code) {
     // containing the token type definitions...
     Object.entries(T)
       .map(entry => {
-        // with values replaced by their return values (bound to T),
+        // with values replaced by their return values (bound to T).
         entry[1] = entry[1].bind(T)();
-        // and the key added.
-        entry[1].type = entry[0];
         return entry;
       })
   );
@@ -104,6 +113,37 @@ export function tokenize (code) {
   }
   // remove whitespace tokens (not significant here).
   tokens = tokens.filter(token => token.type !== 'whitespace');
+
+  // the next step is to make structures from the flat list.
+  // start at a precedence of 1.
+  let prec = 1;
+  let startPosition = 0;
+  while (true) {
+    // stop if there are no rules with the current precedence
+    if (startPosition > tokens.length - 1) {
+      prec++;
+    }
+    const now = Object.values(bound)
+      .filter(value => value.prec === prec);
+    if (now.length === 0) {
+      break;
+    }
+    const rule = now
+      .find(value => {
+        return tokenMatch(tokens.slice(startPosition), value) !== undefined;
+      });
+    if (rule === undefined) {
+      startPosition++;
+      continue;
+    }
+    const match = tokenMatch(tokens.slice(startPosition), rule);
+    tokens.splice(
+      startPosition,
+      match.length,
+      new Token(rule.type, match)
+    );
+    startPosition += match.length;
+  }
   return tokens;
 }
 
