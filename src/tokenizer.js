@@ -79,10 +79,10 @@ const T = {
   number: () => new Expr('number', /^0|^[1-9]\d*/g),
   string: () => new Expr('string', /^'.*?'/g),
   whitespace: () => new Expr('whitespace', /^\s+/g),
-  openBracket: () => new Expr('openBracket', /^\[/g),
-  closeBracket: () => new Expr('closeBracket', /^\]/g),
-  openParen: () => new Expr('openParen', /^\(/g),
-  closeParen: () => new Expr('closeParen', /^\)/g),
+  openBracket: () => new Expr('openBracket', '['),
+  closeBracket: () => new Expr('closeBracket', ']'),
+  openParen: () => new Expr('openParen', '('),
+  closeParen: () => new Expr('closeParen', ')'),
   word: () => new Expr('word', /[^ ]+/g)
 };
 
@@ -98,7 +98,9 @@ function stringMatch (value, expr) {
     return;
   }
   if (typeof expr.pattern === 'string') {
-    return (value.match(escape(expr.pattern)) || [])[0];
+    return (
+      value.match(new RegExp('^' + escape(expr.pattern), 'g')) || []
+    )[0];
   }
   if (expr.pattern instanceof RegExp) {
     return (value.match(expr.pattern) || [])[0];
