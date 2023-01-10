@@ -55,8 +55,9 @@ class Seq {
 }
 
 class Repeat {
-  constructor (repeat) {
+  constructor (repeat, times) {
     this.repeat = repeat.bind(T)();
+    this.times = times;
   }
 }
 
@@ -64,7 +65,7 @@ const T = {
   command: function() {
     return new Seq(
       'command',
-      [this.word, this.value],
+      [this.word, new Repeat(this.value)],
       { prec: 2 }
     );
   },
@@ -89,6 +90,9 @@ const T = {
  * @returns {string|undefined}
  */
 function stringMatch (value, expr) {
+  if (typeof value !== 'string') {
+    return;
+  }
   if (typeof expr.pattern === 'string') {
     return (value.match(escape(expr.pattern)) || [])[0];
   }
@@ -109,14 +113,31 @@ function tokenMatch (tokens, matcher) {
     }
   }
   if (matcher instanceof Seq) {
-    console.log(matcher.seq);
-    if (matcher.seq.every((item, index) => tokens[index].type === item.type)) {
-      return tokens.slice(0, matcher.seq.length);
+    const tokensCopy = [...tokens];
+    let length = 0;
+    for (const [index, seqItem] of matcher.seq.entries()) {
+      if (tokenMatch(tokensCopy, seqItem)) {
+        const matchLength = tokenMatch(tokensCopy, seqItem).length;
+        length += matchLength;
+        tokensCopy.splice(0, matchLength);
+      } else {
+        return undefined;
+      }
     }
+    return tokens.slice(0, length);
   }
   if (matcher instanceof Repeat) {
-    console.log(matcher);
-    console.log(tokens);
+    if (tokens[0].type === matcher.repeat.type) {
+      const nonMatchingIndex = tokens
+        .findIndex(token => token.type !== matcher.repeat.type);
+      if (nonMatchingIndex === -1) {
+        return tokens;
+      }
+      return tokens.slice(
+        0,
+        tokens.findIndex(token => token.type !== matcher.repeat.type)
+      );
+    }
   }
 }
 
@@ -189,14 +210,15 @@ export function tokenize (code) {
       match.length,
       new Token(rule.type, match)
     );
-    startPosition += match.length;
+    startPosition++;
   }
   return tokens;
 }
 
 console.dir(
   tokenize(
-    "replace 'a' 'b'"
+    `replace 'a' 'b'
+    sum 3`
   ),
   { depth: null }
 );
