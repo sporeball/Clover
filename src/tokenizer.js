@@ -79,6 +79,10 @@ const T = {
   number: () => new Expr('number', /^0|^[1-9]\d*/g),
   string: () => new Expr('string', /^'.*?'/g),
   whitespace: () => new Expr('whitespace', /^\s+/g),
+  openBracket: () => new Expr('openBracket', /^\[/g),
+  closeBracket: () => new Expr('closeBracket', /^\]/g),
+  openParen: () => new Expr('openParen', /^\(/g),
+  closeParen: () => new Expr('closeParen', /^\)/g),
   word: () => new Expr('word', /[^ ]+/g)
 };
 
@@ -103,7 +107,8 @@ function stringMatch (value, expr) {
 
 function tokenMatch (tokens, matcher) {
   if (matcher instanceof Expr) {
-    if (stringMatch(tokens[0].value, matcher)) {
+    // if (stringMatch(tokens[0].value, matcher)) {
+    if (tokens[0].type === matcher.type) {
       return [tokens[0]];
     }
   }
@@ -217,7 +222,7 @@ export function tokenize (code) {
 
 console.dir(
   tokenize(
-    `replace 'a' 'b'
+    `focus ['a' 'b']
     sum 3`
   ),
   { depth: null }
