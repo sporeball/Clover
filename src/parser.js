@@ -1,9 +1,5 @@
 import { tokenize } from './tokenizer.js';
 
-// take a single token
-// call a function according to what type it is
-// each function returns a new object to replace the token
-
 function parsePrimitive (tokens) {
   const primitive = tokens.shift();
   return {
@@ -13,15 +9,26 @@ function parsePrimitive (tokens) {
 }
 
 function parseList (tokens) {
-  tokens.shift(); // skip the open bracket
+  // skip the open bracket
+  tokens.shift();
   const list = [];
-  while (tokens.length > 1) {
+  while (true) {
+    // if the next token is a newline, the closing bracket is missing
+    if (tokens[0]?.type === 'newline') {
+      throw new Error('unmatched bracket');
+    }
+    // while there are still tokens,
+    // and the next token is not a closing bracket,
+    // eat
     if (tokens[0] && tokens[0].type !== 'closeBracket') {
       list.push(eat(tokens));
     } else {
       break;
     }
   }
+  // if there are no more tokens,
+  // or the next token is not a closing bracket,
+  // it's missing
   if (tokens.shift()?.type !== 'closeBracket') {
     throw new Error('unmatched bracket');
   }
@@ -79,9 +86,14 @@ function eat (tokens) {
       return parseLeaf(tokens);
     case 'at':
       return parsePlant(tokens);
+    case 'newline':
+      return tokens.shift();
   }
   throw new Error(`no matching rule found: ${tokens[0].type}`);
 }
 
-const tokens = tokenize(`@aok`);
+const tokens = tokenize(
+  `[1 2]
+  [3 4]`
+);
 console.dir(parse(tokens), { depth: null });
