@@ -12,6 +12,25 @@ function parsePrimitive (tokens) {
   };
 }
 
+function parseList (tokens) {
+  tokens.shift(); // skip the open bracket
+  const list = [];
+  while (tokens.length > 1) {
+    if (tokens[0] && tokens[0].type !== 'closeBracket') {
+      list.push(eat(tokens));
+    } else {
+      break;
+    }
+  }
+  if (tokens.shift()?.type !== 'closeBracket') {
+    throw new Error('unmatched bracket');
+  }
+  return {
+    type: 'list',
+    value: list
+  };
+}
+
 /**
  * parse a flat list of tokens
  */
@@ -34,18 +53,11 @@ function eat (tokens) {
     case 'string':
     case 'boolean':
       return parsePrimitive(tokens);
-      break;
+    case 'openBracket':
+      return parseList(tokens);
   }
-  throw new Error('no matching rule found');
+  throw new Error(`no matching rule found: ${tokens[0].type}`);
 }
 
-// R[identifier]
-// R[openBracket] (while token is not closeBracket, eat)
-// falls into
-// R[primitive]
-// R[primitive]
-// R[primitive]
-// the list ends
-// the parsing stops
-const tokens = tokenize(`1234 'five'`);
-console.log(parse(tokens));
+const tokens = tokenize(`[2 ['three' 'four'] 5]`);
+console.dir(parse(tokens), { depth: null });
