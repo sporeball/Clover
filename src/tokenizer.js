@@ -13,6 +13,7 @@ const T = {
   at: '@',
   colon: ':',
   equals: '=',
+  star: '*',
   newline: '\n',
   whitespace: /^\s+/g,
   identifier: /^[a-z]+/g
@@ -49,7 +50,7 @@ export function tokenize (code) {
       // which the code matches.
       .find(entry => {
         return stringMatch(code, entry[1]) !== undefined;
-      })
+      });
     if (expr === undefined) {
       throw new Error('no matching token type found');
     }
@@ -62,6 +63,7 @@ export function tokenize (code) {
     });
     // then remove it from the code.
     code = code.slice(match.length);
+    // console.log(tokens);
   }
   // remove whitespace tokens (not significant here).
   tokens = tokens.filter(token => token.type !== 'whitespace');

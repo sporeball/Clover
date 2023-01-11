@@ -1,13 +1,3 @@
-import { tokenize } from './tokenizer.js';
-
-function parsePrimitive (tokens) {
-  const primitive = tokens.shift();
-  return {
-    type: 'primitive',
-    value: primitive
-  };
-}
-
 function parseList (tokens) {
   // skip the open bracket
   tokens.shift();
@@ -151,6 +141,7 @@ export function parse (tokens) {
   while (tokens.length > 0) {
     tree.push(eat(tokens));
   }
+  tree = tree.filter(node => node.type !== 'newline');
   return tree;
 }
 
@@ -163,7 +154,7 @@ function eat (tokens) {
     case 'number':
     case 'string':
     case 'boolean':
-      return parsePrimitive(tokens);
+      return tokens.shift();
     case 'openParen':
       return parseParenCommand(tokens);
     case 'closeParen': // bare
@@ -180,18 +171,12 @@ function eat (tokens) {
       return parseMutable(tokens);
     case 'equals': // bare
       throw new Error('invalid assignment');
+    case 'star':
+      return tokens.shift();
     case 'identifier':
       return parseCommand(tokens);
     case 'newline':
-      tokens.shift();
-      return eat(tokens);
+      return tokens.shift();
   }
   throw new Error(`no matching rule found: ${tokens[0].type}`);
 }
-
-const tokens = tokenize(
-  `focus [1 2 3]
-  sum = :result
-  plus 5`
-);
-console.dir(parse(tokens), { depth: null });
