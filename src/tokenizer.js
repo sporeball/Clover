@@ -81,10 +81,9 @@ export function tokenize (code) {
   return tokens;
 }
 
-console.dir(
-  tokenize(
-    `focus [[1 2 3] [4 5 6] 'a']
-    sum 3`
-  ),
-  { depth: null }
-);
+// console.dir(
+//   tokenize(
+//     `focus [1 'two' 3]`
+//   ),
+//   { depth: null }
+// );
