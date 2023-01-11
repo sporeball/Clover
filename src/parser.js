@@ -41,7 +41,7 @@ function parseList (tokens) {
 function parseLeaf (tokens) {
   tokens.shift(); // skip the angle bracket
   const index = tokens.shift();
-  if (index.type !== 'number') {
+  if (index?.type !== 'number') {
     throw new Error('invalid leaf index');
   }
   return {
@@ -53,11 +53,23 @@ function parseLeaf (tokens) {
 function parsePlant (tokens) {
   tokens.shift(); // skip the @
   const identifier = tokens.shift();
-  if (identifier.type !== 'identifier') {
+  if (identifier?.type !== 'identifier') {
     throw new Error('invalid plant identifier');
   }
   return {
     type: 'plant',
+    identifier
+  };
+}
+
+function parseMutable (tokens) {
+  tokens.shift(); // skip the colon
+  const identifier = tokens.shift();
+  if (identifier?.type !== 'identifier') {
+    throw new Error('invalid mutable');
+  }
+  return {
+    type: 'mutable',
     identifier
   };
 }
@@ -150,6 +162,8 @@ function eat (tokens) {
       return parseLeaf(tokens);
     case 'at':
       return parsePlant(tokens);
+    case 'colon':
+      return parseMutable(tokens);
     case 'identifier':
       return parseCommand(tokens);
     case 'newline':
@@ -159,6 +173,6 @@ function eat (tokens) {
 }
 
 const tokens = tokenize(
-  `using <-1 (until (prime) (plus 1))`
+  `focus :mutable`
 );
 console.dir(parse(tokens), { depth: null });
