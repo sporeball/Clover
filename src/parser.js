@@ -62,6 +62,25 @@ function parsePlant (tokens) {
   };
 }
 
+function parseCommand (tokens) {
+  const head = tokens.shift();
+  const args = [];
+  while (true) {
+    if (tokens[0] === undefined) {
+      break;
+    }
+    if (tokens[0].type === 'newline') {
+      break;
+    }
+    args.push(eat(tokens));
+  }
+  return {
+    type: 'command',
+    head: head.value,
+    args
+  };
+}
+
 /**
  * parse a flat list of tokens
  */
@@ -89,6 +108,8 @@ function eat (tokens) {
       return parseLeaf(tokens);
     case 'at':
       return parsePlant(tokens);
+    case 'identifier':
+      return parseCommand(tokens);
     case 'newline':
       return tokens.shift();
   }
@@ -96,7 +117,7 @@ function eat (tokens) {
 }
 
 const tokens = tokenize(
-  `@aok
-  3`
+  `focus [1 2 3]
+  sum`
 );
 console.dir(parse(tokens), { depth: null });
