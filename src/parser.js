@@ -83,16 +83,30 @@ function parseCommand (tokens) {
     }
     if (
       tokens[0].type === 'newline' ||
-      tokens[0].type === 'closeParen' // for parenthesized commands
+      tokens[0].type === 'closeParen' || // for parenthesized commands
+      tokens[0].type === 'equals' // for assignment
     ) {
       break;
     }
     args.push(eat(tokens));
   }
+  if (tokens[0]?.type !== 'equals') {
+    return {
+      type: 'command',
+      head: head.value,
+      args
+    };
+  }
+  tokens.shift(); // skip the equals sign
+  if (tokens[0] === undefined || tokens[0].type === 'newline') {
+    throw new Error('empty right-hand side');
+  }
+  const rhs = eat(tokens);
   return {
     type: 'command',
     head: head.value,
-    args
+    args,
+    rhs
   };
 }
 
@@ -164,15 +178,20 @@ function eat (tokens) {
       return parsePlant(tokens);
     case 'colon':
       return parseMutable(tokens);
+    case 'equals': // bare
+      throw new Error('invalid assignment');
     case 'identifier':
       return parseCommand(tokens);
     case 'newline':
-      return tokens.shift();
+      tokens.shift();
+      return eat(tokens);
   }
   throw new Error(`no matching rule found: ${tokens[0].type}`);
 }
 
 const tokens = tokenize(
-  `focus :mutable`
+  `focus [1 2 3]
+  sum = :result
+  plus 5`
 );
 console.dir(parse(tokens), { depth: null });
