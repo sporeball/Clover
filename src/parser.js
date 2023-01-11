@@ -31,6 +31,26 @@ function parseList (tokens) {
   };
 }
 
+function parseLeaf (tokens) {
+  tokens.shift(); // skip the angle bracket
+  const index = tokens.shift();
+  if (index.type !== 'number') {
+    throw new Error('invalid leaf index');
+  }
+  return {
+    type: 'leaf',
+    index: Number(index.value)
+  };
+}
+
+function parsePlant (tokens) {
+  tokens.shift(); // skip the @
+  return {
+    type: 'plant',
+    identifier: tokens.shift()
+  };
+}
+
 /**
  * parse a flat list of tokens
  */
@@ -55,9 +75,13 @@ function eat (tokens) {
       return parsePrimitive(tokens);
     case 'openBracket':
       return parseList(tokens);
+    case 'openAngle':
+      return parseLeaf(tokens);
+    case 'at':
+      return parsePlant(tokens);
   }
   throw new Error(`no matching rule found: ${tokens[0].type}`);
 }
 
-const tokens = tokenize(`[2 ['three' 'four'] 5]`);
+const tokens = tokenize(`@aok`);
 console.dir(parse(tokens), { depth: null });
