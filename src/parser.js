@@ -27,7 +27,7 @@ function parseList (tokens) {
   }
   return {
     type: 'list',
-    value: list
+    items: list
   };
 }
 

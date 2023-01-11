@@ -1,19 +1,5 @@
 import { escape } from './util.js';
 
-/**
- * class representing a token
- */
-class Token {
-  /**
-   * @param {string} type
-   * @param {string} value
-   */
-  constructor (type, value) {
-    this.type = type;
-    this.value = value;
-  }
-}
-
 const T = {
   number: /^0|^-?[1-9]\d*/g,
   string: /^'.*?'/g,
@@ -33,10 +19,10 @@ const T = {
 };
 
 /**
- * match a string against an Expr
+ * match a string against a matcher value
  * returns undefined if there is no match
  * @param {string} value
- * @param {Expr} expr
+ * @param {string|RegExp} matcher
  * @returns {string|undefined}
  */
 function stringMatch (value, matcher) {
@@ -52,7 +38,7 @@ function stringMatch (value, matcher) {
 
 /**
  * @param {string} code
- * @returns {Token[]}
+ * @returns {object[]}
  */
 export function tokenize (code) {
   let tokens = [];
@@ -70,9 +56,10 @@ export function tokenize (code) {
     const [type, matcher] = expr;
     // use that match to make a token...
     const match = stringMatch(code, matcher);
-    tokens.push(
-      new Token(type, match)
-    );
+    tokens.push({
+      type,
+      value: match
+    });
     // then remove it from the code.
     code = code.slice(match.length);
   }
@@ -80,10 +67,3 @@ export function tokenize (code) {
   tokens = tokens.filter(token => token.type !== 'whitespace');
   return tokens;
 }
-
-// console.dir(
-//   tokenize(
-//     `focus [1 'two' 3]`
-//   ),
-//   { depth: null }
-// );
