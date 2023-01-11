@@ -140,8 +140,12 @@ function eat (tokens) {
       return parsePrimitive(tokens);
     case 'openParen':
       return parseParenCommand(tokens);
+    case 'closeParen': // bare
+      throw new Error('unmatched parenthesis');
     case 'openBracket':
       return parseList(tokens);
+    case 'closeBracket': // bare
+      throw new Error('unmatched bracket');
     case 'openAngle':
       return parseLeaf(tokens);
     case 'at':
