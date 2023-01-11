@@ -69,7 +69,10 @@ function parseCommand (tokens) {
     if (tokens[0] === undefined) {
       break;
     }
-    if (tokens[0].type === 'newline') {
+    if (
+      tokens[0].type === 'newline' ||
+      tokens[0].type === 'closeParen' // for parenthesized commands
+    ) {
       break;
     }
     args.push(eat(tokens));
@@ -78,6 +81,39 @@ function parseCommand (tokens) {
     type: 'command',
     head: head.value,
     args
+  };
+}
+
+function parseParenCommand (tokens) {
+  // skip the parenthesis
+  tokens.shift();
+  let command;
+  while (true) {
+    // if the next token is a newline, the closing parenthesis is missing
+    if (tokens[0]?.type === 'newline') {
+      throw new Error('unmatched parenthesis');
+    }
+    // while there are still tokens,
+    // and the next token is not a closing parenthesis,
+    // eat
+    if (tokens[0] && tokens[0].type !== 'closeParen') {
+      command = eat(tokens);
+    } else {
+      break;
+    }
+  }
+  // if there are no more tokens,
+  // or the next token is not a closing parenthesis,
+  // it's missing
+  if (tokens.shift()?.type !== 'closeParen') {
+    throw new Error('unmatched parenthesis');
+  }
+  // if (command.type !== 'command') {
+  //   throw new Error('invalid parenthesized value');
+  // }
+  return {
+    type: 'parenCommand',
+    value: command
   };
 }
 
@@ -102,6 +138,8 @@ function eat (tokens) {
     case 'string':
     case 'boolean':
       return parsePrimitive(tokens);
+    case 'openParen':
+      return parseParenCommand(tokens);
     case 'openBracket':
       return parseList(tokens);
     case 'openAngle':
@@ -117,7 +155,6 @@ function eat (tokens) {
 }
 
 const tokens = tokenize(
-  `focus [1 2 3]
-  sum`
+  `using <-1 (until (prime) (plus 1))`
 );
 console.dir(parse(tokens), { depth: null });

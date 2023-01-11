@@ -15,7 +15,7 @@ const T = {
   equals: '=',
   newline: '\n',
   whitespace: /^\s+/g,
-  identifier: /^[^\s]+/g
+  identifier: /^[a-z]+/g
 };
 
 /**
