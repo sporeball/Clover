@@ -1,3 +1,27 @@
+function parseNumber (tokens) {
+  const number = tokens.shift();
+  return {
+    type: 'number',
+    value: Number(number.value)
+  };
+}
+
+function parseString (tokens) {
+  const string = tokens.shift();
+  return {
+    type: 'string',
+    value: string.value.slice(1, -1) // remove the single quotes
+  };
+}
+
+function parseBoolean (tokens) {
+  const boolean = tokens.shift();
+  return {
+    type: 'boolean',
+    value: (boolean.value === 'true') // haha
+  };
+}
+
 function parseList (tokens) {
   // skip the open bracket
   tokens.shift();
@@ -152,9 +176,11 @@ export function parse (tokens) {
 function eat (tokens) {
   switch (tokens[0].type) {
     case 'number':
+      return parseNumber(tokens);
     case 'string':
+      return parseString(tokens);
     case 'boolean':
-      return tokens.shift();
+      return parseBoolean(tokens);
     case 'openParen':
       return parseParenCommand(tokens);
     case 'closeParen': // bare
