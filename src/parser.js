@@ -52,9 +52,13 @@ function parseLeaf (tokens) {
 
 function parsePlant (tokens) {
   tokens.shift(); // skip the @
+  const identifier = tokens.shift();
+  if (identifier.type !== 'identifier') {
+    throw new Error('invalid plant identifier');
+  }
   return {
     type: 'plant',
-    identifier: tokens.shift()
+    identifier
   };
 }
 
@@ -62,7 +66,6 @@ function parsePlant (tokens) {
  * parse a flat list of tokens
  */
 export function parse (tokens) {
-  let position = 0;
   let tree = [];
   while (tokens.length > 0) {
     tree.push(eat(tokens));
@@ -93,7 +96,7 @@ function eat (tokens) {
 }
 
 const tokens = tokenize(
-  `[1 2]
-  [3 4]`
+  `@aok
+  3`
 );
 console.dir(parse(tokens), { depth: null });
