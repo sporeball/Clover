@@ -1,5 +1,7 @@
+import { tokenize } from './tokenizer.js';
+import { parse } from './parser.js';
 import { Plant } from './plant.js';
-import * as Command from './commands.js';
+import * as Commands from './commands.js';
 import { cast } from './token.js';
 import { format, output } from './util.js';
 
@@ -11,7 +13,8 @@ import fs from 'fs';
  * @param {Object} [options]
  * @param {boolean} options.test
  */
-export default function parse (code, options = {}) {
+export default function run (code, options = {}) {
+  // pollution
   global.Clover = {};
   global.CloverError = class CloverError {
     constructor (message, ...subs) {
@@ -40,7 +43,7 @@ export default function parse (code, options = {}) {
   Clover.plant = new Plant([input]);
   Clover.plants = {};
 
-  Clover.line = 0;
+  // Clover.line = 0;
 
   code = code.split('\n')
     .map(line => line.replace(/--.*/gm, '').trim()); // clean
@@ -51,16 +54,21 @@ export default function parse (code, options = {}) {
     code = code.slice(0, -1);
   }
 
-  for (const line of code) {
-    Clover.line++;
-    // skip empty lines
-    if (line.length === 0) {
-      continue;
-    }
-    // each line of code holds a single command
-    // tokenize and evaluate
-    Command.evaluate(line);
-    // the `stop` command will set this value to true for an early break
+  code = code.join('\n');
+  const tokens = tokenize(code);
+  const AST = parse(tokens);
+
+  // console.dir(AST, { depth: null });
+
+  const invalid = AST.find(topLevelNode => topLevelNode.type !== 'command');
+  if (invalid) {
+    throw new CloverError('found bare token of type %t', invalid.type);
+  }
+
+  for (const topLevelNode of AST) {
+    const commandInstance = evaluateNode(topLevelNode);
+    // evaluate
+    Commands.evaluateInstance(commandInstance);
     if (Clover.stop) {
       break;
     }
@@ -82,4 +90,43 @@ export default function parse (code, options = {}) {
   }
 
   return Clover.plant;
+}
+
+/**
+ * evaluate an AST node, returning a value
+ * @param {object} ASTNode
+ */
+export function evaluateNode (ASTNode) {
+  switch (ASTNode.type) {
+    case 'number':
+    case 'string':
+    case 'boolean':
+      return ASTNode.value;
+    case 'list':
+      return ASTNode.items.map(evaluateNode);
+    case 'mutable':
+      if (Clover.evItem) {
+        return Clover.evItem[ASTNode.identifier];
+      }
+      break;
+    case 'plant':
+      return Clover.plants[ASTNode.identifier];
+    case 'leaf':
+      return Clover.plant.getLeaf(ASTNode.index).flower;
+    case 'command':
+      return new Commands.CommandInstance(
+        ASTNode.head,
+        ASTNode.args,
+        ASTNode.rhs
+      );
+    case 'parenCommand':
+      return new Commands.CommandInstance(
+        ASTNode.value.head,
+        ASTNode.value.args,
+        ASTNode.value.rhs
+      );
+    case 'star':
+      // command instances will substitute this themselves
+      return ASTNode;
+  }
 }

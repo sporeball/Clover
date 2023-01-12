@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import parse from './src/index.js';
+import run from './src/index.js';
 import { pprint } from './src/util.js';
 
 import fs from 'fs';
@@ -20,7 +20,7 @@ function cli () {
   }
   // parse
   // const t0 = performance.now();
-  parse(code);
+  run(code);
   // const t1 = performance.now();
   // console.log(`(${(t1 - t0).toFixed(2)}ms)`);
 }

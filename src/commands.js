@@ -1,7 +1,8 @@
+import { evaluateNode } from './index.js';
 import assert from './assert.js';
 // import { Leaf } from './leaf.js';
 import { Plant, LazyPlant } from './plant.js';
-import { Token, typeOf, cast } from './token.js';
+import { typeOf } from './token.js';
 import { escape, equal } from './util.js';
 
 /**
@@ -15,7 +16,7 @@ import { escape, equal } from './util.js';
  * superclass
  * regular commands change the flower value of every leaf in the plant
  */
-class Pattern {
+export class Pattern {
   /**
    * @param {string} str format string for the pattern
    * @param {Function} body underlying command code
@@ -29,7 +30,7 @@ class Pattern {
 /**
  * plant commands return an entirely new plant
  */
-class PlantPattern extends Pattern { }
+export class PlantPattern extends Pattern { }
 
 /**
  * sugar commands are aliases of other commands
@@ -43,51 +44,39 @@ class SugarPattern extends Pattern {
 }
 
 export class CommandInstance {
-  constructor (line) {
-    const tokens = tokenize(line);
-    const rhsIndex = tokens.findIndex(token => token.value === '=');
-    this.head = tokens[0];
-    if (rhsIndex === -1) {
-      this._args = tokens.slice(1);
-    } else {
-      this._args = tokens.slice(1, rhsIndex);
-      this.sep = tokens[rhsIndex];
-      this.rhs = tokens.slice(rhsIndex + 1);
-    }
-    // console.log(this);
+  /**
+   * @param {string} head
+   * @param {any[]} args
+   */
+  constructor (head, args, rhs) {
+    this.head = head;
+    this.args = args;
+    this.rhs = rhs;
     if (this.pattern === undefined) {
       throw new CloverError(
         'no pattern found for head token %t',
-        this.head.value
+        this.head
       );
     }
-    if (this._args.length !== this.pattern.args) {
+    if (this.args.length !== this.pattern.args) {
       throw new CloverError(
-        'expected %s argument(s), got %s',
+        '%s: expected %s argument(s), got %s',
+        this.head,
         this.pattern.args,
-        this._args.length
+        this.args.length
       );
     }
-  }
-
-  get args () {
-    return this._args.map(arg => cast(arg));
-  }
-
-  substituteArg (sub) {
-    return this.args.map(arg => {
-      if (arg === '*') {
-        return sub;
-      }
-      return arg;
-    });
   }
 
   get pattern () {
-    return patterns[this.head.value];
+    return patterns[this.head];
   }
 
-  run (value, args) {
+  run (value, args, subValue) {
+    args = args.map(evaluateNode);
+    if (subValue) {
+      args = substituteStars(args, subValue);
+    }
     try {
       const result = this.pattern.body(value, args);
       return result;
@@ -97,53 +86,23 @@ export class CommandInstance {
   }
 }
 
-/**
- * convert a line of code into a stream of tokens
- * @param {string} line
- * @returns {Token[]}
- */
-export function tokenize (line) {
-  const match = line.match(
-    /'.*?'|\[.*?\](:(0|[1-9]\d*))?|\(.*\)|[^ ]+/g
-  );
-  // console.log(match);
-  // TODO: for the rare case (command) 'string' (command),
-  // this actually still doesn't work
-  // maybe try getting a result by using the big regex a second time
-  return match
-    // when the regex matches commands, it does so greedily:
-    // (first) (second) becomes one token, not two.
-    // but we *want* a greedy match (e.g. for nested commands),
-    // so to counteract that...
-    .flatMap(token => {
-      // if the regex has returned a match which
-      if (
-        // contains one or more commands,
-        token.startsWith('(') &&
-        // none of which are nested,
-        !token.match(/\([^()]+?\(/g) &&
-        !token.match(/\)[^()]+?\)/g) &&
-        token.match(/\([^()]*?\)/g) // TODO: is this line a no-op?
-      ) {
-        // return an array of all of them (split up the match).
-        return token.match(/\([^()]*?\)/g);
-      }
-      // otherwise, return the original match
-      return token;
-    })
-    .map(token => new Token(token));
+function substituteStars (args, subValue) {
+  return args.map(arg => {
+    if (arg.type === 'star') {
+      return subValue;
+    }
+    return arg;
+  });
 }
 
 /**
- * execute a command
- * @param {string} line
+ * evaluate a command instance, updating the plant
+ * @param {CommandInstance} instance
  */
-export function evaluate (line) {
-  const command = new CommandInstance(line);
-
+export function evaluateInstance (instance) {
   // plant commands return an entirely new plant
-  if (command.pattern instanceof PlantPattern) {
-    Clover.plant = command.run(Clover.plant, command.args);
+  if (instance.pattern instanceof PlantPattern) {
+    Clover.plant = instance.run(Clover.plant, instance.args);
   // regular commands change the flower value of every leaf in the plant
   } else {
     for (const leaf of Clover.plant.leaves) {
@@ -151,37 +110,29 @@ export function evaluate (line) {
         continue;
       }
       Clover.evItem = leaf;
-      leaf.flower = command.run(leaf.flower, command.args);
+      leaf.flower = instance.run(leaf.flower, instance.args);
     }
   }
-
-  // console.dir(command, { depth: 4 });
-
   // if there was a right-hand side...
-  if (command.rhs === undefined) {
+  if (instance.rhs === undefined) {
     return;
   }
-  if (command.sep.value === '=') {
-    const rhs = command.rhs[0];
-    switch (rhs.specifier) {
-      // for plants,
-      case '%P':
-        // store a clone of the plant
-        Clover.plants[rhs.value] = Clover.plant.clone();
-        break;
-      // for mutables,
-      case '%m':
-        // update every flower
-        Clover.plant.leaves.forEach(leaf => {
-          leaf[rhs.value] = leaf.flower;
-        });
-        break;
-      default:
-        throw new CloverError('invalid assignment');
-    }
-    return;
+  switch (instance.rhs.type) {
+    // for plants,
+    case 'plant':
+      // store a clone of the plant
+      Clover.plants[instance.rhs.identifier] = Clover.plant.clone();
+      break;
+    // for mutables,
+    case 'mutable':
+      // update every flower
+      Clover.plant.leaves.forEach(leaf => {
+        leaf[instance.rhs.identifier] = leaf.flower;
+      });
+      break;
+    default:
+      throw new CloverError('invalid assignment');
   }
-  throw new CloverError('invalid right-hand side separator');
 }
 
 /**
@@ -316,7 +267,7 @@ const foreach = new Pattern(2, (flower, args) => {
   assert.type(command, 'command');
   const arr = [];
   for (const item of list) {
-    arr.push(command.run(flower, command.substituteArg(item)));
+    arr.push(command.run(flower, command.args, item));
   }
   return arr;
 });
@@ -347,15 +298,13 @@ const groups = new Pattern(1, (flower, args) => {
 
 /**
  * take a plant with a single array-type flower, and use its elements as
- * the leaves of a new plant, with a mutable set on each
+ * the leaves of a new plant
  * @example
  * focus [1 2 3]
- * itemize naturals
- * -- { flower = 1, natural = 1 }, ...
- * @param {string} dest a plural word used to determine the mutable
+ * itemize
+ * -- { flower = 1 }, { flower = 2 }, { flower = 3 }
  */
-const itemize = new PlantPattern(1, (plant, args) => {
-  const [dest] = args;
+const itemize = new PlantPattern(0, (plant, args) => {
   const leaves = plant.leaves;
   // assert.type(value, 'array');
   if (leaves.length > 1) {
@@ -363,14 +312,10 @@ const itemize = new PlantPattern(1, (plant, args) => {
       'ensure plant has only one leaf before itemizing'
     );
   }
-  if (!dest.endsWith('s')) {
-    throw new CloverError('itemize list should be a plural word');
-  }
   const flower = leaves[0].flower;
   plant.kill();
-  flower.forEach((item, index) => {
+  flower.forEach(item => {
     plant.addLeaf(item);
-    plant.leaves[index][dest.slice(0, -1)] = item;
   });
   return plant;
 });
@@ -632,7 +577,7 @@ const take = new PlantPattern(1, (plant, args) => {
       continue;
     }
     plant.addLeaf(
-      plant.command.run(i, plant.command.substituteArg(i))
+      plant.command.run(i, plant.command.args, i)
     );
   }
   return plant;

@@ -55,8 +55,9 @@ function array (l) {
  */
 function error (e) {
   const msg = `${colors.red('e:')} ${e.message}`;
-  const stack = colors.cyan(`   (line ${Clover.line})`);
-  return `${msg}\n${stack}`;
+  // const stack = colors.cyan(`   (line ${Clover.line})`);
+  // return `${msg}\n${stack}`;
+  return msg;
 }
 
 /**

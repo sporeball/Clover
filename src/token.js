@@ -13,7 +13,6 @@ export class Token {
    */
   constructor (value) {
     this.value = value;
-    this.specifier = specifier(value);
   }
 }
 
@@ -184,41 +183,4 @@ export function cast (v) {
     return Clover.evItem[value.slice(1)];
   }
   return value;
-}
-
-/**
- * return the format specifier that matches a token value
- * @param {any} value
- */
-function specifier (value) {
-  const T = typeOf(value);
-  // console.log(value, T);
-  if (T === 'reserved') {
-    return '%r';
-  }
-  if (T === 'command') {
-    return '%c';
-  }
-  if (T === 'plant') {
-    return '%P';
-  }
-  if (T === 'leaf') {
-    return '%L';
-  }
-  if (T === 'array') {
-    return '%l'; // for "list"
-  }
-  if (T === 'number') {
-    return '%n';
-  }
-  if (T === 'string') {
-    return '%s';
-  }
-  if (T === 'boolean') {
-    return '%b';
-  }
-  if (T === 'mutable') {
-    return '%m';
-  }
-  return '%a';
 }

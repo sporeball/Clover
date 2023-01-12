@@ -29,7 +29,7 @@ function parseList (tokens) {
   while (true) {
     // if the next token is a newline, the closing bracket is missing
     if (tokens[0]?.type === 'newline') {
-      throw new Error('unmatched bracket');
+      throw new CloverError('unmatched bracket');
     }
     // while there are still tokens,
     // and the next token is not a closing bracket,
@@ -44,7 +44,7 @@ function parseList (tokens) {
   // or the next token is not a closing bracket,
   // it's missing
   if (tokens.shift()?.type !== 'closeBracket') {
-    throw new Error('unmatched bracket');
+    throw new CloverError('unmatched bracket');
   }
   return {
     type: 'list',
@@ -56,7 +56,7 @@ function parseLeaf (tokens) {
   tokens.shift(); // skip the angle bracket
   const index = tokens.shift();
   if (index?.type !== 'number') {
-    throw new Error('invalid leaf index');
+    throw new CloverError('invalid leaf index');
   }
   return {
     type: 'leaf',
@@ -68,11 +68,11 @@ function parsePlant (tokens) {
   tokens.shift(); // skip the @
   const identifier = tokens.shift();
   if (identifier?.type !== 'identifier') {
-    throw new Error('invalid plant identifier');
+    throw new CloverError('invalid plant identifier');
   }
   return {
     type: 'plant',
-    identifier
+    identifier: identifier.value
   };
 }
 
@@ -80,11 +80,11 @@ function parseMutable (tokens) {
   tokens.shift(); // skip the colon
   const identifier = tokens.shift();
   if (identifier?.type !== 'identifier') {
-    throw new Error('invalid mutable');
+    throw new CloverError('invalid mutable identifier');
   }
   return {
     type: 'mutable',
-    identifier
+    identifier: identifier.value
   };
 }
 
@@ -113,7 +113,7 @@ function parseCommand (tokens) {
   }
   tokens.shift(); // skip the equals sign
   if (tokens[0] === undefined || tokens[0].type === 'newline') {
-    throw new Error('empty right-hand side');
+    throw new CloverError('empty right-hand side');
   }
   const rhs = eat(tokens);
   return {
@@ -131,7 +131,7 @@ function parseParenCommand (tokens) {
   while (true) {
     // if the next token is a newline, the closing parenthesis is missing
     if (tokens[0]?.type === 'newline') {
-      throw new Error('unmatched parenthesis');
+      throw new CloverError('unmatched parenthesis');
     }
     // while there are still tokens,
     // and the next token is not a closing parenthesis,
@@ -146,11 +146,11 @@ function parseParenCommand (tokens) {
   // or the next token is not a closing parenthesis,
   // it's missing
   if (tokens.shift()?.type !== 'closeParen') {
-    throw new Error('unmatched parenthesis');
+    throw new CloverError('unmatched parenthesis');
   }
-  // if (command.type !== 'command') {
-  //   throw new Error('invalid parenthesized value');
-  // }
+  if (command.type !== 'command') {
+    throw new CloverError('invalid parenthesized value');
+  }
   return {
     type: 'parenCommand',
     value: command
@@ -184,11 +184,11 @@ function eat (tokens) {
     case 'openParen':
       return parseParenCommand(tokens);
     case 'closeParen': // bare
-      throw new Error('unmatched parenthesis');
+      throw new CloverError('unmatched parenthesis');
     case 'openBracket':
       return parseList(tokens);
     case 'closeBracket': // bare
-      throw new Error('unmatched bracket');
+      throw new CloverError('unmatched bracket');
     case 'openAngle':
       return parseLeaf(tokens);
     case 'at':
@@ -196,7 +196,7 @@ function eat (tokens) {
     case 'colon':
       return parseMutable(tokens);
     case 'equals': // bare
-      throw new Error('invalid assignment');
+      throw new CloverError('invalid assignment');
     case 'star':
       return tokens.shift();
     case 'identifier':
@@ -204,5 +204,5 @@ function eat (tokens) {
     case 'newline':
       return tokens.shift();
   }
-  throw new Error(`no matching rule found: ${tokens[0].type}`);
+  throw new CloverError(`parser: no matching rule found: ${tokens[0].type}`);
 }

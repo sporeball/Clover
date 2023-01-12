@@ -114,16 +114,13 @@ groups 2
 ## itemize
 **Type:** `PlantPattern`
 
-Take a plant with a single array-type flower, and use its elements as the leaves of a new plant, with a mutable set on each.
-
-#### dest
-Type: `string`
+Take a plant with a single array-type flower, and use its elements as the leaves of a new plant.
 
 ### Examples
 ```lua
 focus [1 2 3]
-itemize naturals
--- { flower = 1, natural = 1 }, ...
+itemize
+-- { flower = 1 }, { flower = 2 }, { flower = 3 }
 ```
 
 ## last

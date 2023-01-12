@@ -99,7 +99,7 @@ tentamen.add(
 tentamen.add(
   'crush',
   `focus [1 2 3 4 5]
-  itemize naturals
+  itemize
   crush (sum)`,
   15
 );
@@ -145,7 +145,7 @@ tentamen.add(
   'itemize',
   // in this form, we expect that an apply should not be required
   `focus [1 2 3 4 5]
-  itemize numbers
+  itemize
   times 2`,
   [2, 4, 6, 8, 10]
 );
@@ -181,7 +181,7 @@ tentamen.add('over', 'focus 5\nover 5', 1);
 tentamen.add(
   'pluck',
   `focus [1 2 3 4 5]
-  itemize naturals
+  itemize
   pluck (odd)`,
   [2, 4]
 );
