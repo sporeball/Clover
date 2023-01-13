@@ -530,7 +530,6 @@ const split = new Pattern(1, (flower, args) => {
   const [splitter] = args;
   assert.type(flower, 'string');
   assert.type(splitter, 'string');
-  // TODO: doesn't work when given '\n'
   return flower.split(splitter);
 });
 

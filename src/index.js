@@ -104,7 +104,9 @@ export default function run (code, options = {}) {
 export function evaluateNode (ASTNode) {
   switch (ASTNode.type) {
     case 'number':
+      return ASTNode.value;
     case 'string':
+      return ASTNode.value.replace(/\\n/g, '\n');
     case 'boolean':
       return ASTNode.value;
     case 'list':
