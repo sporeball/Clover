@@ -1,3 +1,8 @@
+/**
+ * the second step in executing a Clover program is to parse its tokens.
+ * this means taking a flat list of tokens, and using it to create structures.
+ */
+
 function parseNumber (tokens) {
   const number = tokens.shift();
   return {
@@ -158,7 +163,9 @@ function parseParenCommand (tokens) {
 }
 
 /**
- * parse a flat list of tokens
+ * parse a flat list of Clover tokens
+ * @param {object[]} tokens
+ * @returns {object[]}
  */
 export function parse (tokens) {
   let tree = [];
@@ -170,8 +177,10 @@ export function parse (tokens) {
 }
 
 /**
- * take a flat list of tokens
- * do something based on the first one
+ * take an array of tokens, and remove some of them from the start,
+ * producing a structure
+ * @param {object[]} tokens
+ * @returns {object}
  */
 function eat (tokens) {
   switch (tokens[0].type) {

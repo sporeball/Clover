@@ -8,7 +8,7 @@ import { format, output } from './util.js';
 import fs from 'fs';
 
 /**
- * parse a Clover program
+ * run a Clover program
  * @param {string} code
  * @param {Object} [options]
  * @param {boolean} options.test
@@ -60,6 +60,7 @@ export default function run (code, options = {}) {
 
   // console.dir(AST, { depth: null });
 
+  // all top-level nodes in the AST should be commands
   const invalid = AST.find(topLevelNode => topLevelNode.type !== 'command');
   if (invalid) {
     throw new CloverError('found bare token of type %t', invalid.type);

@@ -2,7 +2,6 @@ import { Plant } from './plant.js';
 import { Leaf } from './leaf.js';
 import { CommandInstance, reservedWords } from './commands.js';
 import { matches } from './util.js';
-// import reserved from '../util/reserved.js';
 
 /**
  * class representing a token

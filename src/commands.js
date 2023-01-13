@@ -1,6 +1,5 @@
 import { evaluateNode } from './index.js';
 import assert from './assert.js';
-// import { Leaf } from './leaf.js';
 import { Plant, LazyPlant } from './plant.js';
 import { typeOf } from './token.js';
 import { escape, equal } from './util.js';
@@ -18,7 +17,7 @@ import { escape, equal } from './util.js';
  */
 export class Pattern {
   /**
-   * @param {string} str format string for the pattern
+   * @param {number} args number of arguments to the command
    * @param {Function} body underlying command code
    */
   constructor (args, body) {
@@ -537,6 +536,7 @@ const split = new Pattern(1, (flower, args) => {
   const [splitter] = args;
   assert.type(flower, 'string');
   assert.type(splitter, 'string');
+  // TODO: doesn't work when given '\n'
   return flower.split(splitter);
 });
 
