@@ -21,6 +21,12 @@ function cli () {
   } catch (e) {
     throw new Error('file not found');
   }
+
+  if (code === '') {
+    console.log('there is nothing to do');
+    return;
+  }
+
   // parse
   // const t0 = performance.now();
   run(code);
