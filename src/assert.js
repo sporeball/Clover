@@ -1,5 +1,4 @@
-import { typeOf } from './token.js';
-import { any, defined, equal, matches } from './util.js';
+import { any, defined, equal, matches, typeOf } from './util.js';
 
 const assert = {
   any (value, values) {

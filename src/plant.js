@@ -46,6 +46,6 @@ export class LazyPlant extends Plant {
   }
 
   clone () {
-    return new LazyPlant(this.leaves, this.cstr);
+    return new LazyPlant(this.leaves, this.command);
   }
 }
