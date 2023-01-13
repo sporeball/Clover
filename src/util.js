@@ -62,7 +62,7 @@ export function typeOf (value) {
   if (Array.isArray(value)) {
     return typeOfList(value);
   }
-  if (value instanceof CloverError) {
+  if (value.constructor.name === 'CloverError') {
     return 'error';
   }
   if (value instanceof Error) {

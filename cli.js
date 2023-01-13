@@ -8,6 +8,9 @@ import fs from 'fs';
 function cli () {
   let code;
   let filename = process.argv[2];
+  if (filename === undefined) {
+    throw new Error('no filename given');
+  }
   // implicit filetype
   if (!filename.endsWith('.clo')) {
     filename += '.clo';
