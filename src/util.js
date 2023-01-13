@@ -60,7 +60,7 @@ export function typeOf (value) {
     return 'boolean';
   }
   if (Array.isArray(value)) {
-    return 'list';
+    return typeOfList(value);
   }
   if (value instanceof CloverError) {
     return 'error';
@@ -78,6 +78,36 @@ export function typeOf (value) {
     return 'command';
   }
   return 'other';
+}
+
+/**
+ * given a list, return a more specific list type,
+ * taking into account its shape
+ * @param {array} list
+ * @returns {string}
+ */
+export function typeOfList (list) {
+  // all elements must be of the same type, and of the same depth
+  // empty case
+  if (list.length === 0) {
+    return 'list';
+  }
+  // 1-dimensional case
+  if (list.every(
+    item =>
+      !Array.isArray(item) && typeOf(item) === typeOf(list[0])
+  )) {
+    return typeOf(list[0]) + '[]';
+  }
+  // n-dimensional case
+  if (list.every(
+    item =>
+      Array.isArray(item) &&
+      typeOfList(item) === typeOfList(list[0])
+  )) {
+    return typeOfList(list[0]) + '[]';
+  }
+  throw new CloverError('invalid list shape');
 }
 
 /**
@@ -130,12 +160,11 @@ export function escape (str) {
   return str.replace(/[.*+?^$()[\]{}|\\]/g, match => '\\' + match);
 }
 
-export function arrayDepth (arr) {
-  return Array.isArray(arr)
-    ? 1 + Math.max(0, ...arr.map(arrayDepth))
-    : 0;
-}
-
+/**
+ * return the contents of a file
+ * @param {string} filePath
+ * @returns {string}
+ */
 export function open (filePath) {
   return fs.readFileSync(
     path.resolve(filePath), { encoding: 'utf-8' }
