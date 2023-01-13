@@ -1,7 +1,7 @@
 import { evaluateNode } from './index.js';
 import assert from './assert.js';
 import { Plant, LazyPlant } from './plant.js';
-import { escape, equal, typeOf } from './util.js';
+import { escape, equal, isList, typeOf } from './util.js';
 
 /**
  * each command written in a Clover program consists of a list of tokens.
@@ -323,7 +323,7 @@ const itemize = new PlantPattern(0, (plant, args) => {
  * @returns {any}
  */
 const last = new Pattern(0, (flower) => {
-  if (typeOf(flower) === 'list') {
+  if (isList(flower)) {
     return flower[flower.length - 1];
   }
   return flower;
@@ -492,22 +492,21 @@ const replace = new Pattern(2, (flower, args) => {
 });
 
 /**
- * array run-length decode
+ * run-length decode a string
  * @flower {array[]}
  * @returns {array}
  */
 const rld = new Pattern(0, (flower) => {
-  assert.type(flower, 'list');
+  assert.type(flower, 'string');
+  if (!flower.match(/^(\d+.)+$/g)) {
+    throw new CloverError('invalid value');
+  }
 
-  const result = [];
-  for (const run of flower) {
-    assert.type(run, 'list');
-    assert.equal('run length', run.length, 2);
-    const [length, item] = run;
-    assert.type(length, 'number');
-    for (let i = 0; i < length; i++) {
-      result.push(item);
-    }
+  let result = '';
+  for (const run of flower.match(/\d+./g)) {
+    const number = Number(run.slice(0, -1));
+    const value = run.slice(-1);
+    result += value.repeat(number);
   }
 
   return result;

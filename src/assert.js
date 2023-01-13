@@ -35,6 +35,10 @@ const assert = {
   },
   type (value, T) {
     const t = typeOf(value);
+    // special case
+    if (T === 'list' && t.endsWith('[]')) {
+      return;
+    }
     if (t !== T) {
       throw new CloverError(
         'expected token of type %s, got %s instead', T, t

@@ -206,10 +206,9 @@ tentamen.add(
 );
 tentamen.add(
   'rld',
-  `focus [1 'a' 2 'b' 3 'c']
-  groups 2
+  `focus '4w3a1d1e6x1y3w'
   rld`,
-  ['a', 'b', 'b', 'c', 'c', 'c']
+  'wwwwaaadexxxxxxywww'
 );
 tentamen.add(
   'sort',

@@ -111,6 +111,16 @@ export function typeOfList (list) {
 }
 
 /**
+ * return whether a value is a list
+ * accomplished through a type check
+ * @param {any} value
+ * @returns {boolean}
+ */
+export function isList (value) {
+  return typeOf(value).endsWith('[]');
+}
+
+/**
  * pretty print a value
  * @param {any} value
  */

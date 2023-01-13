@@ -118,7 +118,7 @@ const functions = {
 export default function pretty (value) {
   const T = typeOf(value);
   if (T.endsWith('[]')) {
-    return functions['list'](value);
+    return functions.list(value);
   }
   return (functions[T] || functions.other)(value);
 }

@@ -247,7 +247,7 @@ Type: `any`
 **Flower type:** `array[]`\
 **Returns:** `array`
 
-Array run-length decode.
+Run-length decode a string.
 
 ## sort
 **Type:** `Pattern`\
