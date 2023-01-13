@@ -1,6 +1,4 @@
-import { typeOf } from '../src/token.js';
-// import { Plant, LazyPlant } from '../src/plant.js';
-// import { Leaf } from '../src/leaf.js';
+import { typeOf } from '../src/util.js';
 import colors from 'picocolors';
 
 function none () {
@@ -44,7 +42,7 @@ function boolean (b) {
 /**
  * @param {[]*} l
  */
-function array (l) {
+function list (l) {
   const str = l.map(v => pretty(v))
     .join(', ');
   return `[${str}]`;
@@ -106,7 +104,7 @@ const functions = {
   number,
   string,
   boolean,
-  array,
+  list,
   error,
   uncaughtError,
   plant,

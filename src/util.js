@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { dequal } from 'dequal/lite';
+import { CommandInstance } from './commands.js';
+import { Plant } from '../src/plant.js';
+import { Leaf } from '../src/leaf.js';
 import pretty from '../util/pretty.js';
 
 /**
@@ -35,6 +38,46 @@ export function equal (v1, v2) {
  */
 export function matches (value, regexp) {
   return typeof value === 'string' && value.match(regexp) !== null;
+}
+
+/**
+ * return the type of a value
+ * does not work with AST nodes, because those already have types
+ * @param {any} value
+ * @returns {string}
+ */
+export function typeOf (value) {
+  if (value === undefined) {
+    return 'none';
+  }
+  if (typeof value === 'number') {
+    return 'number';
+  }
+  if (typeof value === 'string') {
+    return 'string';
+  }
+  if (typeof value === 'boolean') {
+    return 'boolean';
+  }
+  if (Array.isArray(value)) {
+    return 'list';
+  }
+  if (value instanceof CloverError) {
+    return 'error';
+  }
+  if (value instanceof Error) {
+    return 'uncaughtError';
+  }
+  if (value instanceof Plant) {
+    return 'plant';
+  }
+  if (value instanceof Leaf) {
+    return 'leaf';
+  }
+  if (value instanceof CommandInstance) {
+    return 'command';
+  }
+  return 'other';
 }
 
 /**

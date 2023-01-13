@@ -29,7 +29,7 @@ Type: `command`
 ### Examples
 ```lua
 focus [1 2 3 4 5]
-itemize naturals
+itemize
 crush (sum)
 -- { flower = 15 }
 ```

@@ -1,8 +1,7 @@
 import { evaluateNode } from './index.js';
 import assert from './assert.js';
 import { Plant, LazyPlant } from './plant.js';
-import { typeOf } from './token.js';
-import { escape, equal } from './util.js';
+import { escape, equal, typeOf } from './util.js';
 
 /**
  * each command written in a Clover program consists of a list of tokens.
@@ -81,7 +80,7 @@ export class CommandInstance {
       const result = this.pattern.body(value, args);
       return result;
     } catch (e) {
-      throw new CloverError('%s: %s', this.head.value, e.message);
+      throw new CloverError('%s: %s', this.head, e.message);
     }
   }
 }
@@ -147,7 +146,7 @@ export function evaluateInstance (instance) {
  */
 const apply = new Pattern(1, (flower, args) => {
   const [command] = args;
-  assert.type(flower, 'array');
+  assert.type(flower, 'list');
   assert.type(command, 'command');
   return flower.map(x => command.run(x));
 });
@@ -162,9 +161,9 @@ const apply = new Pattern(1, (flower, args) => {
  */
 const count = new Pattern(1, (flower, args) => {
   const [searchValue] = args;
-  assert.any(typeOf(flower), ['array', 'string']);
+  assert.any(typeOf(flower), ['list', 'string']);
   switch (typeOf(flower)) {
-    case 'array':
+    case 'list':
       return flower
         .filter(x => equal(x, searchValue))
         .length;
@@ -181,7 +180,7 @@ const count = new Pattern(1, (flower, args) => {
  * all of its flowers
  * @example
  * focus [1 2 3 4 5]
- * itemize naturals
+ * itemize
  * crush (sum)
  * -- { flower = 15 }
  * @param {command} command
@@ -224,7 +223,7 @@ const even = new Pattern(0, (flower) => {
  */
 const filter = new Pattern(1, (flower, args) => {
   const [filterValue] = args;
-  assert.type(flower, 'array');
+  assert.type(flower, 'list');
   return flower.filter(x => equal(x, filterValue) === false);
 });
 
@@ -234,7 +233,7 @@ const filter = new Pattern(1, (flower, args) => {
  * @returns {array}
  */
 const flatten = new Pattern(0, (flower) => {
-  assert.type(flower, 'array');
+  assert.type(flower, 'list');
   return flower.flat();
 });
 
@@ -260,7 +259,7 @@ const focus = new Pattern(1, (flower, args) => {
  */
 const foreach = new Pattern(2, (flower, args) => {
   const [list, command] = args;
-  assert.type(list, 'array');
+  assert.type(list, 'list');
   assert.type(command, 'command');
   const arr = [];
   for (const item of list) {
@@ -281,7 +280,7 @@ const foreach = new Pattern(2, (flower, args) => {
  */
 const groups = new Pattern(1, (flower, args) => {
   const [size] = args;
-  assert.type(flower, 'array');
+  assert.type(flower, 'list');
   assert.type(size, 'number');
   if (size === 0) {
     throw new CloverError('cannot split into groups of 0');
@@ -303,13 +302,13 @@ const groups = new Pattern(1, (flower, args) => {
  */
 const itemize = new PlantPattern(0, (plant, args) => {
   const leaves = plant.leaves;
-  // assert.type(value, 'array');
   if (leaves.length > 1) {
     throw new CloverError(
       'ensure plant has only one leaf before itemizing'
     );
   }
   const flower = leaves[0].flower;
+  assert.type(flower, 'list');
   plant.kill();
   flower.forEach(item => {
     plant.addLeaf(item);
@@ -324,7 +323,7 @@ const itemize = new PlantPattern(0, (plant, args) => {
  * @returns {any}
  */
 const last = new Pattern(0, (flower) => {
-  if (typeOf(flower) === 'array') {
+  if (typeOf(flower) === 'list') {
     return flower[flower.length - 1];
   }
   return flower;
@@ -349,7 +348,7 @@ const lazy = new PlantPattern(1, (plant, args) => {
  * @returns {number}
  */
 const maximum = new Pattern(0, (flower) => {
-  assert.type(flower, 'array');
+  assert.type(flower, 'list');
   return Math.max(...flower.filter(Number));
 });
 
@@ -359,7 +358,7 @@ const maximum = new Pattern(0, (flower) => {
  * @returns {number}
  */
 const minimum = new Pattern(0, (flower) => {
-  assert.type(flower, 'array');
+  assert.type(flower, 'list');
   return Math.min(...flower.filter(Number));
 });
 
@@ -471,7 +470,7 @@ const prime = new Pattern(0, (flower) => {
  * @returns {number}
  */
 const product = new Pattern(0, (flower) => {
-  assert.type(flower, 'array');
+  assert.type(flower, 'list');
   // TODO: should it throw if it finds non-numbers instead?
   return flower.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a * c, 1);
@@ -498,11 +497,11 @@ const replace = new Pattern(2, (flower, args) => {
  * @returns {array}
  */
 const rld = new Pattern(0, (flower) => {
-  assert.type(flower, 'array');
+  assert.type(flower, 'list');
 
   const result = [];
   for (const run of flower) {
-    assert.type(run, 'array');
+    assert.type(run, 'list');
     assert.equal('run length', run.length, 2);
     const [length, item] = run;
     assert.type(length, 'number');
@@ -520,7 +519,7 @@ const rld = new Pattern(0, (flower) => {
  * @returns {array}
  */
 const sort = new Pattern(0, (flower) => {
-  assert.type(flower, 'array');
+  assert.type(flower, 'list');
   return [...flower].sort((a, b) => a - b);
 });
 
@@ -552,7 +551,7 @@ const stop = new PlantPattern(0, (plant) => {
  * @returns {number}
  */
 const sum = new Pattern(0, (flower) => {
-  assert.type(flower, 'array');
+  assert.type(flower, 'list');
   // TODO: should it throw if it finds non-numbers instead?
   return flower.filter(v => typeOf(v) === 'number')
     .reduce((a, c) => a + c, 0);
@@ -619,7 +618,7 @@ const to = new Pattern(1, (flower, args) => {
  * @returns {array}
  */
 const unique = new Pattern(0, (flower, args) => {
-  assert.any(typeOf(flower), ['array', 'string']);
+  assert.any(typeOf(flower), ['list', 'string']);
   if (typeOf(flower) === 'string') {
     flower = flower.split('');
   }
@@ -672,8 +671,8 @@ const using = new Pattern(2, (flower, args) => {
 const zip = new Pattern(1, (flower, args) => {
   const firsts = flower;
   const [seconds] = args;
-  assert.type(firsts, 'array');
-  assert.type(seconds, 'array');
+  assert.type(firsts, 'list');
+  assert.type(seconds, 'list');
   const result = [];
   const length = Math.min(firsts.length, seconds.length);
   for (let i = 0; i < length; i++) {
