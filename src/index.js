@@ -2,10 +2,7 @@ import { tokenize } from './tokenizer.js';
 import { parse } from './parser.js';
 import { Plant } from './plant.js';
 import * as Commands from './commands.js';
-import { cast } from './token.js';
-import { format, output } from './util.js';
-
-import fs from 'fs';
+import { format, open, output } from './util.js';
 
 /**
  * run a Clover program
@@ -25,11 +22,18 @@ export default function run (code, options = {}) {
   // implicit input
   let input;
   try {
-    input = cast(
-      fs.readFileSync('input.txt', { encoding: 'utf-8' }).trim()
-    );
+    input = open('input.txt').trim();
   } catch (e) {
     input = '';
+  }
+
+  // input casting
+  if (
+    input.match(/^0$|^-?[1-9]\d*$/g) ||
+    // input.match(/^'[^']*?'$/g) ||
+    input.match(/^\[.*\]$/g)
+  ) {
+    input = evaluateNode(parse(tokenize(input))[0]);
   }
 
   Clover.outputs = [];
