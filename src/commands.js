@@ -71,11 +71,12 @@ export class CommandInstance {
     return patterns[this.head];
   }
 
-  run (value, args, subValue) {
-    args = args.map(evaluateNode);
+  run (value, subValue) {
+    let args = this.args.map(evaluateNode);
     if (subValue) {
       args = substituteStars(args, subValue);
     }
+    // console.dir(args, { depth: null });
     try {
       const result = this.pattern.body(value, args);
       return result;
@@ -101,7 +102,7 @@ function substituteStars (args, subValue) {
 export function evaluateInstance (instance) {
   // plant commands return an entirely new plant
   if (instance.pattern instanceof PlantPattern) {
-    Clover.plant = instance.run(Clover.plant, instance.args);
+    Clover.plant = instance.run(Clover.plant);
   // regular commands change the flower value of every leaf in the plant
   } else {
     for (const leaf of Clover.plant.leaves) {
@@ -109,7 +110,7 @@ export function evaluateInstance (instance) {
         continue;
       }
       Clover.evItem = leaf;
-      leaf.flower = instance.run(leaf.flower, instance.args);
+      leaf.flower = instance.run(leaf.flower);
     }
   }
   // if there was a right-hand side...
@@ -148,7 +149,7 @@ const apply = new Pattern(1, (flower, args) => {
   const [command] = args;
   assert.type(flower, 'array');
   assert.type(command, 'command');
-  return flower.map(x => command.run(x, command.args));
+  return flower.map(x => command.run(x));
 });
 
 // TODO: comp used to be here - replace with destructuring bind
@@ -188,10 +189,7 @@ const count = new Pattern(1, (flower, args) => {
 const crush = new PlantPattern(1, (plant, args) => {
   const [command] = args;
   assert.type(command, 'command');
-  const result = command.run(
-    Clover.plant.leaves.map(leaf => leaf.flower),
-    command.args
-  );
+  const result = command.run(Clover.plant.leaves.map(leaf => leaf.flower));
   return new Plant([result]);
 });
 
@@ -266,7 +264,7 @@ const foreach = new Pattern(2, (flower, args) => {
   assert.type(command, 'command');
   const arr = [];
   for (const item of list) {
-    arr.push(command.run(flower, command.args, item));
+    arr.push(command.run(flower, item));
   }
   return arr;
 });
@@ -432,7 +430,7 @@ const pluck = new PlantPattern(1, (plant, args) => {
   const [command] = args;
   assert.type(command, 'command');
   return new Plant(plant.leaves.filter(leaf => {
-    return command.run(leaf.flower, command.args) === false;
+    return command.run(leaf.flower) === false;
   }));
 });
 
@@ -576,9 +574,7 @@ const take = new PlantPattern(1, (plant, args) => {
     if (plant.getLeaf(i - 1) !== undefined) {
       continue;
     }
-    plant.addLeaf(
-      plant.command.run(i, plant.command.args, i)
-    );
+    plant.addLeaf(plant.command.run(i, i));
   }
   return plant;
 });
@@ -642,8 +638,8 @@ const until = new Pattern(2, (flower, args) => {
   assert.type(conditionCommand, 'command');
   assert.type(command, 'command');
   for (let i = 0; i < 1000000; i++) {
-    flower = command.run(flower, command.args);
-    if (conditionCommand.run(flower, conditionCommand.args) === true) {
+    flower = command.run(flower);
+    if (conditionCommand.run(flower) === true) {
       return flower;
     }
   }
@@ -664,7 +660,7 @@ const until = new Pattern(2, (flower, args) => {
 const using = new Pattern(2, (flower, args) => {
   const [otherValue, command] = args;
   assert.type(command, 'command');
-  return command.run(otherValue, command.args);
+  return command.run(otherValue);
 });
 
 /**
