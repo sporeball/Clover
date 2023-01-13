@@ -145,14 +145,14 @@ Type: `command`
 **Flower type:** `array`\
 **Returns:** `number`
 
-Return the highest number which is an element of a flower.
+Return the highest number in a flower.
 
 ## minimum
 **Type:** `Pattern`\
 **Flower type:** `array`\
 **Returns:** `number`
 
-Return the lowest number which is an element of a flower.
+Return the lowest number in a flower.
 
 ## minus
 **Type:** `Pattern`\
@@ -228,7 +228,7 @@ Return if a flower is prime.
 **Flower type:** `array`\
 **Returns:** `number`
 
-Return the product of all numbers in a flower.
+Return the product of a flower.
 
 ## replace
 **Type:** `Pattern`\
@@ -276,7 +276,7 @@ Stop execution early.
 **Flower type:** `array`\
 **Returns:** `number`
 
-Return the sum of all numbers in a flower.
+Return the sum of a flower.
 
 ## take
 **Type:** `PlantPattern`

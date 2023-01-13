@@ -343,23 +343,23 @@ const lazy = new PlantPattern(1, (plant, args) => {
 });
 
 /**
- * return the highest number which is an element of a flower
+ * return the highest number in a flower
  * @flower {array}
  * @returns {number}
  */
 const maximum = new Pattern(0, (flower) => {
-  assert.type(flower, 'list');
-  return Math.max(...flower.filter(Number));
+  assert.type(flower, 'number[]');
+  return Math.max(...flower);
 });
 
 /**
- * return the lowest number which is an element of a flower
+ * return the lowest number in a flower
  * @flower {array}
  * @returns {number}
  */
 const minimum = new Pattern(0, (flower) => {
-  assert.type(flower, 'list');
-  return Math.min(...flower.filter(Number));
+  assert.type(flower, 'number[]');
+  return Math.min(...flower);
 });
 
 /**
@@ -465,15 +465,13 @@ const prime = new Pattern(0, (flower) => {
 });
 
 /**
- * return the product of all numbers in a flower
+ * return the product of a flower
  * @flower {array}
  * @returns {number}
  */
 const product = new Pattern(0, (flower) => {
-  assert.type(flower, 'list');
-  // TODO: should it throw if it finds non-numbers instead?
-  return flower.filter(v => typeOf(v) === 'number')
-    .reduce((a, c) => a * c, 1);
+  assert.type(flower, 'number[]');
+  return flower.reduce((a, c) => a * c, 1);
 });
 
 /**
@@ -545,15 +543,13 @@ const stop = new PlantPattern(0, (plant) => {
 });
 
 /**
- * return the sum of all numbers in a flower
+ * return the sum of a flower
  * @flower {array}
  * @returns {number}
  */
 const sum = new Pattern(0, (flower) => {
-  assert.type(flower, 'list');
-  // TODO: should it throw if it finds non-numbers instead?
-  return flower.filter(v => typeOf(v) === 'number')
-    .reduce((a, c) => a + c, 0);
+  assert.type(flower, 'number[]');
+  return flower.reduce((a, c) => a + c, 0);
 });
 
 /**
