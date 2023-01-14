@@ -161,18 +161,16 @@ const apply = new Pattern(1, (flower, args) => {
  */
 const count = new Pattern(1, (flower, args) => {
   const [searchValue] = args;
-  assert.any(typeOf(flower), ['list', 'string']);
-  switch (typeOf(flower)) {
-    case 'list':
-      return flower
-        .filter(x => equal(x, searchValue))
-        .length;
-    case 'string':
-      return (flower.match(
-        new RegExp(escape(searchValue), 'g')
-      ) || [])
-        .length;
+  assert.type(flower, 'list|string');
+  if (isList(flower)) {
+    return flower
+      .filter(x => equal(x, searchValue))
+      .length;
   }
+  return (flower.match(
+    new RegExp(escape(searchValue), 'g')
+  ) || [])
+    .length;
 });
 
 /**
@@ -543,7 +541,7 @@ const stop = new PlantPattern(0, (plant) => {
 
 /**
  * return the sum of a flower
- * @flower {array}
+ * @flower {number[]}
  * @returns {number}
  */
 const sum = new Pattern(0, (flower) => {
@@ -612,7 +610,7 @@ const to = new Pattern(1, (flower, args) => {
  * @returns {array}
  */
 const unique = new Pattern(0, (flower, args) => {
-  assert.any(typeOf(flower), ['list', 'string']);
+  assert.type(flower, 'list|string');
   if (typeOf(flower) === 'string') {
     flower = flower.split('');
   }

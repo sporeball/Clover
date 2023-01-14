@@ -33,13 +33,28 @@ const assert = {
       );
     }
   },
+  /**
+   * assert that a value is of a certain type.
+   * allowed types include the following:
+   * - any of the types returned by `typeOf()`;
+   * - `list`, matching any list;
+   * - union types such as `number|string`, matching any element of the union.
+   * @param {any} value
+   * @param {string} T
+   */
   type (value, T) {
     const t = typeOf(value);
-    // special case
-    if (T === 'list' && t.endsWith('[]')) {
-      return;
-    }
-    if (t !== T) {
+    // allow union types
+    const options = T.split('|');
+    if (!options.some(option => {
+      if (option === 'list' && t.endsWith('[]')) {
+        return true;
+      }
+      if (t === option) {
+        return true;
+      }
+      return false;
+    })) {
       throw new CloverError(
         'expected token of type %s, got %s instead', T, t
       );
