@@ -110,6 +110,13 @@ tentamen.add(
   true
 );
 tentamen.add(
+  'eq',
+  `focus 1
+  plus 2
+  eq 3`,
+  true
+);
+tentamen.add(
   'even',
   `focus 4
   even`,
@@ -142,6 +149,20 @@ tentamen.add(
   [[1, 2], [3, 4], [5, 6], [7]]
 );
 tentamen.add(
+  'gt',
+  `focus 1
+  plus 2
+  gt 3`,
+  false
+);
+tentamen.add(
+  'gte',
+  `focus 1
+  plus 2
+  gte 3`,
+  true
+);
+tentamen.add(
   'itemize',
   // in this form, we expect that an apply should not be required
   `focus [1 2 3 4 5]
@@ -161,6 +182,20 @@ tentamen.add(
   lazy (plus 1)`,
   // flower stays the same
   1
+);
+tentamen.add(
+  'lt',
+  `focus 3
+  minus 2
+  lt 1`,
+  false
+);
+tentamen.add(
+  'lte',
+  `focus 3
+  minus 2
+  lte 1`,
+  true
 );
 tentamen.add('maximum', 'focus [1 5 6 2 3 4]\nmaximum', 6);
 tentamen.add('minimum', 'focus [6 2 1 5 4 3]\nminimum', 1);

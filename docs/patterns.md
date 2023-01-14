@@ -44,6 +44,16 @@ Return whether a flower is divisible by a number.
 #### divisor
 Type: `number`
 
+## eq
+**Type:** `Pattern`\
+**Flower type:** `any`\
+**Returns:** `boolean`
+
+Return whether a flower is equal to a value.
+
+#### cmpValue
+Type: `any`
+
 ## even
 **Type:** `Pattern`\
 **Flower type:** `number`\
@@ -111,6 +121,26 @@ groups 2
 -- { flower = [[1, 2], [3, 4], [5]] }
 ```
 
+## gt
+**Type:** `Pattern`\
+**Flower type:** `number`\
+**Returns:** `boolean`
+
+Return whether a flower is greater than a value.
+
+#### cmpValue
+Type: `number`
+
+## gte
+**Type:** `Pattern`\
+**Flower type:** `number`\
+**Returns:** `boolean`
+
+Return whether a flower is greater than or equal to a value.
+
+#### cmpValue
+Type: `number`
+
 ## itemize
 **Type:** `PlantPattern`
 
@@ -139,6 +169,26 @@ Use `take` to get more terms.
 
 #### command
 Type: `command`
+
+## lt
+**Type:** `Pattern`\
+**Flower type:** `number`\
+**Returns:** `boolean`
+
+Return whether a flower is less than a value.
+
+#### cmpValue
+Type: `number`
+
+## lte
+**Type:** `Pattern`\
+**Flower type:** `number`\
+**Returns:** `boolean`
+
+Return whether a flower is less than or equal to a value.
+
+#### cmpValue
+Type: `number`
 
 ## maximum
 **Type:** `Pattern`\
@@ -273,7 +323,7 @@ Stop execution early.
 
 ## sum
 **Type:** `Pattern`\
-**Flower type:** `array`\
+**Flower type:** `number[]`\
 **Returns:** `number`
 
 Return the sum of a flower.

@@ -204,6 +204,17 @@ const divisible = new Pattern(1, (flower, args) => {
 });
 
 /**
+ * return whether a flower is equal to a value
+ * @flower {any}
+ * @param {any} cmpValue
+ * @returns {boolean}
+ */
+const eq = new Pattern(1, (flower, args) => {
+  const [cmpValue] = args;
+  return equal(flower, cmpValue);
+});
+
+/**
  * return whether a flower is even
  * @flower {number}
  * @returns {boolean}
@@ -291,6 +302,32 @@ const groups = new Pattern(1, (flower, args) => {
 });
 
 /**
+ * return whether a flower is greater than a value
+ * @flower {number}
+ * @param {number} cmpValue
+ * @returns {boolean}
+ */
+const gt = new Pattern(1, (flower, args) => {
+  const [cmpValue] = args;
+  assert.type(flower, 'number');
+  assert.type(cmpValue, 'number');
+  return flower > cmpValue;
+});
+
+/**
+ * return whether a flower is greater than or equal to a value
+ * @flower {number}
+ * @param {number} cmpValue
+ * @returns {boolean}
+ */
+const gte = new Pattern(1, (flower, args) => {
+  const [cmpValue] = args;
+  assert.type(flower, 'number');
+  assert.type(cmpValue, 'number');
+  return flower >= cmpValue;
+});
+
+/**
  * take a plant with a single array-type flower, and use its elements as
  * the leaves of a new plant
  * @example
@@ -338,6 +375,32 @@ const lazy = new PlantPattern(1, (plant, args) => {
   assert.type(command, 'command');
   const lazyPlant = new LazyPlant(plant.leaves, command);
   return lazyPlant;
+});
+
+/**
+ * return whether a flower is less than a value
+ * @flower {number}
+ * @param {number} cmpValue
+ * @returns {boolean}
+ */
+const lt = new Pattern(1, (flower, args) => {
+  const [cmpValue] = args;
+  assert.type(flower, 'number');
+  assert.type(cmpValue, 'number');
+  return flower < cmpValue;
+});
+
+/**
+ * return whether a flower is less than or equal to a value
+ * @flower {number}
+ * @param {number} cmpValue
+ * @returns {boolean}
+ */
+const lte = new Pattern(1, (flower, args) => {
+  const [cmpValue] = args;
+  assert.type(flower, 'number');
+  assert.type(cmpValue, 'number');
+  return flower <= cmpValue;
 });
 
 /**
@@ -683,14 +746,19 @@ export const patterns = {
   crush,
   divisible,
   even,
+  eq,
   filter,
   flatten,
   focus,
   foreach,
   groups,
+  gt,
+  gte,
   itemize,
   last,
   lazy,
+  lt,
+  lte,
   maximum,
   minimum,
   minus,
