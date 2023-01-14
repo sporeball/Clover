@@ -117,7 +117,10 @@ export function typeOfList (list) {
  * @returns {boolean}
  */
 export function isList (value) {
-  return typeOf(value).endsWith('[]');
+  return (
+    typeOf(value) === 'list' ||
+    typeOf(value).endsWith('[]')
+  );
 }
 
 /**
