@@ -244,7 +244,7 @@ tentamen.add(
   'rld',
   `focus "4w3a1d1e6x1y3w"
   rld`,
-  'wwwwaaadexxxxxxywww'
+  new Hss('wwwwaaadexxxxxxywww')
 );
 tentamen.add(
   'sort',

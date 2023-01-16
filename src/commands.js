@@ -561,14 +561,13 @@ const rld = new Pattern(0, (flower) => {
     throw new CloverError('invalid value');
   }
 
-  let result = '';
   for (const run of flower.match(/\d+./g)) {
     const number = Number(run.slice(0, -1));
     const value = run.slice(-1);
-    result += value.repeat(number);
+    flower = flower.replace(run, value.repeat(number));
   }
 
-  return result;
+  return flower;
 });
 
 /**
