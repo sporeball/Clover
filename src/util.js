@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { dequal } from 'dequal/lite';
+import Hss from '@sporeball/hss.js';
+import stringLength from 'string-length';
 import { CommandInstance } from './commands.js';
 import { Plant } from '../src/plant.js';
 import { Leaf } from '../src/leaf.js';
@@ -53,7 +55,10 @@ export function typeOf (value) {
   if (typeof value === 'number') {
     return 'number';
   }
-  if (typeof value === 'string') {
+  if (typeof value === 'string' && stringLength(value) <= 1) {
+    return 'char';
+  }
+  if (value instanceof Hss) {
     return 'string';
   }
   if (typeof value === 'boolean') {
@@ -119,6 +124,7 @@ export function typeOfList (list) {
 export function isList (value) {
   return (
     typeOf(value) === 'list' ||
+    typeOf(value) === 'string' ||
     typeOf(value).endsWith('[]')
   );
 }

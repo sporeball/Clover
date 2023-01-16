@@ -8,7 +8,8 @@ import { escape } from './util.js';
 // object of match values for the different token types
 const T = {
   number: /^0|^-?[1-9]\d*/g,
-  string: /^'.*?'/g,
+  char: /^'.*?'/g,
+  string: /^".*?"/g,
   boolean: /^true|^false/,
   openParen: '(',
   closeParen: ')',

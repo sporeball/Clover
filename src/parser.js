@@ -1,3 +1,5 @@
+import stringLength from 'string-length';
+
 /**
  * the second step in executing a Clover program is to parse its tokens.
  * this means taking a flat list of tokens, and using it to create structures.
@@ -11,11 +13,29 @@ function parseNumber (tokens) {
   };
 }
 
+function parseChar (tokens) {
+  const char = tokens.shift();
+  if (char.value.slice(1, -1) === '\\n') {
+    return {
+      type: 'char',
+      value: '\n'
+    };
+  }
+  const length = stringLength(char.value.slice(1, -1));
+  if (length > 1) {
+    throw new CloverError(`parser: found char with length ${length}`);
+  }
+  return {
+    type: 'char',
+    value: char.value.slice(1, -1) // remove the single quotes
+  };
+}
+
 function parseString (tokens) {
   const string = tokens.shift();
   return {
     type: 'string',
-    value: string.value.slice(1, -1) // remove the single quotes
+    value: string.value.slice(1, -1) // remove the double quotes
   };
 }
 
@@ -50,6 +70,13 @@ function parseList (tokens) {
   // it's missing
   if (tokens.shift()?.type !== 'closeBracket') {
     throw new CloverError('unmatched bracket');
+  }
+  // special case for strings
+  if (list.every(item => item.type === 'char')) {
+    return {
+      type: 'string',
+      value: list.map(item => item.value).join('')
+    };
   }
   return {
     type: 'list',
@@ -186,6 +213,8 @@ function eat (tokens) {
   switch (tokens[0].type) {
     case 'number':
       return parseNumber(tokens);
+    case 'char':
+      return parseChar(tokens);
     case 'string':
       return parseString(tokens);
     case 'boolean':

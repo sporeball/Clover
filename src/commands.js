@@ -1,7 +1,7 @@
 import { evaluateNode } from './index.js';
 import assert from './assert.js';
 import { Plant, LazyPlant } from './plant.js';
-import { escape, equal, isList, typeOf } from './util.js';
+import { escape, equal, isList } from './util.js';
 
 /**
  * each command written in a Clover program consists of a list of tokens.
@@ -578,7 +578,7 @@ const rld = new Pattern(0, (flower) => {
  */
 const sort = new Pattern(0, (flower) => {
   assert.type(flower, 'list');
-  return [...flower].sort((a, b) => a - b);
+  return flower.sort((a, b) => a - b);
 });
 
 /**
@@ -674,9 +674,6 @@ const to = new Pattern(1, (flower, args) => {
  */
 const unique = new Pattern(0, (flower, args) => {
   assert.type(flower, 'list|string');
-  if (typeOf(flower) === 'string') {
-    flower = flower.split('');
-  }
   return flower.filter((x, i, r) => r.indexOf(x) === i);
 });
 
