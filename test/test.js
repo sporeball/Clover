@@ -256,7 +256,7 @@ tentamen.add(
   'split',
   `focus "1\\n2\\n3\\n4"
   split "\\n"`,
-  ['1', '2', '3', '4']
+  [new Hss('1'), new Hss('2'), new Hss('3'), new Hss('4')]
 );
 tentamen.add(
   'stop',

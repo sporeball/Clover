@@ -2,7 +2,7 @@ import { tokenize } from './tokenizer.js';
 import { parse } from './parser.js';
 import { Plant } from './plant.js';
 import * as Commands from './commands.js';
-import { format, open, output, typeOf } from './util.js';
+import { format, open, output } from './util.js';
 
 import Hss from '@sporeball/hss.js';
 
