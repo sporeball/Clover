@@ -139,6 +139,26 @@ export function evaluateInstance (instance) {
  */
 
 /**
+ * return whether a flower is a vowel (`a`, `e`, `i`, `o`, or `u`)
+ * @flower {char}
+ * @returns {boolean}
+ */
+const aeiou = new Pattern(0, (flower) => {
+  assert.type(flower, 'char');
+  return flower.match(/[aeiou]/g) !== null;
+});
+
+/**
+ * return whether a flower is a vowel (`a`, `e`, `i`, `o`, or `u`) or `y`
+ * @flower {char}
+ * @returns {boolean}
+ */
+const aeiouy = new Pattern(0, (flower) => {
+  assert.type(flower, 'char');
+  return flower.match(/[aeiouy]/g) !== null;
+});
+
+/**
  * run a command on each element of a flower
  * @flower {list}
  * @param {command} command
@@ -777,6 +797,8 @@ const min = new SugarPattern('min', minimum);
 
 export const patterns = {
   // commands
+  aeiou,
+  aeiouy,
   apply,
   applyto,
   count,

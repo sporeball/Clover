@@ -86,6 +86,18 @@ console.log('');
 
 tentamen.suite('commands');
 tentamen.add(
+  'aeiou',
+  `focus 'e'
+  aeiou`,
+  true
+);
+tentamen.add(
+  'aeiouy',
+  `focus 'y'
+  aeiouy`,
+  true
+);
+tentamen.add(
   'apply',
   `focus [1 2 3 4 5]
   apply (times 2)`,

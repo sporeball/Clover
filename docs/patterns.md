@@ -1,3 +1,17 @@
+## aeiou
+**Type:** `Pattern`\
+**Flower type:** `char`\
+**Returns:** `boolean`
+
+Return whether a flower is a vowel (`a`, `e`, `i`, `o`, or `u`).
+
+## aeiouy
+**Type:** `Pattern`\
+**Flower type:** `char`\
+**Returns:** `boolean`
+
+Return whether a flower is a vowel (`a`, `e`, `i`, `o`, or `u`) or `y`.
+
 ## apply
 **Type:** `Pattern`\
 **Flower type:** `list`\
