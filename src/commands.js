@@ -1,7 +1,7 @@
 import { evaluateNode } from './index.js';
 import assert from './assert.js';
 import { Plant, LazyPlant } from './plant.js';
-import { equal, isList } from './util.js';
+import { equal, isList, typeOf } from './util.js';
 
 /**
  * each command written in a Clover program consists of a list of tokens.
@@ -235,9 +235,11 @@ const filter = new Pattern(1, (flower, args) => {
  * @flower {array}
  * @returns {array}
  */
-// TODO:
 const flatten = new Pattern(0, (flower) => {
   assert.type(flower, 'list');
+  if (typeOf(flower) === 'string') {
+    throw new CloverError('cannot flatten a string');
+  }
   return flower.flat();
 });
 
