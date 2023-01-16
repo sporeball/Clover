@@ -1,7 +1,7 @@
 import { evaluateNode } from './index.js';
 import assert from './assert.js';
 import { Plant, LazyPlant } from './plant.js';
-import { escape, equal, isList } from './util.js';
+import { equal, isList } from './util.js';
 
 /**
  * each command written in a Clover program consists of a list of tokens.
@@ -161,15 +161,9 @@ const apply = new Pattern(1, (flower, args) => {
  */
 const count = new Pattern(1, (flower, args) => {
   const [searchValue] = args;
-  assert.type(flower, 'list|string');
-  if (isList(flower)) {
-    return flower
-      .filter(x => equal(x, searchValue))
-      .length;
-  }
-  return (flower.match(
-    new RegExp(escape(searchValue), 'g')
-  ) || [])
+  assert.type(flower, 'list');
+  return flower
+    .filter(x => equal(x, searchValue))
     .length;
 });
 
@@ -241,6 +235,7 @@ const filter = new Pattern(1, (flower, args) => {
  * @flower {array}
  * @returns {array}
  */
+// TODO:
 const flatten = new Pattern(0, (flower) => {
   assert.type(flower, 'list');
   return flower.flat();
@@ -542,6 +537,7 @@ const product = new Pattern(0, (flower) => {
  * @param {any} replacementValue
  * @returns {any}
  */
+// TODO: weird
 const replace = new Pattern(2, (flower, args) => {
   const [matchValue, replacementValue] = args;
   if (equal(flower, matchValue)) {
@@ -589,7 +585,7 @@ const sort = new Pattern(0, (flower) => {
 const split = new Pattern(1, (flower, args) => {
   const [splitter] = args;
   assert.type(flower, 'string');
-  assert.type(splitter, 'string');
+  assert.type(splitter, 'char|string');
   return flower.split(splitter);
 });
 
@@ -672,7 +668,7 @@ const to = new Pattern(1, (flower, args) => {
  * @returns {array}
  */
 const unique = new Pattern(0, (flower, args) => {
-  assert.type(flower, 'list|string');
+  assert.type(flower, 'list');
   return flower.filter((x, i, r) => r.indexOf(x) === i);
 });
 
