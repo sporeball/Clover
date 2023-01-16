@@ -343,7 +343,8 @@ if (uncovered.length === 0) {
 } else {
   const p = (
     100 * ((patternHeads.length - uncovered.length) / patternHeads.length)
-  );
+  )
+    .toFixed(2);
   console.log(
     colors.red('  X  ') +
     colors.yellow(`${p}% coverage (${uncovered.length} commands untested)\n`) +
