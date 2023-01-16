@@ -543,6 +543,9 @@ const prime = new Pattern(0, (flower) => {
   if (flower === Infinity) {
     throw new CloverError('cannot check against infinity');
   }
+  if (flower === 1) {
+    return false;
+  }
   for (let i = 2; i <= Math.sqrt(flower); i++) {
     if (flower % i === 0) {
       return false;
