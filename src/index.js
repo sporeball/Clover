@@ -32,10 +32,13 @@ export default function run (code, options = {}) {
   // input casting
   if (
     input.match(/^0$|^-?[1-9]\d*$/g) ||
-    // input.match(/^'[^']*?'$/g) ||
+    input.match(/^'.*?'$/g) ||
+    input.match(/^".*?"$/g) ||
     input.match(/^\[.*\]$/g)
   ) {
     input = evaluateNode(parse(tokenize(input))[0]);
+  } else {
+    input = new Hss(input);
   }
 
   Clover.outputs = [];
