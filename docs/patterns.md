@@ -1,7 +1,7 @@
 ## apply
 **Type:** `Pattern`\
-**Flower type:** `array`\
-**Returns:** `array`
+**Flower type:** `list`\
+**Returns:** `list`
 
 Run a command on each element of a flower.
 
@@ -10,7 +10,7 @@ Type: `command`
 
 ## count
 **Type:** `Pattern`\
-**Flower type:** `array|string`\
+**Flower type:** `list`\
 **Returns:** `number`
 
 Count occurrences of a value in a flower.
@@ -63,8 +63,8 @@ Return whether a flower is even.
 
 ## filter
 **Type:** `Pattern`\
-**Flower type:** `array`\
-**Returns:** `array`
+**Flower type:** `list`\
+**Returns:** `list`
 
 Remove occurrences of a value from a flower.
 
@@ -73,8 +73,8 @@ Type: `any`
 
 ## flatten
 **Type:** `Pattern`\
-**Flower type:** `array`\
-**Returns:** `array`
+**Flower type:** `list`\
+**Returns:** `list`
 
 Flatten a flower.
 
@@ -93,7 +93,7 @@ Run a command on a flower multiple times, and replace the flower with an array o
 Performs arg substitution.
 
 #### list
-Type: `array`
+Type: `list`
 #### command
 Type: `command`
 
@@ -106,8 +106,8 @@ foreach [1 2 3] (plus *)
 
 ## groups
 **Type:** `Pattern`\
-**Flower type:** `array`\
-**Returns:** `array`
+**Flower type:** `list`\
+**Returns:** `list`
 
 Split a flower into groups of up to n values.
 
@@ -192,14 +192,14 @@ Type: `number`
 
 ## maximum
 **Type:** `Pattern`\
-**Flower type:** `array`\
+**Flower type:** `number[]`\
 **Returns:** `number`
 
 Return the highest number in a flower.
 
 ## minimum
 **Type:** `Pattern`\
-**Flower type:** `array`\
+**Flower type:** `number[]`\
 **Returns:** `number`
 
 Return the lowest number in a flower.
@@ -275,7 +275,7 @@ Return if a flower is prime.
 
 ## product
 **Type:** `Pattern`\
-**Flower type:** `array`\
+**Flower type:** `number[]`\
 **Returns:** `number`
 
 Return the product of a flower.
@@ -294,15 +294,15 @@ Type: `any`
 
 ## rld
 **Type:** `Pattern`\
-**Flower type:** `array[]`\
-**Returns:** `array`
+**Flower type:** `string`\
+**Returns:** `string`
 
 Run-length decode a string.
 
 ## sort
 **Type:** `Pattern`\
-**Flower type:** `array`\
-**Returns:** `array`
+**Flower type:** `list`\
+**Returns:** `list`
 
 Sort a flower.
 
@@ -314,7 +314,7 @@ Sort a flower.
 String split a flower.
 
 #### splitter
-Type: `string`
+Type: `char|string`
 
 ## stop
 **Type:** `PlantPattern`
@@ -351,7 +351,7 @@ Type: `number`
 ## to
 **Type:** `Pattern`\
 **Flower type:** `number`\
-**Returns:** `array`
+**Returns:** `number[]`
 
 Return a range between a flower and another number.\
 If applicable, the range will count down.
@@ -361,8 +361,8 @@ Type: `number`
 
 ## unique
 **Type:** `Pattern`\
-**Flower type:** `array|string`\
-**Returns:** `array`
+**Flower type:** `list`\
+**Returns:** `list`
 
 Return unique elements of a flower.
 
@@ -398,11 +398,11 @@ using [4 5 6] (sum)
 
 ## zip
 **Type:** `Pattern`\
-**Flower type:** `array`\
-**Returns:** `array`
+**Flower type:** `list`\
+**Returns:** `list`
 
 Zip two arrays together.
 
 #### seconds
-Type: `array`
+Type: `list`
 
