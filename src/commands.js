@@ -375,6 +375,15 @@ const lazy = new PlantPattern(1, (plant, args) => {
 });
 
 /**
+ * lowercase a flower
+ * @flower {char|string}
+ * @returns {char|string}
+ */
+const lower = new Pattern(0, (flower) => {
+  return flower.toLowerCase();
+});
+
+/**
  * return whether a flower is less than a value
  * @flower {number}
  * @param {number} cmpValue
@@ -696,6 +705,15 @@ const until = new Pattern(2, (flower, args) => {
 });
 
 /**
+ * uppercase a flower
+ * @flower {char|string}
+ * @returns {char|string}
+ */
+const upper = new Pattern(0, (flower) => {
+  return flower.toUpperCase();
+});
+
+/**
  * replace a flower with the result of a command run on a different value
  * @example
  * flowers [1]
@@ -752,6 +770,7 @@ export const patterns = {
   itemize,
   last,
   lazy,
+  lower,
   lt,
   lte,
   maximum,
@@ -775,6 +794,7 @@ export const patterns = {
   to,
   unique,
   until,
+  upper,
   using,
   zip,
   // syntactic sugar

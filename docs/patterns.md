@@ -170,6 +170,13 @@ Use `take` to get more terms.
 #### command
 Type: `command`
 
+## lower
+**Type:** `Pattern`\
+**Flower type:** `char|string`\
+**Returns:** `char|string`
+
+Lowercase a flower.
+
 ## lt
 **Type:** `Pattern`\
 **Flower type:** `number`\
@@ -377,6 +384,13 @@ Repeatedly run one command on a flower until another command returns true.
 Type: `command`
 #### command
 Type: `command`
+
+## upper
+**Type:** `Pattern`\
+**Flower type:** `char|string`\
+**Returns:** `char|string`
+
+Uppercase a flower.
 
 ## using
 **Type:** `Pattern`\

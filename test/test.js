@@ -185,6 +185,12 @@ tentamen.add(
   1
 );
 tentamen.add(
+  'lower',
+  `focus "AbsoLUTELY"
+  lower`,
+  new Hss('absolutely')
+);
+tentamen.add(
   'lt',
   `focus 3
   minus 2
@@ -299,6 +305,12 @@ tentamen.add(
   `focus 200
   until (prime) (plus 1)`,
   211
+);
+tentamen.add(
+  'upper',
+  `focus "absolutely!"
+  upper`,
+  new Hss('ABSOLUTELY!')
 );
 tentamen.add(
   'using',
