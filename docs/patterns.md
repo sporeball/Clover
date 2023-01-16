@@ -8,6 +8,18 @@ Run a command on each element of a flower.
 #### command
 Type: `command`
 
+## applyto
+**Type:** `Pattern`\
+**Flower type:** `list`\
+**Returns:** `list`
+
+Run a command on each element of a flower for which a condition is true.
+
+#### conditionCommand
+Type: `command`
+#### command
+Type: `command`
+
 ## count
 **Type:** `Pattern`\
 **Flower type:** `list`\

@@ -92,6 +92,12 @@ tentamen.add(
   [2, 4, 6, 8, 10]
 );
 tentamen.add(
+  'applyto',
+  `focus [1 2 3 4 5]
+  applyto (prime) (times 2)`,
+  [1, 4, 6, 4, 10]
+);
+tentamen.add(
   'count',
   `focus "aaaaa"
   count 'a'`,

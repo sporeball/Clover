@@ -151,6 +151,26 @@ const apply = new Pattern(1, (flower, args) => {
   return flower.map(x => command.run(x));
 });
 
+/**
+ * run a command on each element of a flower for which a condition is true
+ * @flower {list}
+ * @param {command} conditionCommand
+ * @param {command} command
+ * @returns {list}
+ */
+const applyto = new Pattern(2, (flower, args) => {
+  const [conditionCommand, command] = args;
+  assert.type(flower, 'list');
+  assert.type(conditionCommand, 'command');
+  assert.type(command, 'command');
+  return flower.map(x => {
+    if (conditionCommand.run(x) === true) {
+      return command.run(x);
+    }
+    return x;
+  });
+});
+
 // TODO: comp used to be here - replace with destructuring bind
 
 /**
@@ -755,6 +775,7 @@ const min = new SugarPattern('min', minimum);
 export const patterns = {
   // commands
   apply,
+  applyto,
   count,
   crush,
   divisible,
