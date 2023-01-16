@@ -140,9 +140,9 @@ export function evaluateInstance (instance) {
 
 /**
  * run a command on each element of a flower
- * @flower {array}
+ * @flower {list}
  * @param {command} command
- * @returns {array}
+ * @returns {list}
  */
 const apply = new Pattern(1, (flower, args) => {
   const [command] = args;
@@ -155,7 +155,7 @@ const apply = new Pattern(1, (flower, args) => {
 
 /**
  * count occurrences of a value in a flower
- * @flower {array|string}
+ * @flower {list}
  * @param {any} searchValue
  * @returns {number}
  */
@@ -220,9 +220,9 @@ const even = new Pattern(0, (flower) => {
 
 /**
  * remove occurrences of a value from a flower
- * @flower {array}
+ * @flower {list}
  * @param {any} filterValue
- * @returns {array}
+ * @returns {list}
  */
 const filter = new Pattern(1, (flower, args) => {
   const [filterValue] = args;
@@ -232,8 +232,8 @@ const filter = new Pattern(1, (flower, args) => {
 
 /**
  * flatten a flower
- * @flower {array}
- * @returns {array}
+ * @flower {list}
+ * @returns {list}
  */
 const flatten = new Pattern(0, (flower) => {
   assert.type(flower, 'list');
@@ -260,7 +260,7 @@ const focus = new Pattern(1, (flower, args) => {
  * focus 5
  * foreach [1 2 3] (plus *)
  * -- { flower = [6, 7, 8] }
- * @param {array} list
+ * @param {list} list
  * @param {command} command
  */
 const foreach = new Pattern(2, (flower, args) => {
@@ -280,9 +280,9 @@ const foreach = new Pattern(2, (flower, args) => {
  * focus [1 2 3 4 5]
  * groups 2
  * -- { flower = [[1, 2], [3, 4], [5]] }
- * @flower {array}
+ * @flower {list}
  * @param {number} size
- * @returns {array}
+ * @returns {list}
  */
 const groups = new Pattern(1, (flower, args) => {
   const [size] = args;
@@ -402,7 +402,7 @@ const lte = new Pattern(1, (flower, args) => {
 
 /**
  * return the highest number in a flower
- * @flower {array}
+ * @flower {number[]}
  * @returns {number}
  */
 const maximum = new Pattern(0, (flower) => {
@@ -412,7 +412,7 @@ const maximum = new Pattern(0, (flower) => {
 
 /**
  * return the lowest number in a flower
- * @flower {array}
+ * @flower {number[]}
  * @returns {number}
  */
 const minimum = new Pattern(0, (flower) => {
@@ -524,7 +524,7 @@ const prime = new Pattern(0, (flower) => {
 
 /**
  * return the product of a flower
- * @flower {array}
+ * @flower {number[]}
  * @returns {number}
  */
 const product = new Pattern(0, (flower) => {
@@ -550,8 +550,8 @@ const replace = new Pattern(2, (flower, args) => {
 
 /**
  * run-length decode a string
- * @flower {array[]}
- * @returns {array}
+ * @flower {string}
+ * @returns {string}
  */
 const rld = new Pattern(0, (flower) => {
   assert.type(flower, 'string');
@@ -570,9 +570,10 @@ const rld = new Pattern(0, (flower) => {
 
 /**
  * sort a flower
- * @flower {array}
- * @returns {array}
+ * @flower {list}
+ * @returns {list}
  */
+// TODO: overload
 const sort = new Pattern(0, (flower) => {
   assert.type(flower, 'list');
   return flower.sort((a, b) => a - b);
@@ -581,7 +582,7 @@ const sort = new Pattern(0, (flower) => {
 /**
  * string split a flower
  * @flower {string}
- * @param {string} splitter
+ * @param {char|string} splitter
  * @returns {string[]}
  */
 const split = new Pattern(1, (flower, args) => {
@@ -648,7 +649,7 @@ const times = new Pattern(1, (flower, args) => {
  * if applicable, the range will count down
  * @flower {number}
  * @param {number} end
- * @returns {array}
+ * @returns {number[]}
  */
 const to = new Pattern(1, (flower, args) => {
   const [end] = args;
@@ -666,8 +667,8 @@ const to = new Pattern(1, (flower, args) => {
 
 /**
  * return unique elements of a flower
- * @flower {array|string}
- * @returns {array}
+ * @flower {list}
+ * @returns {list}
  */
 const unique = new Pattern(0, (flower, args) => {
   assert.type(flower, 'list');
@@ -713,9 +714,9 @@ const using = new Pattern(2, (flower, args) => {
 
 /**
  * zip two arrays together
- * @flower {array}
- * @param {array} seconds
- * @returns {array}
+ * @flower {list}
+ * @param {list} seconds
+ * @returns {list}
  */
 const zip = new Pattern(1, (flower, args) => {
   const firsts = flower;
