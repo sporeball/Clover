@@ -13,6 +13,17 @@ function number (n) {
 }
 
 /**
+ * @param {string} c
+ */
+function char (c) {
+  if (c.length === 0) {
+    return colors.gray("''");
+  }
+  c = c.replace(/\n/g, colors.yellow('\\n'));
+  return colors.cyan(`'${c}'`);
+}
+
+/**
  * @param {string} s
  */
 function string (s) {
@@ -20,7 +31,7 @@ function string (s) {
     return colors.gray("''");
   }
   s = s.replace(/\n/g, colors.yellow('\\n'));
-  return colors.cyan(`'${s}'`);
+  return colors.cyan(`"${s.toString()}"`);
 }
 
 /**
@@ -102,6 +113,7 @@ function other (v) {
 const functions = {
   none,
   number,
+  char,
   string,
   boolean,
   list,

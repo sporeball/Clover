@@ -1,6 +1,7 @@
 import parse from '../src/index.js';
 import { patterns } from '../src/commands.js';
 import { open } from '../src/util.js';
+import Hss from '@sporeball/hss.js';
 import colors from 'picocolors';
 import Tentamen from 'tentamen';
 
@@ -92,7 +93,7 @@ tentamen.add(
 );
 tentamen.add(
   'count',
-  `focus 'aaaaa'
+  `focus "aaaaa"
   count 'a'`,
   5
 );
@@ -241,9 +242,9 @@ tentamen.add(
 );
 tentamen.add(
   'rld',
-  `focus '4w3a1d1e6x1y3w'
+  `focus "4w3a1d1e6x1y3w"
   rld`,
-  'wwwwaaadexxxxxxywww'
+  new Hss('wwwwaaadexxxxxxywww')
 );
 tentamen.add(
   'sort',
@@ -253,9 +254,9 @@ tentamen.add(
 );
 tentamen.add(
   'split',
-  `focus '1\\n2\\n3\\n4'
+  `focus "1\\n2\\n3\\n4"
   split '\\n'`,
-  ['1', '2', '3', '4']
+  [new Hss('1'), new Hss('2'), new Hss('3'), new Hss('4')]
 );
 tentamen.add(
   'stop',
@@ -289,9 +290,9 @@ tentamen.add(
 );
 tentamen.add(
   'unique',
-  `focus 'aaaaabbbbcccdde'
+  `focus "aaaaabbbbcccdde"
   unique`,
-  ['a', 'b', 'c', 'd', 'e']
+  new Hss('abcde')
 );
 tentamen.add(
   'until',

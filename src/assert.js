@@ -1,4 +1,4 @@
-import { any, defined, equal, matches, typeOf } from './util.js';
+import { any, defined, equal, isList, matches, typeOf } from './util.js';
 
 const assert = {
   any (value, values) {
@@ -47,7 +47,7 @@ const assert = {
     // allow union types
     const options = T.split('|');
     if (!options.some(option => {
-      if (option === 'list' && t.endsWith('[]')) {
+      if (option === 'list' && isList(value)) {
         return true;
       }
       if (t === option) {

@@ -4,6 +4,8 @@ import { Plant } from './plant.js';
 import * as Commands from './commands.js';
 import { format, open, output } from './util.js';
 
+import Hss from '@sporeball/hss.js';
+
 /**
  * run a Clover program
  * @param {string} code
@@ -105,8 +107,10 @@ export function evaluateNode (ASTNode) {
   switch (ASTNode.type) {
     case 'number':
       return ASTNode.value;
-    case 'string':
+    case 'char':
       return ASTNode.value.replace(/\\n/g, '\n');
+    case 'string':
+      return new Hss(ASTNode.value.replace(/\\n/g, '\n'));
     case 'boolean':
       return ASTNode.value;
     case 'list':
