@@ -226,6 +226,13 @@ Use `take` to get more terms.
 #### command
 Type: `command`
 
+## lines
+**Type:** `Pattern`\
+**Flower type:** `string`\
+**Returns:** `string[]`
+
+Split a flower by lines (`\n`).
+
 ## lower
 **Type:** `Pattern`\
 **Flower type:** `char|string`\

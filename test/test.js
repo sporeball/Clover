@@ -221,6 +221,12 @@ tentamen.add(
   1
 );
 tentamen.add(
+  'lines',
+  `focus "first line\\nsecond line"
+  lines`,
+  [new Hss('first line'), new Hss('second line')]
+);
+tentamen.add(
   'lower',
   `focus "AbsoLUTELY"
   lower`,

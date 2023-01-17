@@ -463,6 +463,15 @@ const lazy = new PlantPattern(1, (plant, args) => {
 });
 
 /**
+ * split a flower by lines (`\n`)
+ * @flower {string}
+ * @returns {string[]}
+ */
+const lines = new Pattern(0, (flower) => {
+  return flower.split('\n');
+});
+
+/**
  * lowercase a flower
  * @flower {char|string}
  * @returns {char|string}
@@ -890,6 +899,7 @@ export const patterns = {
   itemize,
   last,
   lazy,
+  lines,
   lower,
   lt,
   lte,
