@@ -159,6 +159,28 @@ const aeiouy = new Pattern(0, (flower) => {
 });
 
 /**
+ * append a value to a flower
+ * @flower {list}
+ * @param {any} appendValue
+ * @returns {list}
+ */
+const append = new Pattern(1, (flower, args) => {
+  const [appendValue] = args;
+  assert.type(flower, 'list');
+  if (
+    typeOf(appendValue) !== typeOf(flower) &&
+    typeOf(appendValue) !== typeOf(flower.at(0))
+  ) {
+    throw new CloverError(
+      'cannot append %s to %s',
+      typeOf(appendValue),
+      typeOf(flower)
+    );
+  }
+  return flower.concat(appendValue);
+});
+
+/**
  * run a command on each element of a flower
  * @flower {list}
  * @param {command} command
@@ -554,6 +576,29 @@ const plus = new Pattern(1, (flower, args) => {
 });
 
 /**
+ * prepend a value to a flower
+ * @flower {list}
+ * @param {any} prependValue
+ * @returns {list}
+ */
+const prepend = new Pattern(1, (flower, args) => {
+  const [prependValue] = args;
+  assert.type(flower, 'list');
+  if (
+    typeOf(prependValue) !== typeOf(flower) &&
+    typeOf(prependValue) !== typeOf(flower.at(0))
+  ) {
+    throw new CloverError(
+      'cannot prepend %s to %s',
+      typeOf(prependValue),
+      typeOf(flower)
+    );
+  }
+  flower.splice(0, 0, prependValue);
+  return flower;
+});
+
+/**
  * return if a flower is prime
  * @flower {number}
  * @returns {boolean}
@@ -799,6 +844,7 @@ export const patterns = {
   // commands
   aeiou,
   aeiouy,
+  append,
   apply,
   applyto,
   count,
@@ -827,6 +873,7 @@ export const patterns = {
   over,
   pluck,
   plus,
+  prepend,
   prime,
   product,
   replace,

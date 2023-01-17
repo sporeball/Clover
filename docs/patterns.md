@@ -12,6 +12,16 @@ Return whether a flower is a vowel (`a`, `e`, `i`, `o`, or `u`).
 
 Return whether a flower is a vowel (`a`, `e`, `i`, `o`, or `u`) or `y`.
 
+## append
+**Type:** `Pattern`\
+**Flower type:** `list`\
+**Returns:** `list`
+
+Append a value to a flower.
+
+#### appendValue
+Type: `any`
+
 ## apply
 **Type:** `Pattern`\
 **Flower type:** `list`\
@@ -298,6 +308,16 @@ Add to a flower.
 
 #### addend
 Type: `number`
+
+## prepend
+**Type:** `Pattern`\
+**Flower type:** `list`\
+**Returns:** `list`
+
+Prepend a value to a flower.
+
+#### prependValue
+Type: `any`
 
 ## prime
 **Type:** `Pattern`\

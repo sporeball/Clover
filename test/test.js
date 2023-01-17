@@ -98,6 +98,12 @@ tentamen.add(
   true
 );
 tentamen.add(
+  'append',
+  `focus [1 2 3]
+  append 4`,
+  [1, 2, 3, 4]
+);
+tentamen.add(
   'apply',
   `focus [1 2 3 4 5]
   apply (times 2)`,
@@ -246,6 +252,12 @@ tentamen.add(
   [2, 4]
 );
 tentamen.add('plus', 'focus 5\nplus 5', 10);
+tentamen.add(
+  'prepend',
+  `focus ["b" "c" "d"]
+  prepend "a"`,
+  [new Hss('a'), new Hss('b'), new Hss('c'), new Hss('d')]
+);
 tentamen.add(
   'prime',
   `focus 7
