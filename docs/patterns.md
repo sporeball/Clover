@@ -12,6 +12,26 @@ Return whether a flower is a vowel (`a`, `e`, `i`, `o`, or `u`).
 
 Return whether a flower is a vowel (`a`, `e`, `i`, `o`, or `u`) or `y`.
 
+## all
+**Type:** `Pattern`\
+**Flower type:** `list`\
+**Returns:** `boolean`
+
+Return whether every element of a flower passes a condition.
+
+#### conditionCommand
+Type: `command`
+
+## any
+**Type:** `Pattern`\
+**Flower type:** `list`\
+**Returns:** `boolean`
+
+Return whether any element of a flower passes a condition.
+
+#### conditionCommand
+Type: `command`
+
 ## append
 **Type:** `Pattern`\
 **Flower type:** `list`\

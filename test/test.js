@@ -98,6 +98,18 @@ tentamen.add(
   true
 );
 tentamen.add(
+  'all',
+  `focus [1 2 3 4 5]
+  all (odd)`,
+  false
+);
+tentamen.add(
+  'any',
+  `focus [1 2 3 4 5]
+  any (odd)`,
+  true
+);
+tentamen.add(
   'append',
   `focus [1 2 3]
   append 4`,

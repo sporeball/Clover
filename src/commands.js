@@ -159,6 +159,32 @@ const aeiouy = new Pattern(0, (flower) => {
 });
 
 /**
+ * return whether every element of a flower passes a condition
+ * @flower {list}
+ * @param {command} conditionCommand
+ * @returns {boolean}
+ */
+const all = new Pattern(1, (flower, args) => {
+  const [conditionCommand] = args;
+  assert.type(flower, 'list');
+  assert.type(conditionCommand, 'command');
+  return flower.every(x => conditionCommand.run(x) === true);
+});
+
+/**
+ * return whether any element of a flower passes a condition
+ * @flower {list}
+ * @param {command} conditionCommand
+ * @returns {boolean}
+ */
+const any = new Pattern(1, (flower, args) => {
+  const [conditionCommand] = args;
+  assert.type(flower, 'list');
+  assert.type(conditionCommand, 'command');
+  return flower.some(x => conditionCommand.run(x) === true);
+});
+
+/**
  * append a value to a flower
  * @flower {list}
  * @param {any} appendValue
@@ -844,6 +870,8 @@ export const patterns = {
   // commands
   aeiou,
   aeiouy,
+  all,
+  any,
   append,
   apply,
   applyto,
