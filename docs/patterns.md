@@ -64,6 +64,13 @@ Type: `command`
 #### command
 Type: `command`
 
+## blocks
+**Type:** `Pattern`\
+**Flower type:** `string`\
+**Returns:** `string[]`
+
+Split a flower by blocks (`\n\n`).
+
 ## count
 **Type:** `Pattern`\
 **Flower type:** `list`\

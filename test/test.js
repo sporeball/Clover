@@ -128,6 +128,12 @@ tentamen.add(
   [1, 4, 6, 4, 10]
 );
 tentamen.add(
+  'blocks',
+  `focus "1\\n2\\n3\\n\\n4\\n5\\n6"
+  blocks`,
+  [new Hss('1\n2\n3'), new Hss('4\n5\n6')]
+);
+tentamen.add(
   'count',
   `focus "aaaaa"
   count 'a'`,

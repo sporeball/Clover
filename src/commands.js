@@ -242,6 +242,15 @@ const applyto = new Pattern(2, (flower, args) => {
 // TODO: comp used to be here - replace with destructuring bind
 
 /**
+ * split a flower by blocks (`\n\n`)
+ * @flower {string}
+ * @returns {string[]}
+ */
+const blocks = new Pattern(0, (flower) => {
+  return flower.split('\n\n');
+});
+
+/**
  * count occurrences of a value in a flower
  * @flower {list}
  * @param {any} searchValue
@@ -884,6 +893,7 @@ export const patterns = {
   append,
   apply,
   applyto,
+  blocks,
   count,
   crush,
   divisible,
