@@ -247,6 +247,7 @@ const applyto = new Pattern(2, (flower, args) => {
  * @returns {string[]}
  */
 const blocks = new Pattern(0, (flower) => {
+  assert.type(flower, 'string');
   return flower.split('\n\n');
 });
 
@@ -477,6 +478,7 @@ const lazy = new PlantPattern(1, (plant, args) => {
  * @returns {string[]}
  */
 const lines = new Pattern(0, (flower) => {
+  assert.type(flower, 'string');
   return flower.split('\n');
 });
 
