@@ -488,6 +488,7 @@ const lines = new Pattern(0, (flower) => {
  * @returns {char|string}
  */
 const lower = new Pattern(0, (flower) => {
+  assert.type(flower, 'char|string');
   return flower.toLowerCase();
 });
 
@@ -844,6 +845,7 @@ const until = new Pattern(2, (flower, args) => {
  * @returns {char|string}
  */
 const upper = new Pattern(0, (flower) => {
+  assert.type(flower, 'char|string');
   return flower.toUpperCase();
 });
 
