@@ -242,13 +242,15 @@ const applyto = new Pattern(2, (flower, args) => {
 // TODO: comp used to be here - replace with destructuring bind
 
 /**
- * split a flower by blocks (`\n\n`)
+ * split a flower by blocks (`\n\n`),
+ * then split each block by lines (`\n`)
  * @flower {string}
- * @returns {string[]}
+ * @returns {string[][]}
  */
 const blocks = new Pattern(0, (flower) => {
   assert.type(flower, 'string');
-  return flower.split('\n\n');
+  return flower.split('\n\n')
+    .map(block => block.split('\n'));
 });
 
 /**

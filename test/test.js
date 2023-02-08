@@ -129,9 +129,18 @@ tentamen.add(
 );
 tentamen.add(
   'blocks',
-  `focus "1\\n2\\n3\\n\\n4\\n5\\n6"
+  `focus "1\\n2\\n\\n3\\n4"
   blocks`,
-  [new Hss('1\n2\n3'), new Hss('4\n5\n6')]
+  [
+    [
+      new Hss('1'),
+      new Hss('2')
+    ],
+    [
+      new Hss('3'),
+      new Hss('4')
+    ]
+  ]
 );
 tentamen.add(
   'cast',

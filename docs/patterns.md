@@ -67,9 +67,9 @@ Type: `command`
 ## blocks
 **Type:** `Pattern`\
 **Flower type:** `string`\
-**Returns:** `string[]`
+**Returns:** `string[][]`
 
-Split a flower by blocks (`\n\n`).
+Split a flower by blocks (`\n\n`), then split each block by lines (`\n`).
 
 ## cast
 **Type:** `Pattern`\
