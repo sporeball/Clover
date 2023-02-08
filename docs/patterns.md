@@ -71,6 +71,14 @@ Type: `command`
 
 Split a flower by blocks (`\n\n`).
 
+## cast
+**Type:** `Pattern`\
+**Flower type:** `number|string`\
+**Returns:** `number|string`
+
+Cast a flower from a number to a string, or vice-versa.\
+Throws if this yields an invalid result.
+
 ## count
 **Type:** `Pattern`\
 **Flower type:** `list`\

@@ -252,6 +252,26 @@ const blocks = new Pattern(0, (flower) => {
 });
 
 /**
+ * cast a flower from a number to a string, or vice-versa.
+ * throws if this yields an invalid result
+ * @flower {number|string}
+ * @returns {number|string}
+ */
+const cast = new Pattern(0, (flower) => {
+  assert.type(flower, 'number|string');
+  if (typeOf(flower) === 'number') {
+    return String(flower);
+  }
+  if (typeOf(flower) === 'string') {
+    const result = Number(flower);
+    if (Number.isNaN(result)) {
+      throw new CloverError('could not cast to a number');
+    }
+    return result;
+  }
+});
+
+/**
  * count occurrences of a value in a flower
  * @flower {list}
  * @param {any} searchValue
@@ -898,6 +918,7 @@ export const patterns = {
   apply,
   applyto,
   blocks,
+  cast,
   count,
   crush,
   divisible,

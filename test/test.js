@@ -134,6 +134,12 @@ tentamen.add(
   [new Hss('1\n2\n3'), new Hss('4\n5\n6')]
 );
 tentamen.add(
+  'cast',
+  `focus "1234"
+  cast`,
+  1234
+);
+tentamen.add(
   'count',
   `focus "aaaaa"
   count 'a'`,
