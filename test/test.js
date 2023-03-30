@@ -143,6 +143,12 @@ tentamen.add(
   ]
 );
 tentamen.add(
+  'bottom',
+  `focus [1 3 8 4 2 5 6 9 7 10]
+  bottom 3`,
+  [1, 2, 3]
+);
+tentamen.add(
   'cast',
   `focus "1234"
   cast`,
@@ -362,6 +368,12 @@ tentamen.add(
   `focus 1
   to 10`,
   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+);
+tentamen.add(
+  'top',
+  `focus [1 3 8 4 2 5 6 9 7 10]
+  top 3`,
+  [10, 9, 8]
 );
 tentamen.add(
   'unique',

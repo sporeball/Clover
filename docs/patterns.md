@@ -71,6 +71,16 @@ Type: `command`
 
 Split a flower by blocks (`\n\n`), then split each block by lines (`\n`).
 
+## bottom
+**Type:** `Pattern`\
+**Flower type:** `number[]`\
+**Returns:** `number`
+
+Return the lowest *n* numbers in a flower.
+
+#### n
+Type: `number`
+
 ## cast
 **Type:** `Pattern`\
 **Flower type:** `number|string`\
@@ -452,6 +462,16 @@ Return a range between a flower and another number.\
 If applicable, the range will count down.
 
 #### end
+Type: `number`
+
+## top
+**Type:** `Pattern`\
+**Flower type:** `number[]`\
+**Returns:** `number`
+
+Return the highest *n* numbers in a flower.
+
+#### n
 Type: `number`
 
 ## unique

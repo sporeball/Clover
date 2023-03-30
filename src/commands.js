@@ -254,6 +254,20 @@ const blocks = new Pattern(0, (flower) => {
 });
 
 /**
+ * return the lowest *n* numbers in a flower
+ * @flower {number[]}
+ * @param {number} n
+ * @returns {number}
+ */
+const bottom = new Pattern(1, (flower, args) => {
+  const [n] = args;
+  assert.type(flower, 'number[]');
+  assert.type(n, 'number');
+  return flower.sort((a, b) => a - b)
+    .slice(0, n);
+});
+
+/**
  * cast a flower from a number to a string, or vice-versa.
  * throws if this yields an invalid result
  * @flower {number|string}
@@ -832,6 +846,20 @@ const to = new Pattern(1, (flower, args) => {
 });
 
 /**
+ * return the highest *n* numbers in a flower
+ * @flower {number[]}
+ * @param {number} n
+ * @returns {number}
+ */
+const top = new Pattern(1, (flower, args) => {
+  const [n] = args;
+  assert.type(flower, 'number[]');
+  assert.type(n, 'number');
+  return flower.sort((a, b) => b - a)
+    .slice(0, n);
+});
+
+/**
  * return unique elements of a flower
  * @flower {list}
  * @returns {list}
@@ -920,6 +948,7 @@ export const patterns = {
   apply,
   applyto,
   blocks,
+  bottom,
   cast,
   count,
   crush,
@@ -960,6 +989,7 @@ export const patterns = {
   take,
   times,
   to,
+  top,
   unique,
   until,
   upper,
