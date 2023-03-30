@@ -1,4 +1,4 @@
-import { typeOf } from '../src/util.js';
+import { equal, typeOf } from '../src/util.js';
 import colors from 'picocolors';
 
 function none () {
@@ -92,15 +92,27 @@ function plant (P) {
  * @param {Leaf} L
  */
 function leaf (L) {
-  const entries = colors.white(
-    Object.entries(L)
+  let entries = Object.entries(L);
+  entries.push(entries[0]);
+  entries.splice(0, 1);
+  const someMutableFocused = entries
+    .filter(entry => entry[0] !== 'flower')
+    .some(entry => equal(entry[1], L.flower));
+  if (someMutableFocused) {
+    entries = entries.filter(entry => entry[0] !== 'flower');
+  }
+  const prettyEntries = colors.white(
+    entries
       .map(entry => {
         const [k, v] = entry;
+        if (someMutableFocused && equal(v, L.flower)) {
+          return `  [${colors.red('*')}] ${k} = ${pretty(v)}`;
+        }
         return `  ${k} = ${pretty(v)}`;
       })
       .join(',\n')
   );
-  return colors.green(`{\n${entries}\n}`);
+  return colors.green(`{\n${prettyEntries}\n}`);
 }
 
 /**
