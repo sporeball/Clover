@@ -54,8 +54,15 @@ function boolean (b) {
  * @param {[]*} l
  */
 function list (l) {
+  const items = l.length;
+  if (items > 10) {
+    l = l.slice(0, 10);
+  }
   const str = l.map(v => pretty(v))
     .join(', ');
+  if (items > 10) {
+    return `[${str}, ... ${colors.gray(`(${items - 10} more)`)}]`;
+  }
   return `[${str}]`;
 }
 
