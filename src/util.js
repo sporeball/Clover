@@ -53,7 +53,7 @@ export function typeOf (value) {
     return 'none';
   }
   if (typeof value === 'number') {
-    return 'number';
+    return typeOfNumber(value);
   }
   if (typeof value === 'string' && stringLength(value) <= 1) {
     return 'char';
@@ -86,6 +86,19 @@ export function typeOf (value) {
 }
 
 /**
+ * given a number, return a more specific number type
+ * @param {Number} number
+ * @returns {string}
+ */
+export function typeOfNumber (number) {
+  const str = number.toString();
+  if (str.includes('.')) {
+    return 'rational';
+  }
+  return 'integer';
+}
+
+/**
  * given a list, return a more specific list type,
  * taking into account its shape
  * @param {array} list
@@ -113,6 +126,20 @@ export function typeOfList (list) {
     return typeOfList(list[0]) + '[]';
   }
   throw new CloverError('invalid list shape');
+}
+
+/**
+ * return whether a value is a number,
+ * or a list of numbers of any depth
+ * accomplished through a type check
+ * @param {any} value
+ * @returns {boolean}
+ */
+export function isNumberType (value) {
+  return (
+    typeOf(value).startsWith('rational') ||
+    typeOf(value).startsWith('integer')
+  );
 }
 
 /**

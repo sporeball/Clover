@@ -8,7 +8,14 @@ function none () {
 /**
  * @param {number} n
  */
-function number (n) {
+function rational (n) {
+  return colors.cyan(n);
+}
+
+/**
+ * @param {number} n
+ */
+function integer (n) {
   return colors.cyan(n);
 }
 
@@ -131,7 +138,8 @@ function other (v) {
 
 const functions = {
   none,
-  number,
+  rational,
+  integer,
   char,
   string,
   boolean,

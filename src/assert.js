@@ -1,4 +1,12 @@
-import { any, defined, equal, isList, matches, typeOf } from './util.js';
+import {
+  any,
+  defined,
+  equal,
+  isList,
+  isNumberType,
+  matches,
+  typeOf
+} from './util.js';
 
 const assert = {
   any (value, values) {
@@ -48,6 +56,9 @@ const assert = {
     const options = T.split('|');
     if (!options.some(option => {
       if (option === 'list' && isList(value)) {
+        return true;
+      }
+      if (option.startsWith('number') && isNumberType(value)) {
         return true;
       }
       if (t === option) {

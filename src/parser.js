@@ -5,11 +5,19 @@ import stringLength from 'string-length';
  * this means taking a flat list of tokens, and using it to create structures.
  */
 
-function parseNumber (tokens) {
-  const number = tokens.shift();
+function parseRational (tokens) {
+  const rational = tokens.shift();
   return {
-    type: 'number',
-    value: Number(number.value)
+    type: 'rational',
+    value: Number(rational.value)
+  };
+}
+
+function parseInteger (tokens) {
+  const integer = tokens.shift();
+  return {
+    type: 'integer',
+    value: Number(integer.value)
   };
 }
 
@@ -211,8 +219,10 @@ export function parse (tokens) {
  */
 function eat (tokens) {
   switch (tokens[0].type) {
-    case 'number':
-      return parseNumber(tokens);
+    case 'rational':
+      return parseRational(tokens);
+    case 'integer':
+      return parseInteger(tokens);
     case 'char':
       return parseChar(tokens);
     case 'string':

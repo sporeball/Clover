@@ -31,10 +31,11 @@ export default function run (code, options = {}) {
 
   // input casting
   if (
-    input.match(/^0$|^-?[1-9]\d*$/g) ||
-    input.match(/^'.*?'$/g) ||
-    input.match(/^".*?"$/g) ||
-    input.match(/^\[.*\]$/g)
+    input.match(/^-?\d.\d+/) || // rational
+    input.match(/^0$|^-?[1-9]\d*$/g) || // integer
+    input.match(/^'.*?'$/g) || // char
+    input.match(/^".*?"$/g) || // string
+    input.match(/^\[.*\]$/g) // list
   ) {
     input = evaluateNode(parse(tokenize(input))[0]);
   } else {
@@ -108,7 +109,8 @@ export default function run (code, options = {}) {
  */
 export function evaluateNode (ASTNode) {
   switch (ASTNode.type) {
-    case 'number':
+    case 'rational':
+    case 'integer':
       return ASTNode.value;
     case 'char':
       return ASTNode.value.replace(/\\n/g, '\n');
