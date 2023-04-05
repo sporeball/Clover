@@ -256,13 +256,13 @@ const blocks = new Pattern(0, (flower) => {
 /**
  * return the lowest *n* numbers in a flower
  * @flower {number[]}
- * @param {number} n
- * @returns {number}
+ * @param {integer} n
+ * @returns {number[]}
  */
 const bottom = new Pattern(1, (flower, args) => {
   const [n] = args;
   assert.type(flower, 'number[]');
-  assert.type(n, 'number');
+  assert.type(n, 'integer');
   return flower.sort((a, b) => a - b)
     .slice(0, n);
 });
@@ -415,13 +415,13 @@ const foreach = new Pattern(2, (flower, args) => {
  * groups 2
  * -- { flower = [[1, 2], [3, 4], [5]] }
  * @flower {list}
- * @param {number} size
+ * @param {integer} size
  * @returns {list}
  */
 const groups = new Pattern(1, (flower, args) => {
   const [size] = args;
   assert.type(flower, 'list');
-  assert.type(size, 'number');
+  assert.type(size, 'integer');
   if (size === 0) {
     throw new CloverError('cannot split into groups of 0');
   }
@@ -794,11 +794,11 @@ const sum = new Pattern(0, (flower) => {
  * yield the first n terms of a lazy plant.
  * skips known terms and uses the plant's command to generate unknown terms.
  * performs arg substitution
- * @param {number} n
+ * @param {integer} n
  */
 const take = new PlantPattern(1, (plant, args) => {
   const [n] = args;
-  assert.type(n, 'number');
+  assert.type(n, 'integer');
   if (!(plant instanceof LazyPlant)) {
     throw new CloverError("'take' command run on non-lazy plant");
   }
@@ -827,14 +827,14 @@ const times = new Pattern(1, (flower, args) => {
 /**
  * return a range between a flower and another number.
  * if applicable, the range will count down
- * @flower {number}
- * @param {number} end
- * @returns {number[]}
+ * @flower {integer}
+ * @param {integer} end
+ * @returns {integer[]}
  */
 const to = new Pattern(1, (flower, args) => {
   const [end] = args;
-  assert.type(flower, 'number');
-  assert.type(end, 'number');
+  assert.type(flower, 'integer');
+  assert.type(end, 'integer');
   if (flower > end) {
     return Array(flower - end + 1)
       .fill(0)
@@ -848,13 +848,13 @@ const to = new Pattern(1, (flower, args) => {
 /**
  * return the highest *n* numbers in a flower
  * @flower {number[]}
- * @param {number} n
+ * @param {integer} n
  * @returns {number}
  */
 const top = new Pattern(1, (flower, args) => {
   const [n] = args;
   assert.type(flower, 'number[]');
-  assert.type(n, 'number');
+  assert.type(n, 'integer');
   return flower.sort((a, b) => b - a)
     .slice(0, n);
 });

@@ -74,12 +74,12 @@ Split a flower by blocks (`\n\n`), then split each block by lines (`\n`).
 ## bottom
 **Type:** `Pattern`\
 **Flower type:** `number[]`\
-**Returns:** `number`
+**Returns:** `number[]`
 
 Return the lowest *n* numbers in a flower.
 
 #### n
-Type: `number`
+Type: `integer`
 
 ## cast
 **Type:** `Pattern`\
@@ -193,7 +193,7 @@ foreach [1 2 3] (plus *)
 Split a flower into groups of up to n values.
 
 #### size
-Type: `number`
+Type: `integer`
 
 ### Examples
 ```lua
@@ -441,7 +441,7 @@ Skips known terms and uses the plant's command to generate unknown terms.\
 Performs arg substitution.
 
 #### n
-Type: `number`
+Type: `integer`
 
 ## times
 **Type:** `Pattern`\
@@ -455,14 +455,14 @@ Type: `number`
 
 ## to
 **Type:** `Pattern`\
-**Flower type:** `number`\
-**Returns:** `number[]`
+**Flower type:** `integer`\
+**Returns:** `integer[]`
 
 Return a range between a flower and another number.\
 If applicable, the range will count down.
 
 #### end
-Type: `number`
+Type: `integer`
 
 ## top
 **Type:** `Pattern`\
@@ -472,7 +472,7 @@ Type: `number`
 Return the highest *n* numbers in a flower.
 
 #### n
-Type: `number`
+Type: `integer`
 
 ## unique
 **Type:** `Pattern`\
