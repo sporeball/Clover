@@ -9,14 +9,14 @@ function none () {
  * @param {number} n
  */
 function rational (n) {
-  return colors.cyan(n);
+  return colors.cyan(n.valueOf());
 }
 
 /**
  * @param {number} n
  */
 function integer (n) {
-  return colors.cyan(n);
+  return colors.cyan(n.valueOf());
 }
 
 /**

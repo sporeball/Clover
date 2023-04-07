@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { dequal } from 'dequal/lite';
 import Hss from '@sporeball/hss.js';
+import Num from '@sporeball/num.js';
 import stringLength from 'string-length';
 import { CommandInstance } from './commands.js';
 import { Plant } from '../src/plant.js';
@@ -52,7 +53,7 @@ export function typeOf (value) {
   if (value === undefined) {
     return 'none';
   }
-  if (typeof value === 'number') {
+  if (value instanceof Num) {
     return typeOfNumber(value);
   }
   if (typeof value === 'string' && stringLength(value) <= 1) {

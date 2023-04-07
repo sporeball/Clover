@@ -2,6 +2,7 @@ import parse from '../src/index.js';
 import { patterns } from '../src/commands.js';
 import { open } from '../src/util.js';
 import Hss from '@sporeball/hss.js';
+import Num from '@sporeball/num.js';
 import colors from 'picocolors';
 import Tentamen from 'tentamen';
 
@@ -113,19 +114,19 @@ tentamen.add(
   'append',
   `focus [1 2 3]
   append 4`,
-  [1, 2, 3, 4]
+  [new Num(1), new Num(2), new Num(3), new Num(4)]
 );
 tentamen.add(
   'apply',
   `focus [1 2 3 4 5]
   apply (times 2)`,
-  [2, 4, 6, 8, 10]
+  [new Num(2), new Num(4), new Num(6), new Num(8), new Num(10)]
 );
 tentamen.add(
   'applyto',
   `focus [1 2 3 4 5]
   applyto (prime) (times 2)`,
-  [1, 4, 6, 4, 10]
+  [new Num(1), new Num(4), new Num(6), new Num(4), new Num(10)]
 );
 tentamen.add(
   'blocks',
@@ -146,26 +147,26 @@ tentamen.add(
   'bottom',
   `focus [1 3 8 4 2 5 6 9 7 10]
   bottom 3`,
-  [1, 2, 3]
+  [new Num(1), new Num(2), new Num(3)]
 );
 tentamen.add(
   'cast',
   `focus "1234"
   cast`,
-  1234
+  new Num(1234)
 );
 tentamen.add(
   'count',
   `focus "aaaaa"
   count 'a'`,
-  5
+  new Num(5)
 );
 tentamen.add(
   'crush',
   `focus [1 2 3 4 5]
   itemize
   crush (sum)`,
-  15
+  new Num(15)
 );
 tentamen.add(
   'divisible',
@@ -190,27 +191,36 @@ tentamen.add(
   'filter',
   `focus [1 2 2 3 3 3 4 4 4 4]
   filter 4`,
-  [1, 2, 2, 3, 3, 3]
+  [new Num(1), new Num(2), new Num(2), new Num(3), new Num(3), new Num(3)]
 );
 tentamen.add(
   'flatten',
   `focus [1 2 3 4]
   groups 2
   flatten`,
-  [1, 2, 3, 4]
+  [new Num(1), new Num(2), new Num(3), new Num(4)]
 );
-tentamen.add('focus', 'focus 5', 5);
+tentamen.add(
+  'focus',
+  'focus 5',
+  new Num(5)
+);
 tentamen.add(
   'foreach',
   `focus 5
   foreach [1 2 3] (plus *)`,
-  [6, 7, 8]
+  [new Num(6), new Num(7), new Num(8)]
 );
 tentamen.add(
   'groups',
   `focus [1 2 3 4 5 6 7]
   groups 2`,
-  [[1, 2], [3, 4], [5, 6], [7]]
+  [
+    [new Num(1), new Num(2)],
+    [new Num(3), new Num(4)],
+    [new Num(5), new Num(6)],
+    [new Num(7)]
+  ]
 );
 tentamen.add(
   'gt',
@@ -232,20 +242,20 @@ tentamen.add(
   `focus [1 2 3 4 5]
   itemize
   times 2`,
-  [2, 4, 6, 8, 10]
+  [new Num(2), new Num(4), new Num(6), new Num(8), new Num(10)]
 );
 tentamen.add(
   'last',
   `focus [1 2 3 4 5]
   last`,
-  5
+  new Num(5)
 );
 tentamen.add(
   'lazy',
   `focus 1
   lazy (plus 1)`,
   // flower stays the same
-  1
+  new Num(1)
 );
 tentamen.add(
   'lines',
@@ -273,14 +283,29 @@ tentamen.add(
   lte 1`,
   true
 );
-tentamen.add('maximum', 'focus [1 5 6 2 3 4]\nmaximum', 6);
-tentamen.add('minimum', 'focus [6 2 1 5 4 3]\nminimum', 1);
-tentamen.add('minus', 'focus 5\nminus 5', 0);
+tentamen.add(
+  'maximum',
+  `focus [1 5 6 2 3 4]
+  maximum`,
+  new Num(6)
+);
+tentamen.add(
+  'minimum',
+  `focus [6 2 1 5 4 3]
+  minimum`,
+  new Num(1)
+);
+tentamen.add(
+  'minus',
+  `focus 5
+  minus 5`,
+  new Num(0)
+);
 tentamen.add(
   'mod',
   `focus 5
   mod 3`,
-  2
+  new Num(2)
 );
 tentamen.add(
   'odd',
@@ -288,15 +313,25 @@ tentamen.add(
   odd`,
   false
 );
-tentamen.add('over', 'focus 5\nover 5', 1);
+tentamen.add(
+  'over',
+  `focus 5
+  over 5`,
+  new Num(1)
+);
 tentamen.add(
   'pluck',
   `focus [1 2 3 4 5]
   itemize
   pluck (odd)`,
-  [2, 4]
+  [new Num(2), new Num(4)]
 );
-tentamen.add('plus', 'focus 5\nplus 5', 10);
+tentamen.add(
+  'plus',
+  `focus 5
+  plus 5`,
+  new Num(10)
+);
 tentamen.add(
   'prepend',
   `focus ["b" "c" "d"]
@@ -313,7 +348,7 @@ tentamen.add(
   'product',
   `focus [1 2 3 4 5 6 7 8 9 10]
   product`,
-  3628800
+  new Num(3628800)
 );
 tentamen.add(
   'replace',
@@ -331,7 +366,10 @@ tentamen.add(
   'sort',
   `focus [1 3 8 4 2 5 6 9 7 10]
   sort`,
-  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  [
+    new Num(1), new Num(2), new Num(3), new Num(4), new Num(5), new Num(6),
+    new Num(7), new Num(8), new Num(9), new Num(10)
+  ]
 );
 tentamen.add(
   'split',
@@ -346,13 +384,13 @@ tentamen.add(
   stop
   plus 5`,
   // last line should be skipped, giving 10 instead of 15
-  10
+  new Num(10)
 );
 tentamen.add(
   'sum',
   `focus [1 2 3 4 5 6 7 8 9 10]
   sum`,
-  55
+  new Num(55)
 );
 tentamen.add(
   'take',
@@ -360,20 +398,31 @@ tentamen.add(
   lazy (focus *)
   take 10`,
   // naturals
-  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  [
+    new Num(1), new Num(2), new Num(3), new Num(4), new Num(5), new Num(6),
+    new Num(7), new Num(8), new Num(9), new Num(10)
+  ]
 );
-tentamen.add('times', 'focus 5\ntimes 5', 25);
+tentamen.add(
+  'times',
+  `focus 5
+  times 5`,
+  new Num(25)
+);
 tentamen.add(
   'to',
   `focus 1
   to 10`,
-  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  [
+    new Num(1), new Num(2), new Num(3), new Num(4), new Num(5), new Num(6),
+    new Num(7), new Num(8), new Num(9), new Num(10)
+  ]
 );
 tentamen.add(
   'top',
   `focus [1 3 8 4 2 5 6 9 7 10]
   top 3`,
-  [10, 9, 8]
+  [new Num(10), new Num(9), new Num(8)]
 );
 tentamen.add(
   'unique',
@@ -385,7 +434,7 @@ tentamen.add(
   'until',
   `focus 200
   until (prime) (plus 1)`,
-  211
+  new Num(211)
 );
 tentamen.add(
   'upper',
@@ -398,13 +447,18 @@ tentamen.add(
   `focus 1
   using [4 5 6] (sum)`,
   // flower should be ignored, giving 15 instead of 6
-  15
+  new Num(15)
 );
 tentamen.add(
   'zip',
   `focus [1 2 3 4 5]
   zip [6 7 8 9]`,
-  [[1, 6], [2, 7], [3, 8], [4, 9]]
+  [
+    [new Num(1), new Num(6)],
+    [new Num(2), new Num(7)],
+    [new Num(3), new Num(8)],
+    [new Num(4), new Num(9)]
+  ]
 );
 
 tentamen.done();

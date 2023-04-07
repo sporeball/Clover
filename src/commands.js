@@ -3,6 +3,8 @@ import assert from './assert.js';
 import { Plant, LazyPlant } from './plant.js';
 import { equal, isList, typeOf } from './util.js';
 
+import Num from '@sporeball/num.js';
+
 /**
  * each command written in a Clover program consists of a list of tokens.
  * if this list begins with a valid token, the interpreter will call a
@@ -279,10 +281,7 @@ const cast = new Pattern(0, (flower) => {
     return String(flower);
   }
   if (typeOf(flower) === 'string') {
-    const result = Number(flower);
-    if (Number.isNaN(result)) {
-      throw new CloverError('could not cast to a number');
-    }
+    const result = new Num(flower);
     return result;
   }
 });
@@ -296,9 +295,7 @@ const cast = new Pattern(0, (flower) => {
 const count = new Pattern(1, (flower, args) => {
   const [searchValue] = args;
   assert.type(flower, 'list');
-  return flower
-    .filter(x => equal(x, searchValue))
-    .length;
+  return new Num(flower.filter(x => equal(x, searchValue)).length);
 });
 
 /**
@@ -561,7 +558,7 @@ const lte = new Pattern(1, (flower, args) => {
  */
 const maximum = new Pattern(0, (flower) => {
   assert.type(flower, 'number[]');
-  return Math.max(...flower);
+  return new Num(Math.max(...flower.map(x => x.valueOf())));
 });
 
 /**
@@ -571,7 +568,7 @@ const maximum = new Pattern(0, (flower) => {
  */
 const minimum = new Pattern(0, (flower) => {
   assert.type(flower, 'number[]');
-  return Math.min(...flower);
+  return new Num(Math.min(...flower.map(x => x.valueOf())));
 });
 
 /**
@@ -584,7 +581,7 @@ const minus = new Pattern(1, (flower, args) => {
   const [subtrahend] = args;
   assert.type(flower, 'number');
   assert.type(subtrahend, 'number');
-  return flower - subtrahend;
+  return flower.minus(subtrahend);
 });
 
 /**
@@ -597,10 +594,10 @@ const mod = new Pattern(1, (flower, args) => {
   const [argument] = args;
   assert.type(flower, 'number');
   assert.type(argument, 'number');
-  if (argument === 0) {
+  if (argument.eq(0)) {
     throw new CloverError('cannot divide by 0');
   }
-  return flower % argument;
+  return flower.mod(argument);
 });
 
 /**
@@ -610,7 +607,7 @@ const mod = new Pattern(1, (flower, args) => {
  */
 const odd = new Pattern(0, (flower) => {
   assert.type(flower, 'number');
-  return flower % 2 === 1;
+  return flower.mod(2).eq(1);
 });
 
 /**
@@ -623,10 +620,10 @@ const over = new Pattern(1, (flower, args) => {
   const [divisor] = args;
   assert.type(flower, 'number');
   assert.type(divisor, 'number');
-  if (divisor === 0) {
+  if (divisor.eq(0)) {
     throw new CloverError('cannot divide by 0');
   }
-  return flower / divisor;
+  return flower.div(divisor);
 });
 
 /**
@@ -655,7 +652,7 @@ const plus = new Pattern(1, (flower, args) => {
   const [addend] = args;
   assert.type(flower, 'number');
   assert.type(addend, 'number');
-  return flower + addend;
+  return flower.plus(addend);
 });
 
 /**
@@ -687,15 +684,15 @@ const prepend = new Pattern(1, (flower, args) => {
  * @returns {boolean}
  */
 const prime = new Pattern(0, (flower) => {
-  assert.type(flower, 'number');
-  if (flower === Infinity) {
+  assert.type(flower, 'integer');
+  if (flower.eq(Infinity)) {
     throw new CloverError('cannot check against infinity');
   }
-  if (flower === 1) {
+  if (flower.eq(1)) {
     return false;
   }
-  for (let i = 2; i <= Math.sqrt(flower); i++) {
-    if (flower % i === 0) {
+  for (let i = 2; i <= flower.sqrt().valueOf(); i++) {
+    if (flower.mod(i).eq(0)) {
       return false;
     }
   }
@@ -709,7 +706,7 @@ const prime = new Pattern(0, (flower) => {
  */
 const product = new Pattern(0, (flower) => {
   assert.type(flower, 'number[]');
-  return flower.reduce((a, c) => a * c, 1);
+  return flower.reduce((a, c) => a.times(c), new Num(1));
 });
 
 /**
@@ -787,7 +784,7 @@ const stop = new PlantPattern(0, (plant) => {
  */
 const sum = new Pattern(0, (flower) => {
   assert.type(flower, 'number[]');
-  return flower.reduce((a, c) => a + c, 0);
+  return flower.reduce((a, c) => a.plus(c), new Num(0));
 });
 
 /**
@@ -806,7 +803,7 @@ const take = new PlantPattern(1, (plant, args) => {
     if (plant.getLeaf(i - 1) !== undefined) {
       continue;
     }
-    plant.addLeaf(plant.command.run(i, i));
+    plant.addLeaf(plant.command.run(new Num(i), new Num(i)));
   }
   return plant;
 });
@@ -821,7 +818,7 @@ const times = new Pattern(1, (flower, args) => {
   const [multiplier] = args;
   assert.type(flower, 'number');
   assert.type(multiplier, 'number');
-  return flower * multiplier;
+  return flower.times(multiplier);
 });
 
 /**
@@ -835,14 +832,14 @@ const to = new Pattern(1, (flower, args) => {
   const [end] = args;
   assert.type(flower, 'integer');
   assert.type(end, 'integer');
-  if (flower > end) {
-    return Array(flower - end + 1)
+  if (flower.gt(end)) {
+    return Array(flower.minus(end).plus(1).valueOf())
       .fill(0)
-      .map((x, i) => flower - i);
+      .map((x, i) => flower.minus(i));
   }
-  return Array(end - flower + 1)
+  return Array(end.minus(flower).plus(1).valueOf())
     .fill(0)
-    .map((x, i) => flower + i);
+    .map((x, i) => flower.plus(i));
 });
 
 /**

@@ -5,6 +5,7 @@ import * as Commands from './commands.js';
 import { format, open, output } from './util.js';
 
 import Hss from '@sporeball/hss.js';
+import Num from '@sporeball/num.js';
 
 /**
  * run a Clover program
@@ -111,7 +112,7 @@ export function evaluateNode (ASTNode) {
   switch (ASTNode.type) {
     case 'rational':
     case 'integer':
-      return ASTNode.value;
+      return new Num(ASTNode.value);
     case 'char':
       return ASTNode.value.replace(/\\n/g, '\n');
     case 'string':
