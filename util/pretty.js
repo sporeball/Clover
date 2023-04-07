@@ -5,6 +5,10 @@ function none () {
   return colors.yellow('(undefined!)');
 }
 
+function precision (n) {
+  return colors.blue(n.valueOf() + 'p');
+}
+
 /**
  * @param {number} n
  */
@@ -138,6 +142,7 @@ function other (v) {
 
 const functions = {
   none,
+  precision,
   rational,
   integer,
   char,

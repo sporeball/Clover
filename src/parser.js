@@ -5,6 +5,14 @@ import stringLength from 'string-length';
  * this means taking a flat list of tokens, and using it to create structures.
  */
 
+function parsePrecision (tokens) {
+  const precision = tokens.shift();
+  return {
+    type: 'precision',
+    value: precision.value.slice(0, -1)
+  };
+}
+
 function parseRational (tokens) {
   const rational = tokens.shift();
   return {
@@ -95,7 +103,7 @@ function parseList (tokens) {
 function parseLeaf (tokens) {
   tokens.shift(); // skip the angle bracket
   const index = tokens.shift();
-  if (index?.type !== 'number') {
+  if (index?.type !== 'integer') {
     throw new CloverError('invalid leaf index');
   }
   return {
@@ -219,6 +227,8 @@ export function parse (tokens) {
  */
 function eat (tokens) {
   switch (tokens[0].type) {
+    case 'precision':
+      return parsePrecision(tokens);
     case 'rational':
       return parseRational(tokens);
     case 'integer':

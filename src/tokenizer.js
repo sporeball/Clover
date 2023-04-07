@@ -7,6 +7,7 @@ import { escape } from './util.js';
 
 // object of match values for the different token types
 const T = {
+  precision: /^-?\d.\d+p|^0p|^-?[1-9]\d*p/g,
   rational: /^-?\d\.\d+/g,
   integer: /^0|^-?[1-9]\d*/g,
   char: /^'.*?'/g,

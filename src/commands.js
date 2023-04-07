@@ -265,7 +265,7 @@ const bottom = new Pattern(1, (flower, args) => {
   const [n] = args;
   assert.type(flower, 'number[]');
   assert.type(n, 'integer');
-  return flower.sort((a, b) => a - b)
+  return flower.sort((a, b) => a.cmp(b))
     .slice(0, n);
 });
 
@@ -558,7 +558,7 @@ const lte = new Pattern(1, (flower, args) => {
  */
 const maximum = new Pattern(0, (flower) => {
   assert.type(flower, 'number[]');
-  return new Num(Math.max(...flower.map(x => x.valueOf())));
+  return new (flower[0].constructor)(Math.max(...flower.map(x => x.valueOf())));
 });
 
 /**
@@ -568,7 +568,7 @@ const maximum = new Pattern(0, (flower) => {
  */
 const minimum = new Pattern(0, (flower) => {
   assert.type(flower, 'number[]');
-  return new Num(Math.min(...flower.map(x => x.valueOf())));
+  return new (flower[0].constructor)(Math.min(...flower.map(x => x.valueOf())));
 });
 
 /**
@@ -706,7 +706,7 @@ const prime = new Pattern(0, (flower) => {
  */
 const product = new Pattern(0, (flower) => {
   assert.type(flower, 'number[]');
-  return flower.reduce((a, c) => a.times(c), new Num(1));
+  return flower.reduce((a, c) => a.times(c), new (flower[0].constructor)(1));
 });
 
 /**
@@ -784,7 +784,7 @@ const stop = new PlantPattern(0, (plant) => {
  */
 const sum = new Pattern(0, (flower) => {
   assert.type(flower, 'number[]');
-  return flower.reduce((a, c) => a.plus(c), new Num(0));
+  return flower.reduce((a, c) => a.plus(c), new (flower[0].constructor)(0));
 });
 
 /**
@@ -793,6 +793,7 @@ const sum = new Pattern(0, (flower) => {
  * performs arg substitution
  * @param {integer} n
  */
+// TODO:
 const take = new PlantPattern(1, (plant, args) => {
   const [n] = args;
   assert.type(n, 'integer');
@@ -852,7 +853,7 @@ const top = new Pattern(1, (flower, args) => {
   const [n] = args;
   assert.type(flower, 'number[]');
   assert.type(n, 'integer');
-  return flower.sort((a, b) => b - a)
+  return flower.sort((a, b) => b.cmp(a))
     .slice(0, n);
 });
 

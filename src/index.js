@@ -4,6 +4,7 @@ import { Plant } from './plant.js';
 import * as Commands from './commands.js';
 import { format, open, output } from './util.js';
 
+import Big from 'big.js';
 import Hss from '@sporeball/hss.js';
 import Num from '@sporeball/num.js';
 
@@ -110,6 +111,8 @@ export default function run (code, options = {}) {
  */
 export function evaluateNode (ASTNode) {
   switch (ASTNode.type) {
+    case 'precision':
+      return new Big(ASTNode.value);
     case 'rational':
     case 'integer':
       return new Num(ASTNode.value);

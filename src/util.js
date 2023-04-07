@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { dequal } from 'dequal/lite';
+import Big from 'big.js';
 import Hss from '@sporeball/hss.js';
 import Num from '@sporeball/num.js';
 import stringLength from 'string-length';
@@ -52,6 +53,9 @@ export function matches (value, regexp) {
 export function typeOf (value) {
   if (value === undefined) {
     return 'none';
+  }
+  if (value instanceof Big) {
+    return 'precision';
   }
   if (value instanceof Num) {
     return typeOfNumber(value);
@@ -138,6 +142,7 @@ export function typeOfList (list) {
  */
 export function isNumberType (value) {
   return (
+    typeOf(value).startsWith('precision') ||
     typeOf(value).startsWith('rational') ||
     typeOf(value).startsWith('integer')
   );
