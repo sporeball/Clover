@@ -33,7 +33,7 @@ export default function run (code, options = {}) {
 
   // input casting
   if (
-    input.match(/^-?\d.\d+/) || // rational
+    input.match(/^-?\d\.\d+$/g) || // rational
     input.match(/^0$|^-?[1-9]\d*$/g) || // integer
     input.match(/^'.*?'$/g) || // char
     input.match(/^".*?"$/g) || // string
