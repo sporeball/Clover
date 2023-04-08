@@ -375,6 +375,16 @@ const flatten = new Pattern(0, (flower) => {
 });
 
 /**
+ * return the floor of a flower
+ * @flower {number}
+ * @returns {number}
+ */
+const floor = new Pattern(0, (flower) => {
+  assert.type(flower, 'number');
+  return new (flower.constructor)(Math.floor(flower.valueOf()));
+});
+
+/**
  * set a flower equal to another value
  * @param {any} focusValue
  */
@@ -955,6 +965,7 @@ export const patterns = {
   even,
   filter,
   flatten,
+  floor,
   focus,
   foreach,
   groups,
