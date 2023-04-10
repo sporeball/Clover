@@ -241,6 +241,16 @@ const applyto = new Pattern(2, (flower, args) => {
   });
 });
 
+/**
+ * sort a flower in ascending order
+ * @flower {number[]}
+ * @returns {number}
+ */
+const ascending = new Pattern(0, (flower) => {
+  assert.type(flower, 'number[]');
+  return flower.sort((a, b) => a.minus(b));
+});
+
 // TODO: comp used to be here - replace with destructuring bind
 
 /**
@@ -313,6 +323,16 @@ const crush = new PlantPattern(1, (plant, args) => {
   assert.type(command, 'command');
   const result = command.run(Clover.plant.leaves.map(leaf => leaf.flower));
   return new Plant([result]);
+});
+
+/**
+ * sort a flower in descending order
+ * @flower {number[]}
+ * @returns {number[]}
+ */
+const descending = new Pattern(0, (flower) => {
+  assert.type(flower, 'number[]');
+  return flower.sort((a, b) => b.minus(a));
 });
 
 /**
@@ -955,11 +975,13 @@ export const patterns = {
   append,
   apply,
   applyto,
+  ascending,
   blocks,
   bottom,
   cast,
   count,
   crush,
+  descending,
   divisible,
   eq,
   even,

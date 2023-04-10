@@ -9,7 +9,7 @@ function parsePrecision (tokens) {
   const precision = tokens.shift();
   return {
     type: 'precision',
-    value: precision.value.slice(0, -1)
+    value: precision.value.slice(0, -1) // remove the p
   };
 }
 

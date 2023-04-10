@@ -129,6 +129,12 @@ tentamen.add(
   [new Num(1), new Num(4), new Num(6), new Num(4), new Num(10)]
 );
 tentamen.add(
+  'ascending',
+  `focus [5 3 2 1 4]
+  ascending`,
+  [new Num(1), new Num(2), new Num(3), new Num(4), new Num(5)]
+);
+tentamen.add(
   'blocks',
   `focus "1\\n2\\n\\n3\\n4"
   blocks`,
@@ -167,6 +173,12 @@ tentamen.add(
   itemize
   crush (sum)`,
   new Num(15)
+);
+tentamen.add(
+  'descending',
+  `focus [5 3 2 1 4]
+  descending`,
+  [new Num(5), new Num(4), new Num(3), new Num(2), new Num(1)]
 );
 tentamen.add(
   'divisible',

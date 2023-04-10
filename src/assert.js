@@ -50,6 +50,7 @@ const assert = {
    * @param {any} value
    * @param {string} T
    */
+  // TODO: `number` check is not restrictive enough
   type (value, T) {
     const t = typeOf(value);
     // allow union types

@@ -64,6 +64,13 @@ Type: `command`
 #### command
 Type: `command`
 
+## ascending
+**Type:** `Pattern`\
+**Flower type:** `number[]`\
+**Returns:** `number`
+
+Sort a flower in ascending order.
+
 ## blocks
 **Type:** `Pattern`\
 **Flower type:** `string`\
@@ -115,6 +122,13 @@ crush (sum)
 -- { flower = 15 }
 ```
 
+## descending
+**Type:** `Pattern`\
+**Flower type:** `number[]`\
+**Returns:** `number[]`
+
+Sort a flower in descending order.
+
 ## divisible
 **Type:** `Pattern`\
 **Flower type:** `number`\
@@ -158,6 +172,13 @@ Type: `any`
 **Returns:** `list`
 
 Flatten a flower.
+
+## floor
+**Type:** `Pattern`\
+**Flower type:** `number`\
+**Returns:** `number`
+
+Return the floor of a flower.
 
 ## focus
 **Type:** `Pattern`
