@@ -1,6 +1,7 @@
 import parse from '../src/index.js';
 import { patterns } from '../src/commands.js';
 import { open } from '../src/util.js';
+import Big from 'big.js';
 import Hss from '@sporeball/hss.js';
 import Num from '@sporeball/num.js';
 import colors from 'picocolors';
@@ -211,6 +212,12 @@ tentamen.add(
   groups 2
   flatten`,
   [new Num(1), new Num(2), new Num(3), new Num(4)]
+);
+tentamen.add(
+  'floor',
+  `focus 12.3456789p
+  floor`,
+  new Big(12)
 );
 tentamen.add(
   'focus',
